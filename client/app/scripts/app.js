@@ -10,6 +10,7 @@
  */
 angular
   .module('irateApp', [
+    'famous.angular',
     'ngAnimate',
     'ngCookies',
     'ngRoute',
