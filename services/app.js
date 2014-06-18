@@ -34,11 +34,11 @@ if ('development' == app.get('env')) {
   app.use(express.errorHandler());
 }
 
-app.get('/', function(req, res) {
-    fs.readFile(__dirname + '/public/index.html', 'utf8', function(err, text){
-        res.send(text);
-    });
-});
+// app.get('/', function(req, res) {
+//     fs.readFile(__dirname + '/public/index.html', 'utf8', function(err, text){
+//         res.send(text);
+//     });
+// });
 
 app.get('/api/sample', sample.get);
 

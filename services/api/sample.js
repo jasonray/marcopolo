@@ -1,8 +1,27 @@
 function Sample(io){
     this.get = function(req, res){
-        var data = {
-            test: "sample data"
-        }
+        var data = [
+            {
+                idea: 'Dipping dots on fri',
+                comments: '3',
+                voted: false
+            },
+            {
+                idea: 'Dipping dots on fri',
+                comments: '3',
+                voted: false
+            },
+            {
+                idea: 'Dipping dots on fri',
+                comments: '3',
+                voted: false
+            },
+            {
+                idea: 'Dipping dots on fri',
+                comments: '3',
+                voted: false
+            }
+        ]
 
         io.sockets.emit('getcalled', {test: "sample socket data"});
         //io.emit('an event sent to all connected clients 2');
