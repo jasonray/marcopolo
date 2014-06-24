@@ -1,7 +1,6 @@
 {
     "node": true,
     "browser": true,
-    "es5": true,
     "esnext": true,
     "bitwise": true,
     "camelcase": true,
@@ -18,5 +17,21 @@
     "unused": true,
     "strict": true,
     "trailing": true,
-    "smarttabs": true
+    "smarttabs": true,
+    "jquery": true,
+    "globals": {
+        "Client": true,
+        "client": true,
+        "_": false,
+        "Backbone": false,
+        "JST": false,
+        "beforeEach": false,
+        "describe": false,
+        "it": false,
+        "assert": true,
+        "expect": true,
+        "should": true,
+        "require": false,
+        "define": false
+    }
 }
