@@ -1,13 +1,11 @@
-var dependencies = [
-    "backbone",
-    "marionette"
-];
+define(function(require, exports, module) {
+    var Marionette = require("marionette"),
+        Engine = require("famous/core/Engine"),
+        AppView = require('modules/views/AppView');
 
-define(dependencies, exportAMD);
-
-function exportAMD(Backbone, Marionette) {
     var iRate = new Marionette.Application();
-
+    console.log(iRate);
+    console.log(Engine);
     // iRate.addRegions({
     //   headerRegion: "#header-region",
     //   mainRegion: "#main-region",
@@ -25,15 +23,22 @@ function exportAMD(Backbone, Marionette) {
     //   return Backbone.history.fragment
     // };
 
-    // iRate.on("initialize:after", function(){
-    //   if(Backbone.history){
-    //     Backbone.history.start();
+    iRate.on("initialize:after", function(){
+      if(Backbone.history){
+        Backbone.history.start();
 
-    //     if(this.getCurrentRoute() === ""){
-    //       iRate.trigger("contacts:list");
-    //     }
-    //   }
-    // });
+        // if(this.getCurrentRoute() === ""){
+        //   iRate.trigger("contacts:list");
+        // }
+      }
+        // var Engine = require('famous/core/Engine');
+        // var 
 
-    return iRate;
-}
+        var mainContext = Engine.createContext(),
+            appView = new AppView();
+        mainContext.add(appView);
+    });
+
+    iRate.start();
+    module.exports = iRate;
+});
