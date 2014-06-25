@@ -1,11 +1,10 @@
 define(function(require, exports, module) {
     var Marionette = require("marionette"),
         Engine = require("famous/core/Engine"),
-        AppView = require('modules/views/AppView');
+        AppView = require('modules/views/AppView'),
+        bootstrapData = require('modules/data/NewFeedData');
 
     var iRate = new Marionette.Application();
-    console.log(iRate);
-    console.log(Engine);
     // iRate.addRegions({
     //   headerRegion: "#header-region",
     //   mainRegion: "#main-region",
@@ -31,8 +30,11 @@ define(function(require, exports, module) {
         //   iRate.trigger("contacts:list");
         // }
       }
-        // var Engine = require('famous/core/Engine');
-        // var 
+        
+        //Bootstrap data //Delete 
+        if (Modernizr.localstorage) {
+            window.localStorage["newFeed"] = JSON.stringify(bootstrapData);
+        } 
 
         var mainContext = Engine.createContext(),
             appView = new AppView();
