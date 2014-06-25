@@ -6,7 +6,8 @@ define(function(require, exports, module) {
     var HeaderFooter    = require('famous/views/HeaderFooterLayout');
     var ImageSurface    = require('famous/surfaces/ImageSurface');
 
-    var FeedData       = require('modules/data/NewFeedData');
+    var FeedView        = require('modules/views/FeedView');
+    var FeedData        = JSON.parse(window.localStorage['newFeed']);
 
     function PageView() {
         View.apply(this, arguments);
@@ -15,10 +16,11 @@ define(function(require, exports, module) {
         _createLayout.call(this);
         _createHeader.call(this);
         _createBody.call(this);
+        _createFeedView.call(this);
 
         _setListeners.call(this);
     }
-
+    
     PageView.prototype = Object.create(View.prototype);
     PageView.prototype.constructor = PageView;
 
@@ -122,6 +124,15 @@ define(function(require, exports, module) {
         });
 
         this.layout.content.add(this.bodySurface);
+    }
+    function _createFeedView() {
+        this.feedView = new FeedView({ feedData: FeedData });
+
+        var feedModifier = new StateModifier({
+            transform: Transform.behind
+        });
+
+        this.add(feedModifier).add(this.feedView);
     }
 
     function _setListeners() {

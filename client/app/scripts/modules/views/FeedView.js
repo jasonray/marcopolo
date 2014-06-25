@@ -1,4 +1,4 @@
-/*** MenuView.js ***/
+/*** FeedView.js ***/
 
 define(function(require, exports, module) {
     var View          = require('famous/core/View');
@@ -7,21 +7,23 @@ define(function(require, exports, module) {
     var StateModifier = require('famous/modifiers/StateModifier');
     var Timer         = require('famous/utilities/Timer');
 
-    // var StripView     = require('views/StripView');
+    var FeedItemView     = require('modules/views/FeedItemView');
     // var FeaturedView  = require('views/FeaturedView');
 
     function FeedView() {
         View.apply(this, arguments);
 
-        // _createStripViews.call(this);
+        _createFeedItemViews.call(this);
         // _createFeaturedView.call(this);
+
     }
+
 
     FeedView.prototype = Object.create(View.prototype);
     FeedView.prototype.constructor = FeedView;
 
     FeedView.DEFAULT_OPTIONS = {
-        itemData: {},
+        feedData: {},
         angle: -0.2,
         stripWidth: 320,
         stripHeight: 54,
@@ -35,14 +37,13 @@ define(function(require, exports, module) {
         }
     };
 
-    function _createStripViews() {
+    function _createFeedItemViews() {
         this.stripModifiers = [];
         var yOffset = this.options.topOffset;
 
-        for (var i = 0; i < this.options.stripData.length; i++) {
-            var stripView = new StripView({
-                iconUrl: this.options.stripData[i].iconUrl,
-                title: this.options.stripData[i].title
+        for (var i = 0; i < this.options.feedData.length; i++) {
+            var feedItemView = new FeedItemView({
+                title: this.options.feedData[i].title
             });
 
             var stripModifier = new StateModifier({
@@ -50,7 +51,7 @@ define(function(require, exports, module) {
             });
 
             this.stripModifiers.push(stripModifier);
-            this.add(stripModifier).add(stripView);
+            this.add(stripModifier).add(feedItemView);
 
             yOffset += this.options.stripOffset;
         }
@@ -67,7 +68,7 @@ define(function(require, exports, module) {
         this.add(this.featuredMod).add(featuredView);
     }
 
-    MenuView.prototype.resetStrips = function() {
+    FeedView.prototype.resetStrips = function() {
         for(var i = 0; i < this.stripModifiers.length; i++) {
             var initX = -this.options.stripWidth;
             var initY = this.options.topOffset
@@ -80,7 +81,7 @@ define(function(require, exports, module) {
         this.featuredMod.setOpacity(0);
     };
 
-    MenuView.prototype.animateStrips = function() {
+    FeedView.prototype.animateStrips = function() {
         this.resetStrips();
 
         var transition = this.options.transition;
@@ -102,5 +103,5 @@ define(function(require, exports, module) {
         }).bind(this), transition.duration);
     };
 
-    module.exports = MenuView;
+    module.exports = FeedView;
 });
