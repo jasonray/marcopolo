@@ -13,6 +13,7 @@ define(function(require, exports, module) {
         _createBackground.call(this);
        // _createIcon.call(this);
         _createTitle.call(this);
+        _createComments.call(this);
         _setListeners.call(this);
     }
 
@@ -20,33 +21,24 @@ define(function(require, exports, module) {
     FeedItemView.prototype.constructor = FeedItemView;
 
     FeedItemView.DEFAULT_OPTIONS = {
-        width: 320,
         height: 55,
-        angle: -0.2,
+        angle: 0,
         iconSize: 32,
         iconUrl: 'img/strip-icons/famous.png',
         title: 'Famo.us',
-        fontSize: 26,
+        primaryFontSize: 18,
+        secondaryFontSize: 12
     };
 
     function _createBackground() {
         this.backgroundSurface = new Surface({
             size: [this.options.width, this.options.height],
             properties: {
-                backgroundColor: '#4f4f4f',
-                boxShadow: '0 0 1px black'
+                backgroundColor: '#e9e9e9'
             }
-        });        
+        });   
 
-        var rotateModifier = new StateModifier({
-            transform: Transform.rotateZ(this.options.angle)
-        });
-
-        var skewModifier = new StateModifier({
-            transform: Transform.skew(0, 0, this.options.angle)
-        });
-
-        this.add(rotateModifier).add(skewModifier).add(this.backgroundSurface);
+        this.add(this.backgroundSurface);
     }
 
     function _createIcon() {
@@ -68,30 +60,65 @@ define(function(require, exports, module) {
             size: [true, true],
             content: this.options.title,
             properties: {
-                color: 'white',
+                color: '#4f4f4f',
                 fontFamily: 'AvenirNextCondensed-DemiBold',
-                fontSize: this.options.fontSize + 'px',
-                textTransform: 'uppercase',
+                fontSize: this.options.primaryFontSize + 'px',
                 pointerEvents : 'none'
             }
         });
 
         var titleModifier = new StateModifier({
-            transform: Transform.thenMove(Transform.rotateZ(this.options.angle), [15, 7.5, 0])
+            transform: Transform.translate(15, 10, 0)
         });
 
         this.add(titleModifier).add(titleSurface);
+    }
+    function _createComments() {
+        var commentSurface = new Surface({
+            size: [true, true],
+            content: 'Comments: '+this.options.comments,
+            properties: {
+                color: '#b2b2b2',
+                fontFamily: 'AvenirNextCondensed-DemiBold',
+                fontSize: this.options.secondaryFontSize + 'px',
+                pointerEvents : 'none'
+            }
+        });
+
+        var commentModifier = new StateModifier({
+            transform: Transform.translate(15, 30, 0)
+        });
+
+        this.add(commentModifier).add(commentSurface);
+    }
+    function _createActionButton() {
+        var commentSurface = new Surface({
+            size: [true, true],
+            content: 'Comments: '+this.options.comments,
+            properties: {
+                color: '#ccc',
+                fontFamily: 'AvenirNextCondensed-DemiBold',
+                fontSize: this.options.secondaryFontSize + 'px',
+                pointerEvents : 'none'
+            }
+        });
+
+        var commentModifier = new StateModifier({
+            transform: Transform.translate(15, 30, 0)
+        });
+
+        this.add(commentModifier).add(commentSurface);
     }
 
     function _setListeners() {
         this.backgroundSurface.on("mouseover", function(){
             this.setProperties({
-                backgroundColor: '#5e5e5e'
+                backgroundColor: 'white'
             });
         });
         this.backgroundSurface.on("mouseout", function(){
             this.setProperties({
-                backgroundColor: '#4f4f4f'
+                backgroundColor: '#e9e9e9'
             });
         });
         this.backgroundSurface.on("click", function(){

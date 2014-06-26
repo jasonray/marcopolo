@@ -1,36 +1,33 @@
 /*** FeedView.js ***/
 
 define(function(require, exports, module) {
-    var View          = require('famous/core/View');
+    var View          = require('famous/core/view');
+    var ScrollView    = require('famous/views/Scrollview');
     var Surface       = require('famous/core/Surface');
     var Transform     = require('famous/core/Transform');
     var StateModifier = require('famous/modifiers/StateModifier');
     var Timer         = require('famous/utilities/Timer');
 
     var FeedItemView     = require('modules/views/FeedItemView');
-    // var FeaturedView  = require('views/FeaturedView');
 
     function FeedView() {
         View.apply(this, arguments);
 
         _createFeedItemViews.call(this);
-        // _createFeaturedView.call(this);
-
     }
-
 
     FeedView.prototype = Object.create(View.prototype);
     FeedView.prototype.constructor = FeedView;
 
     FeedView.DEFAULT_OPTIONS = {
         feedData: {},
-        angle: -0.2,
-        stripWidth: 320,
+        angle: 0,
+        stripWidth: -320,
         stripHeight: 54,
-        topOffset: 37,
+        topOffset: 0,
         stripOffset: 58,
-        staggerDelay: 35,
-        featureOffset: 280,
+        staggerDelay: 38,
+        // featureOffset: 280,
         transition: {
             duration: 400,
             curve: 'easeOut'
@@ -43,7 +40,8 @@ define(function(require, exports, module) {
 
         for (var i = 0; i < this.options.feedData.length; i++) {
             var feedItemView = new FeedItemView({
-                title: this.options.feedData[i].title
+                title: this.options.feedData[i].title,
+                comments: this.options.feedData[i].comments
             });
 
             var stripModifier = new StateModifier({
@@ -53,20 +51,23 @@ define(function(require, exports, module) {
             this.stripModifiers.push(stripModifier);
             this.add(stripModifier).add(feedItemView);
 
+            this.animateStrips();
+
             yOffset += this.options.stripOffset;
         }
     }
 
-    function _createFeaturedView() {
-        var featuredView = new FeaturedView({ angle: this.options.angle });
+    // function _createFeaturedView() {
+    //     var featuredView = new FeaturedView({ angle: this.options.angle });
 
-        this.featuredMod = new StateModifier({
-            transform: Transform.translate(0, this.options.featureOffset, 0),
-            opacity: 0
-        });
+    //     this.featuredMod = new StateModifier({
+    //         transform: Transform.translate(0, this.options.featureOffset, 0),
+    //         opacity: 0
+    //     });
 
-        this.add(this.featuredMod).add(featuredView);
-    }
+    //     this.add(this.featuredMod).add(featuredView);
+    //     this.animateStrips();
+    // }
 
     FeedView.prototype.resetStrips = function() {
         for(var i = 0; i < this.stripModifiers.length; i++) {
@@ -78,7 +79,7 @@ define(function(require, exports, module) {
             this.stripModifiers[i].setTransform(Transform.translate(initX, initY, 0));
         }
 
-        this.featuredMod.setOpacity(0);
+        // this.featuredMod.setOpacity(0);
     };
 
     FeedView.prototype.animateStrips = function() {
@@ -98,9 +99,9 @@ define(function(require, exports, module) {
             }.bind(this, i), i * delay);
         }
 
-        Timer.setTimeout((function() {
-            this.featuredMod.setOpacity(1, transition);
-        }).bind(this), transition.duration);
+        // Timer.setTimeout((function() {
+        //     this.featuredMod.setOpacity(1, transition);
+        // }).bind(this), transition.duration);
     };
 
     module.exports = FeedView;
