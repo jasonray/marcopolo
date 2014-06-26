@@ -139,8 +139,9 @@ references users;
 
 
 create table topic_tags (
-	topic_id	number,
-	tag		varchar2(250)
+	topic_id	number		not null,
+	tag		varchar2(250)	not null,
+	tagged		date		not null
 );
 
 alter table topic_tags
@@ -160,7 +161,8 @@ references tags;
 
 create table idea_tags (
 	idea_id		number,
-	tag		varchar2(250)
+	tag		varchar2(250),
+	tagged		date
 );
 
 alter table idea_tags
@@ -182,11 +184,19 @@ create table tag_black_list (
 	tag		varchar2(250)
 );
 
+alter table tag_black_list
+add constraint tag_black_list_pk
+primary key (tag);
+
 
 create table votes (
 	idea_id		number,
 	voter		varchar2(200),
-	vote		varchar2(50)
+	vote		varchar2(50),
+	voted		date
 );
 
+alter table votes
+add constraint votes_pk
+primary key (idea_id, voter, vote);
 

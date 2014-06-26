@@ -3,8 +3,10 @@ create or replace package th_ideas_pkg as
 
 	-- create an idea
 	function create_idea (p_short_desc	ideas.short_desc%type, 
-			p_description		ideas.description%type, 
-			p_owner			ideas.owner%type) return ideas.id%type;
+			p_owner			ideas.owner%type,
+			p_description		ideas.description%type,
+			p_topic_id		ideas.topic_id%type,
+                        p_tags			clob) return ideas.id%type;
 
 
 	-- update idea description(s)
@@ -42,15 +44,16 @@ end th_ideas_pkg;
 show errors
 
 
-
 create or replace package body th_ideas_pkg as
 
 
 	---------------------------------------------
 	-- create an idea
 	function create_idea (p_short_desc	ideas.short_desc%type, 
+			p_owner			ideas.owner%type,
 			p_description		ideas.description%type, 
-			p_owner			ideas.owner%type) return ideas.id%type
+			p_topic_id		ideas.topic_id%type,
+			p_tags			clob) return ideas.id%type
 	is
 		l_id	ideas.id%type;
 		l_now	date	:= sysdate;
@@ -63,10 +66,13 @@ create or replace package body th_ideas_pkg as
 						th_constants_pkg.NO_CREATOR_MSG);
 		end if;
 		--
-		insert into ideas (short_desc, description, owner)
-		values (p_short_desc, p_description, p_owner)
+		insert into ideas (short_desc, description, owner, topic_id)
+		values (p_short_desc, p_description, p_owner, p_topic_id)
 		returning id into l_id;
 		return l_id;
+
+		-- insert tags on this idea
+--		th_tags_pkg.create_tag () 
 	exception
 		when others then
 			-- TODO: log tried to insert a row and it threw an error, then reraise exception

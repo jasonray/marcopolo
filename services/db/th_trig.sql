@@ -1,4 +1,4 @@
-create or replace trigger bi_ideas
+create or replace trigger biu_ideas
 before insert or update on ideas
 for each row 
 declare
@@ -17,7 +17,7 @@ end;
 /
 
 
-create or replace trigger bi_comments
+create or replace trigger biu_comments
 before insert or update on comments
 for each row 
 declare
@@ -33,7 +33,7 @@ end;
 /
 
 
-create or replace trigger bi_tags
+create or replace trigger biu_tags
 before insert or update on tags
 for each row 
 declare
@@ -48,7 +48,17 @@ end;
 /
 
 
-create or replace trigger bi_topics
+create or replace trigger bi_idea_tags
+before insert on idea_tags
+for each row 
+declare
+begin
+	:new.tagged := sysdate;
+end;
+/
+
+
+create or replace trigger biu_topics
 before insert or update on topics
 for each row 
 declare
@@ -62,4 +72,25 @@ begin
 	:new.last_edited := l_now;
 end;
 /
+
+
+create or replace trigger bi_topic_tags
+before insert on topic_tags
+for each row 
+declare
+begin
+	:new.tagged := sysdate;
+end;
+/
+
+
+create or replace trigger bi_votes
+before insert on votes
+for each row 
+declare
+begin
+	:new.voted := sysdate;
+end;
+/
+
 
