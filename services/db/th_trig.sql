@@ -94,3 +94,16 @@ end;
 /
 
 
+create or replace trigger bi_tracked_ideas
+before insert on tracked_ideas
+for each row 
+declare
+begin
+	:new.tracked := sysdate;
+end;
+/
+
+
+
+			
+

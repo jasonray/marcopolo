@@ -2,6 +2,14 @@ set define off
 create or replace package th_ideas_pkg as
 
 	-- create an idea
+	procedure create_idea (p_short_desc	ideas.short_desc%type, 
+			p_owner			ideas.owner%type,
+			p_description		ideas.description%type,
+			p_topic_id		ideas.topic_id%type,
+                        p_tags			clob);
+
+
+	-- create an idea
 	function create_idea (p_short_desc	ideas.short_desc%type, 
 			p_owner			ideas.owner%type,
 			p_description		ideas.description%type,
@@ -22,6 +30,11 @@ create or replace package th_ideas_pkg as
 			p_closer		users.username%type);
 
 
+	-- suspend an idea
+	procedure suspend_idea (p_id		ideas.id%type,
+			p_suspender		users.username%type);
+
+
 	-- revoke an idea
 	procedure revoke_idea (p_id		ideas.id%type,
 			p_revoker		users.username%type);
@@ -38,6 +51,19 @@ create or replace package th_ideas_pkg as
 			p_comment_txt		comments.comment_txt%type,
 			p_commenter		comments.owner%type) return comments.id%type;
 
+	-- vote on an idea
+	procedure vote_on_idea (p_id		votes.idea_id%type,
+			p_voter			votes.voter%type,
+			p_vote			votes.vote%type);
+
+	-- track an idea
+	procedure track_an_idea (p_id		votes.idea_id%type,
+			p_user			votes.voter%type);
+
+	-- stop tracking an idea
+	procedure untrack_an_idea (p_id		votes.idea_id%type,
+			p_user			votes.voter%type);
+
 
 end th_ideas_pkg;
 /
@@ -45,6 +71,24 @@ show errors
 
 
 create or replace package body th_ideas_pkg as
+
+
+	---------------------------------------------
+	-- create an idea
+	procedure create_idea (p_short_desc	ideas.short_desc%type, 
+			p_owner			ideas.owner%type,
+			p_description		ideas.description%type,
+			p_topic_id		ideas.topic_id%type,
+                        p_tags			clob)
+        is
+		l_id	ideas.id%type;
+        begin
+		l_id := create_idea (p_short_desc	=> p_short_desc,
+					p_owner		=> p_owner,
+					p_description	=> p_description,
+					p_topic_id	=> p_topic_id,
+					p_tags		=> p_tags);
+        end create_idea;
 
 
 	---------------------------------------------
@@ -139,6 +183,34 @@ create or replace package body th_ideas_pkg as
 	end;
 
 
+	-- suspend an idea
+	procedure suspend_idea (p_id		ideas.id%type,
+			p_suspender		users.username%type)
+	is
+	begin
+		if (p_id is null) then
+			raise_application_error(th_constants_pkg.NO_ID_CODE,
+						th_constants_pkg.NO_ID_MSG);
+		elsif (p_suspender is null or length(p_suspender) > th_constants_pkg.G_USERNAME_MAXLEN) then
+			raise_application_error(th_constants_pkg.NO_SUSPENDER_CODE,
+						th_constants_pkg.NO_SUSPENDER_MSG);
+		end if;
+		--
+		update ideas
+		   set suspended = sysdate,
+		       suspended_by = p_suspender,
+		       last_edited_by = p_suspender
+		 where id = p_id;
+		--
+		if SQL%ROWCOUNT = 0 then
+			-- TODO: log tried to revoke an idea that doesn't exist
+			null;
+		end if;
+	end;
+
+
+
+
 	-- revoke an idea
 	procedure revoke_idea (p_id		ideas.id%type,
 			p_revoker		users.username%type)
@@ -224,6 +296,58 @@ create or replace package body th_ideas_pkg as
 		return l_id;
 	end comment_on_idea;
 			
+
+	-- vote on an idea
+	procedure vote_on_idea (p_id		votes.idea_id%type,
+			p_voter			votes.voter%type,
+			p_vote			votes.vote%type)
+	is
+	begin
+		if (p_id is null) then
+			raise_application_error(th_constants_pkg.NO_ID_CODE,
+						th_constants_pkg.NO_ID_MSG);
+		elsif (p_voter is null or length(p_voter) > th_constants_pkg.G_USERNAME_MAXLEN) then
+			raise_application_error(th_constants_pkg.NO_VOTER_CODE,
+						th_constants_pkg.NO_VOTER_MSG);
+
+		elsif lower(p_vote) not in ('yes', 'no') then
+			raise_application_error(th_constants_pkg.NO_VOTE_CODE,
+						th_constants_pkg.NO_VOTE_MSG);
+
+		end if;
+		--
+		insert into votes (idea_id, voter, vote)
+		values (p_id, p_voter, p_vote);
+	end vote_on_idea;
+
+
+	-- track an idea
+	procedure track_an_idea (p_id		votes.idea_id%type,
+			p_user			votes.voter%type)
+
+	is
+	begin
+		insert into tracked_ideas (idea_id, tracking_user)
+		values (p_id, p_user);
+	exception
+		when DUP_VAL_ON_INDEX then
+			raise_application_error(th_constants_pkg.ALREADY_TRACKED_CODE,
+						th_constants_pkg.ALREADY_TRACKED_MSG);
+	end track_an_idea;
+
+
+	-- stop tracking an idea
+	procedure untrack_an_idea (p_id		votes.idea_id%type,
+			p_user			votes.voter%type)
+	is
+	begin
+		delete 
+		  from tracked_ideas
+ 		 where idea_id = p_id
+		   and tracking_user = p_user;
+		-- TODO: do we return an error if this user wasn't tracking in the first place?! do we care?
+	end untrack_an_idea;
+
 
 end th_ideas_pkg;
 /
