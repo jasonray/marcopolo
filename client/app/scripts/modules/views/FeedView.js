@@ -14,6 +14,7 @@ define(function(require, exports, module) {
         View.apply(this, arguments);
 
         _createFeedItemViews.call(this);
+        _setListeners.call(this);
     }
 
     FeedView.prototype = Object.create(View.prototype);
@@ -24,7 +25,7 @@ define(function(require, exports, module) {
         angle: 0,
         stripWidth: -320,
         stripHeight: 54,
-        topOffset: 0,
+        topOffset: 10,
         stripOffset: 58,
         staggerDelay: 38,
         // featureOffset: 280,
@@ -39,7 +40,7 @@ define(function(require, exports, module) {
         var yOffset = this.options.topOffset;
 
         for (var i = 0; i < this.options.feedData.length; i++) {
-            var feedItemView = new FeedItemView({
+            this.feedItemView = new FeedItemView({
                 title: this.options.feedData[i].title,
                 comments: this.options.feedData[i].comments
             });
@@ -49,25 +50,13 @@ define(function(require, exports, module) {
             });
 
             this.stripModifiers.push(stripModifier);
-            this.add(stripModifier).add(feedItemView);
+            this.add(stripModifier).add(this.feedItemView);
 
             this.animateStrips();
 
             yOffset += this.options.stripOffset;
         }
     }
-
-    // function _createFeaturedView() {
-    //     var featuredView = new FeaturedView({ angle: this.options.angle });
-
-    //     this.featuredMod = new StateModifier({
-    //         transform: Transform.translate(0, this.options.featureOffset, 0),
-    //         opacity: 0
-    //     });
-
-    //     this.add(this.featuredMod).add(featuredView);
-    //     this.animateStrips();
-    // }
 
     FeedView.prototype.resetStrips = function() {
         for(var i = 0; i < this.stripModifiers.length; i++) {
@@ -103,6 +92,12 @@ define(function(require, exports, module) {
         //     this.featuredMod.setOpacity(1, transition);
         // }).bind(this), transition.duration);
     };
+
+    function _setListeners() {
+        this.feedItemView.on("idea:yes", function(){
+            console.log('vote Up');
+        });
+    }
 
     module.exports = FeedView;
 });
