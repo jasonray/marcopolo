@@ -62,7 +62,7 @@ define(function(require, exports, module) {
 
     function _createBackground() {
         this.backgroundSurface = new Surface({
-            size : [320, 600],
+            size : [320, 500],
             content : this.options.title,
             properties: {
                 color: 'white',
@@ -78,11 +78,10 @@ define(function(require, exports, module) {
         this.add(formModifier).add(this.backgroundSurface);
     }
     function _createInputs() {
-        var view = new View();
-        var formModifier = new StateModifier({
-            transform: Transform.translate(0, 0, 500)
-        });
-        this.inputs.push(new InputSurface({
+        var buttonView = new View();
+        var oneView = new View();
+        var twoView = new View();
+        this.summaryInput = new InputSurface({
             size: this.options.inputs.size,
             name: 'input-summary',
             placeholder: 'Type idea here',
@@ -91,8 +90,8 @@ define(function(require, exports, module) {
             properties: {
                 zIndex: this.options.zIndex
             }
-        }));
-        this.inputs.push(new TextareaSurface({
+        });
+        this.descriptionInput = new TextareaSurface({
             size: [this.options.inputs.size[0], 200],
             name: 'input-description',
             placeholder: 'Type description',
@@ -101,8 +100,8 @@ define(function(require, exports, module) {
             properties: {
                 zIndex: this.options.zIndex
             }
-        }));
-        var view = new View();
+        });
+        
         this.submitSurface = new Surface({
             size: [120, 50],
             content: 'Submit',
@@ -129,23 +128,39 @@ define(function(require, exports, module) {
                 lineHeight: '30px',
                 verticalAlign: 'middle',
                 border: 'none',
-                backgroundColor: '#00a9a6',
+                backgroundColor: '#5e5e5e',
                 color: 'white',
                 textAlign: 'center',
                 borderRadius: '5px',
                 padding: '10px',
-                textDecoration: 'none',
-                pointerEvents : 'none'
+                textDecoration: 'none'
             }
         }); 
-        view.add(this.submitSurface);
-        //view.add(this.cancelSurface);
-        this.inputs.push(view); 
+        var submitModifier = new StateModifier({
+            transform: Transform.translate(140,20,0)
+        });
+        var cancelModifier = new StateModifier({
+            transform: Transform.translate(0,20,0)
+        });
+        oneView.add(this.summaryInput);
+        twoView.add(this.descriptionInput);
+        buttonView.add(submitModifier).add(this.submitSurface);
+        buttonView.add(cancelModifier).add(this.cancelSurface);
+        this.inputs.push(oneView);
+        this.inputs.push(twoView);
+        this.inputs.push(buttonView); 
     }
 
     function _setListeners() {
         this.submitSurface.on("click", function(){
-            this._eventOutput.emit('newFeed:add');
+            this.newIdea = {comments:''};
+            this.newIdea.title = this.summaryInput.getValue();
+            this.newIdea.description = this.descriptionInput.getValue();
+            this._eventOutput.emit('newFeed:add', this.newIdea);
+            this.descriptionInput.setValue('');
+        }.bind(this));
+        this.cancelSurface.on("click", function(){
+            this._eventOutput.emit('newFeed:close');
         }.bind(this));
     }
 
