@@ -40,10 +40,7 @@ define(function(require, exports, module) {
         var yOffset = this.options.topOffset;
 
         for (var i = 0; i < this.options.feedData.length; i++) {
-            this.feedItemView = new FeedItemView({
-                title: this.options.feedData[i].title,
-                comments: this.options.feedData[i].comments
-            });
+            this.feedItemView = new FeedItemView({data: this.options.feedData[i]});
 
             var stripModifier = new StateModifier({
                 transform: Transform.translate(0, yOffset, 0)

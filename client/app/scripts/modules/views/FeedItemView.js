@@ -17,7 +17,7 @@ define(function(require, exports, module) {
         _createBackground.call(this);
         _createButtons.call(this);
         _createTitle.call(this);
-        if (this.options.comments) {
+        if (this.options.data.comments) {
             _createComments.call(this);
         }
         _setListeners.call(this);
@@ -86,7 +86,7 @@ define(function(require, exports, module) {
     function _createTitle() {
         var titleSurface = new Surface({
             size: [true, true],
-            content: this.options.title,
+            content: this.options.data.title,
             properties: {
                 color: '#4f4f4f',
                 fontFamily: 'AvenirNextCondensed-DemiBold',
@@ -104,7 +104,7 @@ define(function(require, exports, module) {
     function _createComments() {
         var commentSurface = new Surface({
             size: [true, true],
-            content: 'Comments: '+this.options.comments,
+            content: 'Comments: '+this.options.data.comments,
             properties: {
                 color: '#b2b2b2',
                 fontFamily: 'AvenirNextCondensed-DemiBold',
@@ -155,15 +155,15 @@ define(function(require, exports, module) {
         });
 
         this.voteUpSurface.on("click", function(){
-            this._eventOutput.emit('idea:yes');
+            this._eventOutput.emit('idea:yes', this.options.data);
         }.bind(this));
 
         this.voteDownSurface.on("click", function(){
-            this._eventOutput.emit('idea:no');
+            this._eventOutput.emit('idea:no', this.options.data);
         }.bind(this));
 
         this.backgroundSurface.on("click", function(){
-            this._eventOutput.emit('ides:open');
+            this._eventOutput.emit('ides:open', this.options.data);
         }.bind(this));
     }
 
