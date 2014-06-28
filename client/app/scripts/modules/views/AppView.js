@@ -67,9 +67,6 @@ define(function(require, exports, module) {
 
     function _setListeners() {
         this.pageView.on('menuToggle', this.toggleMenu.bind(this));
-        this.pageView.on('newFeed:add', function(){
-            alert('d')
-        });
     }
 
     function _handleSwipe() {
