@@ -10,10 +10,11 @@ define(function(require, exports, module) {
 
     var AddItemView     = require('modules/views/AddItemView');
     var FeedView        = require('modules/views/FeedView');
-    var FeedData        = JSON.parse(window.localStorage['newFeed']);
+    var FeedData        = [];
 
     function PageView() {
         View.apply(this, arguments);
+        FeedData = JSON.parse(window.localStorage['newFeed']);
 
         _createBacking.call(this);
         _createLayout.call(this);
@@ -22,8 +23,10 @@ define(function(require, exports, module) {
         _createFeedView.call(this);
         _createLightbox.call(this);
         _createModal.call(this);
+        _createAddItemView.call(this);
 
         _setListeners.call(this);
+
     }
     
     PageView.prototype = Object.create(View.prototype);
@@ -39,8 +42,8 @@ define(function(require, exports, module) {
             showOrigin: [.5, .5],
             inTransform: Transform.thenMove(Transform.rotateX(0.9), [0, -300, 500]),
             outTransform: Transform.thenMove(Transform.rotateZ(0.7), [0, window.innerHeight, 500]),
-            inTransition: { duration: 650, curve: 'easeOut' },
-            outTransition: { duration: 500, curve: Easing.inCubic }
+            inTransition: { duration: 500, curve: 'easeOut' },
+            outTransition: { duration: 100, curve: Easing.inCubic }
         }
     };
 
@@ -103,6 +106,11 @@ define(function(require, exports, module) {
             }
         });
 
+        var addItemModifier = new StateModifier({
+            origin: [1, 0.5],
+            align : [1, 0.5]
+        });
+
         var backgroundModifier = new StateModifier({
             transform : Transform.behind
         });
@@ -118,11 +126,6 @@ define(function(require, exports, module) {
         var searchModifier = new StateModifier({
             origin: [1, 1],
             transform: Transform.translate(-60, 0, 60),   
-        });
-
-        var addItemModifier = new StateModifier({
-            origin: [1, 0.5],
-            align : [1, 0.5]
         });
 
         this.layout.header.add(backgroundModifier).add(backgroundSurface);
@@ -169,6 +172,9 @@ define(function(require, exports, module) {
         });
         this.add(stateModifier).add(this.modalbacking);
     }
+    function _createAddItemView() {
+        this.addItemView = new AddItemView();
+    }
     function _createFeedView() {
         this.feedView = new FeedView({ feedData: FeedData });
         // this.feedModifier = new Modifier({
@@ -179,16 +185,17 @@ define(function(require, exports, module) {
 
         // this._add(this.feedModifier).add(this.pageView);
         this.layout.content.add(this.feedView);
+
     }
     function _openAddItemView() {
-        var form = new AddItemView();
         _openModal.call(this);
-        this.lightbox.show(form, function() {
+        this.lightbox.show(this.addItemView, function() {
             this.ready = true;   
         }.bind(this));
     }
 
     function _setListeners() {
+        var that = this;
         this.hamburgerSurface.on('click', function() {
             this._eventOutput.emit('menuToggle');
         }.bind(this));
@@ -214,6 +221,21 @@ define(function(require, exports, module) {
             this.lightbox.hide();
             _closeModal.call(this);
         }.bind(this));
+
+        this.addItemView.on('newFeed:add', function(item){
+           that.lightbox.hide();
+            _closeModal.call(that);
+            FeedData.unshift(item);
+            if (Modernizr.localstorage) {
+                window.localStorage["newFeed"] = JSON.stringify(FeedData);
+            } 
+            that.feedView.render = function(){ return null; }
+            _createFeedView.call(that);
+        });
+        this.addItemView.on('newFeed:close', function(){
+           that.lightbox.hide();
+            _closeModal.call(that);
+        });
     }
 
     module.exports = PageView;
