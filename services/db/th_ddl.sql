@@ -1,4 +1,5 @@
 drop table votes;
+drop table tracked_ideas;
 drop table tag_black_list;
 drop table topic_tags;
 drop table idea_tags;
@@ -14,7 +15,10 @@ create sequence ideas_seq start with 100;
 
 
 create table users (
-	username	varchar2(200) not null	-- unique id for user
+	username	varchar2(200) not null,	-- unique id for user
+	first_name	varchar2(100),
+	last_name	varchar2(100),
+	email		varchar2(100)
 );
 
 alter table users
@@ -139,8 +143,9 @@ references users;
 
 
 create table topic_tags (
-	topic_id	number,
-	tag		varchar2(250)
+	topic_id	number		not null,
+	tag		varchar2(250)	not null,
+	tagged		date		not null
 );
 
 alter table topic_tags
@@ -160,7 +165,8 @@ references tags;
 
 create table idea_tags (
 	idea_id		number,
-	tag		varchar2(250)
+	tag		varchar2(250),
+	tagged		date
 );
 
 alter table idea_tags
@@ -182,11 +188,42 @@ create table tag_black_list (
 	tag		varchar2(250)
 );
 
+alter table tag_black_list
+add constraint tag_black_list_pk
+primary key (tag);
+
 
 create table votes (
 	idea_id		number,
 	voter		varchar2(200),
-	vote		varchar2(50)
+	vote		varchar2(50),
+	voted		date
 );
+
+alter table votes
+add constraint votes_pk
+primary key (idea_id, voter, vote);
+
+
+create table tracked_ideas (
+	idea_id		number,
+	tracking_user	varchar2(200),
+	tracked		date
+);
+
+alter table tracked_ideas
+add constraint tracked_ideas_pk
+primary key (idea_id, tracking_user);
+
+alter table tracked_ideas
+add constraint tracked_ideas_idea_fk
+foreign key (idea_id)
+references ideas;
+
+alter table tracked_ideas
+add constraint tracked_ideas_user_fk
+foreign key (tracking_user)
+references users;
+
 
 

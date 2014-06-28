@@ -1,6 +1,0 @@
-select th_topics_pkg.create_topic(
-	'TestTopic', 
-	'Give me ideas about things to do on vacation in Northern Virginia', 
-	'dillons') 
-  from dual
-/
