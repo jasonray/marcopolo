@@ -19,8 +19,12 @@ app.post('/ideas/id/:id/track', function(req, res, next) {
 	// value = TRUE | FALSE
 });
 
-app.post('/ideas/id/:id/suspend', function(req,res,next) {
+app.post('/ideas/id/:id/suspend', function(req, res, next) {
 	// suspends an item
+});
+
+app.post('/ideas/id/:id/comments', function(req, res, next) {
+	// get comments for an idea
 });
 
 var port = 8888;
