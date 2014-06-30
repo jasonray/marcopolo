@@ -102,14 +102,13 @@ app.post('/ideas/id/:id/operations/untrack', function(req, res, next) {
 	res.send(200);
 });
 
-app.post('/ideas/id/:id/track', function(req, res, next) {
-	// value = TRUE | FALSE
-});
-
 app.post('/ideas/id/:id/suspend', function(req, res, next) {
 	// suspends an item
 });
 
+app.get('/ideas/id/:id/comments', function(req, res, next) {
+	// get comments for an idea
+});
 app.post('/ideas/id/:id/comments', function(req, res, next) {
 	// get comments for an idea
 });
