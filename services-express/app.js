@@ -102,10 +102,6 @@ app.post('/ideas/id/:id/operations/untrack', function(req, res, next) {
 	res.send(200);
 });
 
-app.post('/ideas/id/:id/suspend', function(req, res, next) {
-	// suspends an item
-});
-
 app.get('/ideas/id/:id/comments', function(req, res, next) {
 	var id = req.param('id');
 	console.log('fetch comments [%s][%s]', id);
