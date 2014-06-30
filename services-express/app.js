@@ -28,6 +28,10 @@ app.post('/ideas', function(req, res, next) {
 	//add idea
 });
 
+//// a couple of different ways to model voting
+//// please forgive the redundency!
+//// i like "PUT /ideas/id/:id/votingResult" for rest considerations
+//// but i like "POST /ideas/id/:id/operations/voteYes" for simplicity
 app.get('/ideas/id/:id/votingResult', function(req, res, next) {
 	res.send(dataAdapter.fetchIdeaVoteResultForUser(req.param('id'), determineUser(req)));
 });
@@ -39,7 +43,6 @@ app.put('/ideas/id/:id/votingResult', function(req, res, next) {
 	dataAdapter.vote(id,user,votingResult);
 	res.send(200);
 });
-
 app.post('/ideas/id/:id/operations/voteYes', function(req, res, next) {
 	var id = req.param('id');
 	var user = determineUser(req);
