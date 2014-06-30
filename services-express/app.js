@@ -7,11 +7,15 @@ app.get('/ideas', function(req, res, next) {
 	res.send('list of ideas');
 });
 
-app.post('/ideas', function(req,res,next) {
+app.post('/ideas', function(req, res, next) {
 	//add idea
 });
 
-app.post('/ideas/id/:id/vote', function (req,res,next) {
+app.post('/ideas/id/:id/vote', function(req, res, next) {
+	// value = TRUE | FALSE
+});
+
+app.post('/ideas/id/:id/track', function(req, res, next) {
 	// value = TRUE | FALSE
 });
 
