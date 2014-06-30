@@ -57,11 +57,46 @@ function convertFromDataToTransport(dataItem) {
 
 exports.fetchIdea = fetchIdea = function(id) {
 	console.log('fetching single idea by id [%s]', id);
+	var matchingRawItem = findMatchingItem(id);
+	return convertFromDataToTransport(matchingRawItem);
+};
+
+exports.fetchIdeaVoteResultForUser = fetchIdea = function(id, user) {
+	console.log('fetching voting result [%s][%s]', id, user);
+	var matchingRawItem = findMatchingItem(id);
+	var result = matchingRawItem.voting_history[user];
+	console.log('fetching voting result [%s][%s] => [%s]', id, user, result);
+	return result;
+};
+
+exports.voteYes = voteYes = function(id, user) {
+	vote(id, user, true);
+};
+exports.voteNo = voteNo = function(id, user) {
+	vote(id, user, false);
+};
+
+exports.vote = vote = function(id, user, votingResult) {
+	console.log('voting [id=%s][user=%s][votingResult=%s]', id, user, votingResult);
+	if (!id || !user) {
+		throw error('missing required field');
+	}
+
+	var item = findMatchingItem(id);
+	if (item) {
+		item.voting_history[user] = votingResult;
+		console.log('set voting history to ' + item.voting_history[user]);
+	} else {
+		throw error('no matching result');
+	}
+};
+
+function findMatchingItem(id) {
 	var matchingRawItem = _.find(data, function(dataItem) {
 		var matchingResult = (dataItem.id === id);
 		console.log('comparing [%s][%s]=>[%s]', dataItem.id, id, matchingResult);
 		return matchingResult;
 	});
 	console.log('find result => [%s]', matchingRawItem);
-	return convertFromDataToTransport(matchingRawItem);
-};
+	return matchingRawItem;
+}
