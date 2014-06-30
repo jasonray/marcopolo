@@ -76,18 +76,23 @@ exports.voteNo = voteNo = function(id, user) {
 	vote(id, user, false);
 };
 
-exports.vote = vote = function(id, user, votingResult) {
+exports.vote = vote = function(id, user, rawVotingResult) {
+	//ensure voting result parses
+	var votingResult = stringToBoolean(rawVotingResult);
+	console.log('parsed %s => %s', rawVotingResult, votingResult);
+
 	console.log('voting [id=%s][user=%s][votingResult=%s]', id, user, votingResult);
 	if (!id || !user) {
 		throw error('missing required field');
 	}
+
 
 	var item = findMatchingItem(id);
 	if (item) {
 		item.voting_history[user] = votingResult;
 		console.log('set voting history to ' + item.voting_history[user]);
 	} else {
-		throw error('no matching result');
+		throw Error('no matching result');
 	}
 };
 
@@ -100,3 +105,19 @@ function findMatchingItem(id) {
 	console.log('find result => [%s]', matchingRawItem);
 	return matchingRawItem;
 }
+
+var stringToBoolean = function(string) {
+	switch (string.toLowerCase()) {
+		case "true":
+		case "yes":
+		case "1":
+			return true;
+		case "false":
+		case "no":
+		case "0":
+		case null:
+			return false;
+		default:
+			return Boolean(string);
+	}
+};

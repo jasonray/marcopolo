@@ -1,7 +1,12 @@
 var express = require('express');
+var bodyParser = require('body-parser');
 var app = express();
 
 var dataAdapter = require('./sampleDataAdapter');
+
+app.use(bodyParser.text({
+	limit: '100kb'
+}));
 
 app.get('/ideas', function(req, res, next) {
 	res.send(dataAdapter.fetchIdeas());
@@ -26,6 +31,14 @@ app.post('/ideas', function(req, res, next) {
 app.get('/ideas/id/:id/votingResult', function(req, res, next) {
 	res.send(dataAdapter.fetchIdeaVoteResultForUser(req.param('id'), determineUser(req)));
 });
+app.put('/ideas/id/:id/votingResult', function(req, res, next) {
+	var id = req.param('id');
+	var user = determineUser(req);
+	var votingResult = req.body;
+	console.log('voting [%s][%s][%s]', id, user, votingResult);
+	dataAdapter.vote(id,user,votingResult);
+	res.send(200);
+});
 
 app.post('/ideas/id/:id/operations/voteYes', function(req, res, next) {
 	var id = req.param('id');
@@ -41,6 +54,7 @@ app.post('/ideas/id/:id/operations/voteNo', function(req, res, next) {
 	dataAdapter.voteNo(id, user);
 	res.send(200);
 });
+
 
 app.post('/ideas/id/:id/track', function(req, res, next) {
 	// value = TRUE | FALSE
