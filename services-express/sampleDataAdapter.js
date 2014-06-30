@@ -188,3 +188,8 @@ exports.saveComment = saveComment = function(id, user, comment) {
 		return null;
 	}
 };
+
+exports.suspendIdea = suspendIdea = function(id, user) {
+	var matchingRawItem = findMatchingItem(id);
+	matchingRawItem.suspended = true;
+};

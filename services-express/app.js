@@ -124,6 +124,14 @@ app.post('/ideas/id/:id/comments', function(req, res, next) {
 	res.send(200);
 });
 
+app.post('/ideas/id/:id/operations/suspend', function(req, res, next) {
+	var id = req.param('id');
+	var user = determineUser(req);
+	console.log('suspend item [%s][%s]', id, user);
+	dataAdapter.suspendIdea(id, user);
+	res.send(200);
+});
+
 function determineUser(req) {
 	return req.param('user');
 }
