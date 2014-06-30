@@ -107,10 +107,21 @@ app.post('/ideas/id/:id/suspend', function(req, res, next) {
 });
 
 app.get('/ideas/id/:id/comments', function(req, res, next) {
-	// get comments for an idea
+	var id = req.param('id');
+	console.log('fetch comments [%s][%s]', id);
+	var comments = dataAdapter.fetchComments(id);
+	res.send(comments);
 });
+app.use('/ideas/id/:id/comments', bodyParser.text({
+	limit: '1kb'
+}));
 app.post('/ideas/id/:id/comments', function(req, res, next) {
-	// get comments for an idea
+	var id = req.param('id');
+	var user = determineUser(req);
+	var commentText = req.body;
+	console.log('storing comment [%s][%s][%s]', id, user, commentText);
+	dataAdapter.saveComment(id, user, commentText);
+	res.send(200);
 });
 
 function determineUser(req) {

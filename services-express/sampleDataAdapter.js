@@ -166,3 +166,25 @@ exports.createIdea = createIdea = function(item) {
 	data.push(item);
 	return item;
 };
+
+exports.fetchComments = fetchComments = function(id) {
+	var matchingRawItem = findMatchingItem(id);
+	if (matchingRawItem) {
+		return matchingRawItem.comments;
+	} else {
+		return null;
+	}
+};
+exports.saveComment = saveComment = function(id, user, comment) {
+	var matchingRawItem = findMatchingItem(id);
+	if (matchingRawItem) {
+		var commentEntry = {};
+		commentEntry.id = uuid.v4();
+		commentEntry.comment = comment;
+		commentEntry.user = user;
+		commentEntry.created = new Date();
+		matchingRawItem.comments.push(commentEntry);
+	} else {
+		return null;
+	}
+};
