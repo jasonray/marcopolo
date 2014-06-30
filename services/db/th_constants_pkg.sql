@@ -85,6 +85,22 @@ create or replace package th_constants_pkg as
 	NO_DESC_MSG varchar2(100) := 'EXCEPTION: Invalid or null description specified';
 	PRAGMA EXCEPTION_INIT(NO_DESC_EXCEPTION, -20101);
 		
+	NO_VOTER_EXCEPTION EXCEPTION;
+	NO_VOTER_CODE number := -20202;
+	NO_VOTER_MSG varchar2(100) := 'EXCEPTION: Invalid or null voter specified';
+	PRAGMA EXCEPTION_INIT(NO_VOTER_EXCEPTION, -20102);
+		
+	NO_VOTE_EXCEPTION EXCEPTION;
+	NO_VOTE_CODE number := -20203;
+	NO_VOTE_MSG varchar2(100) := 'EXCEPTION: Invalid or null vote specified';
+	PRAGMA EXCEPTION_INIT(NO_VOTE_EXCEPTION, -20103);
+
+	ALREADY_TRACKED_EXCEPTION EXCEPTION;
+	ALREADY_TRACKED_CODE number := -20204;
+	ALREADY_TRACKED_MSG varchar2(100) := 'EXCEPTION: This tracking user is already tracking this idea';
+	PRAGMA EXCEPTION_INIT(ALREADY_TRACKED_EXCEPTION, -20104);
+
+		
 
 	---------------------------------------------
 	-- COMMENT RELATED EXCEPTIONS : -20300..-20399

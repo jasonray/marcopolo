@@ -3,8 +3,13 @@ define(function(require, exports, module) {
         Engine = require("famous/core/Engine"),
         AppView = require('modules/views/AppView'),
         bootstrapData = require('modules/data/NewFeedData');
+        require('famous/inputs/FastClick');
 
     var iRate = new Marionette.Application();
+    //Bootstrap data //Delete 
+        if (Modernizr.localstorage && !window.localStorage['newFeed']) {
+            window.localStorage["newFeed"] = JSON.stringify(bootstrapData);
+        } 
     // iRate.addRegions({
     //   headerRegion: "#header-region",
     //   mainRegion: "#main-region",
@@ -21,6 +26,9 @@ define(function(require, exports, module) {
     // iRate.getCurrentRoute = function(){
     //   return Backbone.history.fragment
     // };
+    iRate.on("initialize:before", function(){
+    
+    });
 
     iRate.on("initialize:after", function(){
       if(Backbone.history){
@@ -30,11 +38,6 @@ define(function(require, exports, module) {
         //   iRate.trigger("contacts:list");
         // }
       }
-        
-        //Bootstrap data //Delete 
-        if (Modernizr.localstorage) {
-            window.localStorage["newFeed"] = JSON.stringify(bootstrapData);
-        } 
 
         var mainContext = Engine.createContext(),
             appView = new AppView();

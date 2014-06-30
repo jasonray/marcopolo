@@ -16,6 +16,7 @@ define(function(require, exports, module) {
     var PageView      = require('modules/views/PageView');
     var MenuView      = require('modules/views/MenuView');
     var StripData     = require('modules/data/StripData');
+    var FeedView        = require('modules/views/FeedItemView');
 
     function AppView() {
         View.apply(this, arguments);

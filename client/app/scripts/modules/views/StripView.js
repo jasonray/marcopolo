@@ -34,7 +34,8 @@ define(function(require, exports, module) {
             size: [this.options.width, this.options.height],
             properties: {
                 backgroundColor: '#4f4f4f',
-                boxShadow: '0 0 1px black'
+                boxShadow: '0 0 1px black',
+                pointerEvents : 'cursor'
             }
         });        
 

@@ -6,13 +6,20 @@ define(function(require, exports, module) {
     var Transform     = require('famous/core/Transform');
     var StateModifier = require('famous/modifiers/StateModifier');
     var ImageSurface  = require('famous/surfaces/ImageSurface');
+    var EventHandler = require('famous/core/EventHandler');
 
     function FeedItemView() {
         View.apply(this, arguments);
 
+        this.voteUpEvent = new EventHandler();
+        this.voteDownEvent = new EventHandler();
+
         _createBackground.call(this);
-       // _createIcon.call(this);
+        _createButtons.call(this);
         _createTitle.call(this);
+        if (this.options.data.comments) {
+            _createComments.call(this);
+        }
         _setListeners.call(this);
     }
 
@@ -20,82 +27,143 @@ define(function(require, exports, module) {
     FeedItemView.prototype.constructor = FeedItemView;
 
     FeedItemView.DEFAULT_OPTIONS = {
-        width: 320,
         height: 55,
-        angle: -0.2,
+        angle: 0,
         iconSize: 32,
         iconUrl: 'img/strip-icons/famous.png',
         title: 'Famo.us',
-        fontSize: 26,
+        primaryFontSize: 18,
+        secondaryFontSize: 12
     };
 
     function _createBackground() {
         this.backgroundSurface = new Surface({
             size: [this.options.width, this.options.height],
             properties: {
-                backgroundColor: '#4f4f4f',
-                boxShadow: '0 0 1px black'
+                backgroundColor: '#e9e9e9'
             }
-        });        
+        });   
 
-        var rotateModifier = new StateModifier({
-            transform: Transform.rotateZ(this.options.angle)
-        });
-
-        var skewModifier = new StateModifier({
-            transform: Transform.skew(0, 0, this.options.angle)
-        });
-
-        this.add(rotateModifier).add(skewModifier).add(this.backgroundSurface);
+        this.add(this.backgroundSurface);
     }
 
-    function _createIcon() {
-        var iconSurface = new ImageSurface({
-            size: [this.options.iconSize, this.options.iconSize],
-            content : this.options.iconUrl,
-            pointerEvents : 'none'
+    function _createButtons() {
+        var buttonView = new View();
+        this.voteUpSurface = new ImageSurface({
+            size: [55, 55],
+            content : './images/thumbs-up.png',
+            properties: {
+                // backgroundColor: '#4f4f4f',
+                borderLeft: '5px solid white',
+                zIndex: '5'
+            }
         });
-
-        var iconModifier = new StateModifier({
-            transform: Transform.translate(24, 2, 0)
+        this.voteDownSurface = new ImageSurface({
+            size: [55, 55],
+            content : './images/thumbs-down.png',
+            properties: {
+                // backgroundColor: '#fe9a9a',
+                borderLeft: '5px solid white',
+                zIndex: '5'
+            }
         });
-
-        this.add(iconModifier).add(iconSurface);
+        var viewModifier = new StateModifier({
+            origin: [1, 0],
+            align : [0, 0]
+        });
+        var voteUpModifier = new StateModifier({
+            origin: [1, 0],
+            align : [0, 0]
+        });
+        var voteDownModifier = new StateModifier({
+            transform: Transform.translate(-55, 0, 0)
+        });
+        buttonView.add(voteUpModifier).add(this.voteUpSurface);
+        buttonView.add(voteDownModifier).add(this.voteDownSurface);
+        this.add(viewModifier).add(buttonView);
     }
 
     function _createTitle() {
         var titleSurface = new Surface({
             size: [true, true],
-            content: this.options.title,
+            content: this.options.data.title,
             properties: {
-                color: 'white',
+                color: '#4f4f4f',
                 fontFamily: 'AvenirNextCondensed-DemiBold',
-                fontSize: this.options.fontSize + 'px',
-                textTransform: 'uppercase',
+                fontSize: this.options.primaryFontSize + 'px',
                 pointerEvents : 'none'
             }
         });
 
         var titleModifier = new StateModifier({
-            transform: Transform.thenMove(Transform.rotateZ(this.options.angle), [15, 7.5, 0])
+            transform: Transform.translate(15, 10, 0)
         });
 
         this.add(titleModifier).add(titleSurface);
+    }
+    function _createComments() {
+        var commentSurface = new Surface({
+            size: [true, true],
+            content: 'Comments: '+this.options.data.comments,
+            properties: {
+                color: '#b2b2b2',
+                fontFamily: 'AvenirNextCondensed-DemiBold',
+                fontSize: this.options.secondaryFontSize + 'px',
+                pointerEvents : 'none'
+            }
+        });
+
+        var commentModifier = new StateModifier({
+            transform: Transform.translate(15, 30, 0)
+        });
+
+        this.add(commentModifier).add(commentSurface);
     }
 
     function _setListeners() {
         this.backgroundSurface.on("mouseover", function(){
             this.setProperties({
-                backgroundColor: '#5e5e5e'
+                backgroundColor: 'white'
             });
         });
         this.backgroundSurface.on("mouseout", function(){
             this.setProperties({
-                backgroundColor: '#4f4f4f'
+                backgroundColor: '#e9e9e9'
             });
         });
+
+        this.voteUpSurface.on("mouseover", function(){
+            this.setProperties({
+                backgroundColor: 'white'
+            });
+        });
+        this.voteUpSurface.on("mouseout", function(){
+            this.setProperties({
+                backgroundColor: null
+            });
+        });
+
+        this.voteDownSurface.on("mouseover", function(){
+            this.setProperties({
+                backgroundColor: 'white'
+            });
+        });
+        this.voteDownSurface.on("mouseout", function(){
+            this.setProperties({
+                backgroundColor: null
+            });
+        });
+
+        this.voteUpSurface.on("click", function(){
+            this._eventOutput.emit('idea:yes', this.options.data);
+        }.bind(this));
+
+        this.voteDownSurface.on("click", function(){
+            this._eventOutput.emit('idea:no', this.options.data);
+        }.bind(this));
+
         this.backgroundSurface.on("click", function(){
-            this._eventOutput.emit('menuToggle');
+            this._eventOutput.emit('ides:open', this.options.data);
         }.bind(this));
     }
 
