@@ -19,6 +19,10 @@ app.post('/ideas/id/:id/track', function(req, res, next) {
 	// value = TRUE | FALSE
 });
 
+app.post('/ideas/id/:id/suspend', function(req,res,next) {
+	// suspends an item
+});
+
 var port = 8888;
 app.listen(port, function() {
 	console.log('services now listening on %s', port);
