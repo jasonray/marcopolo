@@ -1,10 +1,10 @@
 var express = require('express');
 var app = express();
 
+var dataAdapter = require('./sampleDataAdapter');
+
 app.get('/ideas', function(req, res, next) {
-	// get list of ideas for user
-	// support pagination	
-	res.send('list of ideas');
+	res.send(dataAdapter.fetchIdeas());
 });
 
 app.post('/ideas', function(req, res, next) {
