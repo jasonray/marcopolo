@@ -11,6 +11,9 @@ app.post('/ideas', function(req,res,next) {
 	//add idea
 });
 
+app.post('/ideas/id/:id/vote', function (req,res,next) {
+	// value = TRUE | FALSE
+});
 
 var port = 8888;
 app.listen(port, function() {
