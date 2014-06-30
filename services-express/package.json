@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/jasonray/marcopolo",
   "dependencies": {
-    "express": "^4.4.5"
+    "express": "^4.4.5",
+    "underscore": "^1.6.0"
   }
 }
