@@ -1,8 +1,8 @@
 var express = require('express');
 var app = express();
 
-app.get('/', function(req, res, next) {
-	res.send('hello world');
+app.get('/ideas', function(req, res, next) {
+	res.send('list of ideas');
 });
 
 var port = 8888;
