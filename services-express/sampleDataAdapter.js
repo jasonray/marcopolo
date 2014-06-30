@@ -26,6 +26,7 @@ function initializeSampleIdea(id, short_description, long_description, createDat
 	item.short_description = short_description;
 	item.long_description = long_description;
 	item.voting_history = {};
+	item.tracking = {};
 	item.tags = [];
 	item.suspended = false;
 	item.comments = [];
@@ -86,7 +87,6 @@ exports.vote = vote = function(id, user, rawVotingResult) {
 		throw error('missing required field');
 	}
 
-
 	var item = findMatchingItem(id);
 	if (item) {
 		item.voting_history[user] = votingResult;
@@ -95,6 +95,38 @@ exports.vote = vote = function(id, user, rawVotingResult) {
 		throw Error('no matching result');
 	}
 };
+
+exports.fetchTrackingValueForUser = fetchTrackingValueForUser = function(id, user) {
+	console.log('fetching tracking result [%s][%s]', id, user);
+	var matchingRawItem = findMatchingItem(id);
+	var result = matchingRawItem.tracking[user];
+	console.log('fetching tracking value [%s][%s] => [%s]', id, user, result);
+	return result;
+};
+exports.trackItem = trackItem = function(id, user) {
+	setTrackItem(id, user, true);
+};
+exports.untrackItem = untrackItem = function(id, user) {
+	setTrackItem(id, user, false);
+};
+exports.setTrackItem = setTrackItem = function(id, user, rawTrackValue) {
+	var trackValue = stringToBoolean(rawTrackValue);
+	console.log('parsed %s => %s', rawTrackValue, trackValue);
+
+	console.log('tracking [id=%s][user=%s][trackValue=%s]', id, user, trackValue);
+	if (!id || !user) {
+		throw error('missing required field');
+	}
+
+	var item = findMatchingItem(id);
+	if (item) {
+		item.tracking[user] = trackValue;
+		console.log('set tracking to ' + item.tracking[user]);
+	} else {
+		throw Error('no matching result');
+	}
+};
+
 
 function findMatchingItem(id) {
 	var matchingRawItem = _.find(data, function(dataItem) {
@@ -107,6 +139,8 @@ function findMatchingItem(id) {
 }
 
 var stringToBoolean = function(string) {
+	if (typeof string === 'boolean') return string;
+
 	switch (string.toLowerCase()) {
 		case "true":
 		case "yes":
