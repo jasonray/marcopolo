@@ -1,0 +1,19 @@
+{
+  "name": "macropolo-services-express",
+  "version": "0.0.1",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jasonray/marcopolo"
+  },
+  "author": "jason ray <jason@jayray.net> (https://github.com/jasonray)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jasonray/marcopolo/issues"
+  },
+  "homepage": "https://github.com/jasonray/marcopolo"
+}
