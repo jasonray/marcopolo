@@ -139,6 +139,7 @@ function findMatchingItem(id) {
 }
 
 var stringToBoolean = function(string) {
+	// todo: extract this
 	if (typeof string === 'boolean') return string;
 
 	switch (string.toLowerCase()) {
@@ -154,4 +155,14 @@ var stringToBoolean = function(string) {
 		default:
 			return Boolean(string);
 	}
+};
+
+var uuid = require('node-uuid');
+exports.createIdea = createIdea = function(item) {
+	// todo: check if item exists already?
+	// todo: validate input data
+	if (!item.id) item.id = uuid.v4();
+	item = initializeSampleIdea(item.id, item.short_description, item.long_description, new Date());
+	data.push(item);
+	return item;
 };

@@ -4,10 +4,6 @@ var app = express();
 
 var dataAdapter = require('./sampleDataAdapter');
 
-app.use(bodyParser.text({
-	limit: '100kb'
-}));
-
 app.get('/ideas', function(req, res, next) {
 	res.send(dataAdapter.fetchIdeas());
 });
@@ -24,8 +20,23 @@ app.get('/ideas/id/:id', function(req, res, next) {
 	}
 });
 
+app.use('/ideas', bodyParser.json({
+	strict: true
+}));
 app.post('/ideas', function(req, res, next) {
-	//add idea
+	var newIdea = req.body;
+	console.log('received request to create new idea [%s][%s]', newIdea, newIdea.short_description);
+
+	var util = require('util');
+	console.log(util.inspect(req.body, {
+		showHidden: true,
+		depth: null
+	}));
+
+	var idea = dataAdapter.createIdea(newIdea);
+	// i am returning the version from the data adapter to ensure that the links get built, there are better ways to accomplish this
+	var result = dataAdapter.fetchIdea(idea.id);
+	res.send(result);
 });
 
 //// a couple of different ways to model voting
@@ -35,6 +46,9 @@ app.post('/ideas', function(req, res, next) {
 app.get('/ideas/id/:id/votingResult', function(req, res, next) {
 	res.send(dataAdapter.fetchIdeaVoteResultForUser(req.param('id'), determineUser(req)));
 });
+app.use('/ideas/id/:id/votingResult', bodyParser.text({
+	limit: '1kb'
+}));
 app.put('/ideas/id/:id/votingResult', function(req, res, next) {
 	var id = req.param('id');
 	var user = determineUser(req);
@@ -62,6 +76,9 @@ app.post('/ideas/id/:id/operations/voteNo', function(req, res, next) {
 app.get('/ideas/id/:id/tracking', function(req, res, next) {
 	res.send(dataAdapter.fetchTrackingValueForUser(req.param('id'), determineUser(req)));
 });
+app.use('/ideas/id/:id/tracking', bodyParser.text({
+	limit: '1kb'
+}));
 app.put('/ideas/id/:id/tracking', function(req, res, next) {
 	var id = req.param('id');
 	var user = determineUser(req);
