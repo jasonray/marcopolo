@@ -3,6 +3,7 @@ var bodyParser = require('body-parser');
 var app = express();
 
 var dataAdapter = require('./sampleDataAdapter');
+var apexClient = require('./apexclient');
 
 function errorHandler(res) {
 	return function(err) {
@@ -13,14 +14,17 @@ function errorHandler(res) {
 
 app.get('/health', function(req, res, next) {
 	console.log('checking isHealthy');
-	var apexClient = require('./apexclient');
 	apexClient.isHealthy(function() {
 		res.send(200, 'healthy');
 	}, errorHandler(res));
 });
 
 app.get('/ideas', function(req, res, next) {
-	res.send(dataAdapter.fetchIdeas());
+	var onSuccess = function(results) {
+		res.send(results);
+	};
+
+	apexClient.fetchIdeas(onSuccess, errorHandler);
 });
 
 app.get('/ideas/id/:id', function(req, res, next) {
