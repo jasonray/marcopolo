@@ -4,16 +4,25 @@ var app = express();
 
 var dataAdapter = require('./sampleDataAdapter');
 
+function errorHandler(res) {
+	return function(err) {
+		var util = require('util');
+console.log('error handler: ');
+		console.log(util.inspect(err, {
+			showHidden: true,
+			depth: null
+		}));
+
+		res.send(500, err.message);
+	};
+}
+
 app.get('/health', function(req, res, next) {
+	console.log('checking isHealthy');
 	var apexClient = require('./apexclient');
-	apexClient.isHealthy(function(health) {
-		console.log('isHealthy returned %s', health);
-		if (health) {
-			res.send(200, 'healthy');
-		} else {
-			res.send(500, 'unhealthy');
-		}
-	});
+	apexClient.isHealthy(function() {
+		res.send(200, 'healthy');
+	}, errorHandler(res));
 });
 
 app.get('/ideas', function(req, res, next) {
