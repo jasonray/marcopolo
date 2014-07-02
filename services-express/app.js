@@ -1,8 +1,12 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 var app = express();
+var cors = require('cors');
 
 var dataAdapter = require('./sampleDataAdapter');
+
+
+app.use(cors());
 
 app.get('/ideas', function(req, res, next) {
 	res.send(dataAdapter.fetchIdeas());
@@ -132,7 +136,7 @@ function determineUser(req) {
 	return req.param('user');
 }
 
-var port = 8888;
+var port = 9999;
 app.listen(port, function() {
 	console.log('services now listening on %s', port);
 });
