@@ -17,10 +17,10 @@
   },
   "homepage": "https://github.com/jasonray/marcopolo",
   "dependencies": {
-    "body-parser": "^1.4.3",
-    "express": "^4.4.5",
-    "jasmine-node": "^1.14.3",
-    "node-uuid": "^1.4.1",
-    "underscore": "^1.6.0"
+    "body-parser": "1.4.3",
+    "express": "4.4.5",
+    "jasmine-node": "1.14.3",
+    "node-uuid": "1.4.1",
+    "underscore": "1.6.0"
   }
 }
