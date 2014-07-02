@@ -4,6 +4,18 @@ var app = express();
 
 var dataAdapter = require('./sampleDataAdapter');
 
+app.get('/health', function(req, res, next) {
+	var apexClient = require('./apexclient');
+	apexClient.isHealthy(function(health) {
+		console.log('isHealthy returned %s', health);
+		if (health) {
+			res.send(200, 'healthy');
+		} else {
+			res.send(500, 'unhealthy');
+		}
+	});
+});
+
 app.get('/ideas', function(req, res, next) {
 	res.send(dataAdapter.fetchIdeas());
 });
