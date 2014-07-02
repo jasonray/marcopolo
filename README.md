@@ -4,7 +4,7 @@ marcopolo
 Install It! (services)
 ======================
 
-- Install oracle client [https://github.com/joeferner/node-oracle/blob/master/INSTALL.md]
+- Install oracle client [https://github.com/joeferner/node-oracle/blob/master/INSTALL.md].  I recommend to install OUTSIDE of the git repo directory.
 
 - Ensure that you have node installed [http://nodejs.org/download/]
 
