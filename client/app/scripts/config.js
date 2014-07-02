@@ -10,7 +10,9 @@ require.config({
         "jquery": "vendor/jquery",
         "backbone": "vendor/backbone",
         "underscore": "vendor/underscore",
-        "marionette": "vendor/backbone.marionette"
+        "marionette": "vendor/backbone.marionette",
+        "store": "vendor/store+json2.min",
+        "uuid": "vendor/uuid"
         
     },
     // Sets the configuration for your third party scripts that are not AMD compatible
@@ -22,6 +24,9 @@ require.config({
         "marionette": {
             "deps": ["underscore", "backbone", "jquery"],
             "exports": "Marionette"
+        },
+        "uuid": {
+            "exports": "UUID"
         }
     },
 });
