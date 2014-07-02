@@ -7,12 +7,6 @@ var dataAdapter = require('./sampleDataAdapter');
 function errorHandler(res) {
 	return function(err) {
 		var util = require('util');
-console.log('error handler: ');
-		console.log(util.inspect(err, {
-			showHidden: true,
-			depth: null
-		}));
-
 		res.send(500, err.message);
 	};
 }
