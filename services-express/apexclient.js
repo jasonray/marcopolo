@@ -73,7 +73,6 @@ exports.fetchIdeas = fetchIdeas = function(successHandler, errorHandler) {
   where rnum >= 1"
 
 
-
 	runSqlHandleError(sql, function(data) {
 		var resultData = [];
 		_.each(data, function(rawItem) {
@@ -88,11 +87,6 @@ exports.fetchIdeas = fetchIdeas = function(successHandler, errorHandler) {
 // customize this if needed to convert from oracle response to transport
 function convertFromDataToTransport(dataItem) {
 
-	// id: "a"
-	// short_description: "ideaA"
-	// long_description: "long description A"
-	// comment_count: 0
-	// created: "2014-01-01T17:34:56.000Z"
 	console.log('converting from data to transport for ' + dataItem);
 	if (!dataItem) return dataItem;
 
