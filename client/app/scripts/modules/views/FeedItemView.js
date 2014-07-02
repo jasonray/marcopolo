@@ -6,7 +6,8 @@ define(function(require, exports, module) {
     var Transform     = require('famous/core/Transform');
     var StateModifier = require('famous/modifiers/StateModifier');
     var ImageSurface  = require('famous/surfaces/ImageSurface');
-    var EventHandler = require('famous/core/EventHandler');
+    var EventHandler    = require('famous/core/EventHandler');
+    var Ideas           = require('entities/ideas');
 
     function FeedItemView() {
         View.apply(this, arguments);
@@ -159,11 +160,28 @@ define(function(require, exports, module) {
         }.bind(this));
 
         this.voteDownSurface.on("click", function(){
-            this._eventOutput.emit('idea:no', this.options.data);
+            var id = this.options.data.id;
+            var tempIdea = new Ideas.Idea(this.options.data);
+            tempIdea.unset('id');
+            tempIdea.save({
+                url: 'http://localhost:9999/ideas/id/'+id+'/operations/voteNo?user=cushingb'
+                }, {
+                success: function(resp) {
+                    console.log(resp)
+                }
+            });
         }.bind(this));
-
-        this.backgroundSurface.on("click", function(){
-            this._eventOutput.emit('ides:open', this.options.data);
+        this.voteUpSurface.on("click", function(){
+            var id = this.options.data.id;
+            var tempIdea = new Ideas.Idea(this.options.data);
+            tempIdea.unset('id');
+            tempIdea.save({
+                url: 'http://localhost:9999/ideas/id/'+id+'/operations/voteYes?user=cushingb'
+                }, {
+                success: function(resp) {
+                    console.log(resp)
+                }
+            });
         }.bind(this));
     }
 
