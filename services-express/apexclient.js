@@ -1,4 +1,5 @@
 var oracle = require("oracle");
+var _ = require('underscore');
 
 exports.isHealthy = function(successHandler, errorHandler) {
 	sql = "SELECT systimestamp FROM dual";
@@ -10,6 +11,9 @@ exports.isHealthy = function(successHandler, errorHandler) {
 // provide callback `function(results)` and `function(err)` for handling exceptions
 function runSqlHandleError(sql, successHandler, errorHandler) {
 	runSql(sql, function(err, results) {
+		console.log('firing runSqlHandleError handler');
+		console.log('err [%s]', err);
+		console.log('results [%s]', results);
 		if (err) return errorHandler(err);
 		else return successHandler(results);
 	});
@@ -49,21 +53,55 @@ function runSql(sql, callback) {
 
 exports.fetchIdeas = fetchIdeas = function(successHandler, errorHandler) {
 	//update sql statement here
-	var sql = '';
-	runSqlHandleError(sql, successHandler, errorHandler);
+	var sql = "select *  \
+   from ( select rownum rnum, a.* \
+            from ( select x.id, x.short_desc, x.description, x.created, x.comment_count, x.tags, x.rn \
+                     from (select i.id, i.short_desc, i.description, i.created, c.comment_count, rownum rn, \
+                                  t.tags   \
+                             from ideas i, \
+                                  (select count(*) comment_count, parent_id \
+                                     from comments \
+                                    where parent_type = 'idea' \
+                                    group by parent_id) c, \
+                                  (select it.idea_id,  \
+                                          listagg(it.tag, ' ') within group (order by it.tag) tags \
+                                     from idea_tags it \
+                                    group by it.idea_id) t \
+                            where c.parent_id = i.id \
+                              and i.id = t.idea_id ) x ) a  \
+           where rownum <= 10 ) \
+  where rnum >= 1"
+
+
+
+	runSqlHandleError(sql, function(data) {
+		var resultData = [];
+		_.each(data, function(rawItem) {
+			var resultItem = convertFromDataToTransport(rawItem);
+			resultData.push(resultItem);
+		});
+		successHandler(resultData);
+	}, errorHandler);
+	console.log('past fetchIdeas.runSqlHandleError');
 };
 
 // customize this if needed to convert from oracle response to transport
 function convertFromDataToTransport(dataItem) {
+
+	// id: "a"
+	// short_description: "ideaA"
+	// long_description: "long description A"
+	// comment_count: 0
+	// created: "2014-01-01T17:34:56.000Z"
 	console.log('converting from data to transport for ' + dataItem);
 	if (!dataItem) return dataItem;
 
 	var transport = {};
-	transport.id = dataItem.id;
-	transport.short_description = dataItem.short_description;
-	transport.long_description = dataItem.long_description;
-	transport.comment_count = dataItem.comments.length;
-	transport.created = dataItem.createDate;
+	transport.id = dataItem.ID;
+	transport.short_description = dataItem.SHORT_DESC;
+	transport.long_description = dataItem.DESCRIPTION;
+	transport.comment_count = dataItem.COMMENT_COUNT;
+	transport.created = new Date(dataItem.CREATED);
 	return transport;
 }
 

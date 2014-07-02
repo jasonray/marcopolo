@@ -7,6 +7,7 @@ var apexClient = require('./apexclient');
 
 function errorHandler(res) {
 	return function(err) {
+		console.log('error handler firing');
 		var util = require('util');
 		res.send(500, err.message);
 	};
@@ -21,10 +22,12 @@ app.get('/health', function(req, res, next) {
 
 app.get('/ideas', function(req, res, next) {
 	var onSuccess = function(results) {
+		console.log('success handler firing');
 		res.send(results);
 	};
 
-	apexClient.fetchIdeas(onSuccess, errorHandler);
+	apexClient.fetchIdeas(onSuccess, errorHandler(res));
+	console.log('past /ideas request');
 });
 
 app.get('/ideas/id/:id', function(req, res, next) {
@@ -151,7 +154,7 @@ function determineUser(req) {
 	return req.param('user');
 }
 
-var port = 9999;
+var port = 9998;
 app.listen(port, function() {
 	console.log('services now listening on %s', port);
 });
