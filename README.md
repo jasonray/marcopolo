@@ -15,6 +15,10 @@ Run it! (services)
 ==================
 `./run.sh`
 
+Health Check
+------------
+GET `/health`
+
 List of ideas
 -------------
 GET `/ideas?user=userid`
