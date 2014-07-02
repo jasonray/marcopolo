@@ -1,10 +1,20 @@
 marcopolo
 =========
 
+Install It! (services)
+======================
+
+# Install oracle client [https://github.com/joeferner/node-oracle/blob/master/INSTALL.md]
+
+# Ensure that you have node installed [http://nodejs.org/download/]
+
+# Run `npm install`
 
 
-Services
-========
+Run it! (services)
+==================
+`./run.sh`
+
 List of ideas
 -------------
 GET `/ideas?user=userid`
