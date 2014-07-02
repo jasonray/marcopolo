@@ -86,7 +86,7 @@ define(function(require, exports, module) {
     function _createTitle() {
         var titleSurface = new Surface({
             size: [true, true],
-            content: this.options.data.title,
+            content: this.options.data.short_description,
             properties: {
                 color: '#4f4f4f',
                 fontFamily: 'AvenirNextCondensed-DemiBold',
@@ -104,7 +104,7 @@ define(function(require, exports, module) {
     function _createComments() {
         var commentSurface = new Surface({
             size: [true, true],
-            content: 'Comments: '+this.options.data.comments,
+            content: 'Comments: '+this.options.data.comment_count,
             properties: {
                 color: '#b2b2b2',
                 fontFamily: 'AvenirNextCondensed-DemiBold',
