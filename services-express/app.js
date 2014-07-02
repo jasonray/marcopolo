@@ -132,7 +132,7 @@ function determineUser(req) {
 	return req.param('user');
 }
 
-var port = 8888;
+var port = 9999;
 app.listen(port, function() {
 	console.log('services now listening on %s', port);
 });
