@@ -86,6 +86,9 @@ insert into ideas (short_desc, owner, available)
 insert into ideas (id, short_desc, owner, available) 
 	values (4, 'How many people would like to have ALOHA FRIDAYS?! You wear Hawaiian shirts to work :).', 'dillons', sysdate);
 
+insert into ideas (id, short_desc, owner, available) 
+	values (999, 'This is a testing idea', 'dillons', sysdate);
+
 insert into idea_tags (idea_id, tag) values (3, '#agilex');
 
 -- insert comments

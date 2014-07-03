@@ -5,16 +5,17 @@ create or replace package th_ideas_pkg as
 	procedure create_idea (p_short_desc	ideas.short_desc%type, 
 			p_owner			ideas.owner%type,
 			p_description		ideas.description%type,
-			p_topic_id		ideas.topic_id%type,
-                        p_tags			clob);
+			p_tags			clob default null,
+			p_topic_id		ideas.topic_id%type default null);
 
 
 	-- create an idea
 	function create_idea (p_short_desc	ideas.short_desc%type, 
 			p_owner			ideas.owner%type,
 			p_description		ideas.description%type,
-			p_topic_id		ideas.topic_id%type,
-                        p_tags			clob) return ideas.id%type;
+			p_tags			clob default null,
+			p_topic_id		ideas.topic_id%type default null)
+		return ideas.id%type;
 
 
 	-- update idea description(s)
@@ -51,6 +52,11 @@ create or replace package th_ideas_pkg as
 			p_comment_txt		comments.comment_txt%type,
 			p_commenter		comments.owner%type) return comments.id%type;
 
+	-- comment on an idea
+	procedure comment_on_idea (p_id		comments.parent_id%type,
+			p_comment_txt		comments.comment_txt%type,
+			p_commenter		comments.owner%type);
+
 	-- vote on an idea
 	procedure vote_on_idea (p_id		votes.idea_id%type,
 			p_voter			votes.voter%type,
@@ -64,7 +70,9 @@ create or replace package th_ideas_pkg as
 	procedure untrack_an_idea (p_id		votes.idea_id%type,
 			p_user			votes.voter%type);
 
-
+	-- remove all associated records for a particular idea
+	--  votes, comments, tracking, suspension, revocation, closing, tags
+	procedure reset_idea (p_id		ideas.id%type);
 end th_ideas_pkg;
 /
 show errors
@@ -78,8 +86,8 @@ create or replace package body th_ideas_pkg as
 	procedure create_idea (p_short_desc	ideas.short_desc%type, 
 			p_owner			ideas.owner%type,
 			p_description		ideas.description%type,
-			p_topic_id		ideas.topic_id%type,
-                        p_tags			clob)
+			p_tags			clob default null,
+			p_topic_id		ideas.topic_id%type default null)
         is
 		l_id	ideas.id%type;
         begin
@@ -96,8 +104,9 @@ create or replace package body th_ideas_pkg as
 	function create_idea (p_short_desc	ideas.short_desc%type, 
 			p_owner			ideas.owner%type,
 			p_description		ideas.description%type, 
-			p_topic_id		ideas.topic_id%type,
-			p_tags			clob) return ideas.id%type
+			p_tags			clob default null,
+			p_topic_id		ideas.topic_id%type default null)
+		return ideas.id%type
 	is
 		l_id	ideas.id%type;
 		l_now	date	:= sysdate;
@@ -173,6 +182,7 @@ create or replace package body th_ideas_pkg as
 		--
 		update ideas
 		   set closed = sysdate,
+		       closed_by = p_closer,
 		       last_edited_by = p_closer
 		 where id = p_id;
 		--
@@ -226,6 +236,7 @@ create or replace package body th_ideas_pkg as
 		--
 		update ideas
 		   set revoked = sysdate,
+		       revoked_by = p_revoker,
 		       last_edited_by = p_revoker
 		 where id = p_id;
 		--
@@ -297,6 +308,17 @@ create or replace package body th_ideas_pkg as
 	end comment_on_idea;
 			
 
+	-- comment on an idea (procedure)
+	procedure comment_on_idea (p_id		comments.parent_id%type,
+			p_comment_txt		comments.comment_txt%type,
+			p_commenter		comments.owner%type)
+	is
+		l_id comments.id%type;
+	begin
+		l_id := comment_on_idea(p_id, p_comment_txt, p_commenter);
+	end comment_on_idea;
+
+
 	-- vote on an idea
 	procedure vote_on_idea (p_id		votes.idea_id%type,
 			p_voter			votes.voter%type,
@@ -316,6 +338,7 @@ create or replace package body th_ideas_pkg as
 
 		end if;
 		--
+		delete from votes where idea_id = p_id and voter = p_voter;
 		insert into votes (idea_id, voter, vote)
 		values (p_id, p_voter, p_vote);
 	end vote_on_idea;
@@ -348,6 +371,34 @@ create or replace package body th_ideas_pkg as
 		-- TODO: do we return an error if this user wasn't tracking in the first place?! do we care?
 	end untrack_an_idea;
 
+
+	-- remove all associated records for a particular idea
+	--  votes, comments, tracking, suspension, revocation, closing, tags
+	procedure reset_idea (p_id		ideas.id%type)
+	is
+	begin
+		delete from comments
+		 where parent_type = 'idea'
+		   and parent_id = p_id;
+		--
+		delete from votes
+		 where idea_id = p_id;
+		--
+		delete from idea_tags
+		 where idea_id = p_id;
+		--
+		delete from tracked_ideas
+		 where idea_id = p_id;
+		--
+		update ideas
+		   set closed = null,
+			closed_by = null,
+			revoked = null,
+			revoked_by = null,
+			suspended = null,
+			suspended_by = null
+		 where id = p_id;
+	end reset_idea;
 
 end th_ideas_pkg;
 /
