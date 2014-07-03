@@ -1,6 +1,6 @@
 /*
-	IGNORE AN IDEA
-        PROCEDURE IGNORE_IDEA
+	UNIGNORE AN IDEA
+        PROCEDURE UNIGNORE_IDEA
          Argument Name			Type			In/Out Default?
          ------------------------------ ----------------------- ------ --------
          P_ID				NUMBER			IN
@@ -22,10 +22,10 @@ oracle.connect(connectData, function(err, connection) {
 	if (err) { console.log("Error connecting to db:", err); return; }
 
 	connection.execute(
-		"call th_ideas_pkg.ignore_idea(:1, :2)",
+		"call th_ideas_pkg.unignore_idea(:1, :2)",
 		[999, "dillons"],
 	        function(err, results) {
-			if (err) { console.log("Error ignoring idea: ", err); return; }
+			if (err) { console.log("Error unignoring idea: ", err); return; }
 
     			console.log(results);
        			connection.close(); // call only when query is finished executing
