@@ -13,6 +13,14 @@ function errorHandler(res) {
 	};
 }
 
+function onSuccessReturnResults(res) {
+	return function(results) {
+		console.log('success handler firing');
+		res.send(results);
+	};
+}
+
+
 app.get('/health', function(req, res, next) {
 	console.log('checking isHealthy');
 	apexClient.isHealthy(function() {
@@ -21,25 +29,13 @@ app.get('/health', function(req, res, next) {
 });
 
 app.get('/ideas', function(req, res, next) {
-	var onSuccess = function(results) {
-		console.log('success handler firing');
-		res.send(results);
-	};
-
-	apexClient.fetchIdeas(onSuccess, errorHandler(res));
+	apexClient.fetchIdeas(onSuccessReturnResults(res), errorHandler(res));
 	console.log('past /ideas request');
 });
 
 app.get('/ideas/id/:id', function(req, res, next) {
 	var id = req.param('id');
-	console.log('fetch by id [%s]', id);
-	var result = dataAdapter.fetchIdea(id);
-	if (result) {
-		res.send(result);
-	} else {
-		console.log('unable to fetch by id [%s]', id);
-		res.send(404);
-	}
+	apexClient.fetchIdea(id, onSuccessReturnResults(res), errorHandler(res));
 });
 
 app.use('/ideas', bodyParser.json({

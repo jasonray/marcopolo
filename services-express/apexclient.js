@@ -73,6 +73,11 @@ exports.fetchIdeas = fetchIdeas = function(successHandler, errorHandler) {
   where rnum >= 1"
 
 
+	// this is going to run a sql statement, adn on success
+	// of oracle client it will run the function(data)
+	// that function will parse data to "transport model"
+	// and then hand back to the "successHandler"
+	// passed in from app.js, which just perfroms result.send(transportdata);
 	runSqlHandleError(sql, function(data) {
 		var resultData = [];
 		_.each(data, function(rawItem) {
@@ -99,8 +104,33 @@ function convertFromDataToTransport(dataItem) {
 	return transport;
 }
 
-exports.fetchIdea = fetchIdea = function(id) {
-	// return single item by id
+exports.fetchIdea = fetchIdea = function(id, successHandler, errorHandler) {
+	//replace sql
+	var sql = "select *  \
+   from ( select rownum rnum, a.* \
+            from ( select x.id, x.short_desc, x.description, x.created, x.comment_count, x.tags, x.rn \
+                     from (select i.id, i.short_desc, i.description, i.created, c.comment_count, rownum rn, \
+                                  t.tags   \
+                             from ideas i, \
+                                  (select count(*) comment_count, parent_id \
+                                     from comments \
+                                    where parent_type = 'idea' \
+                                    group by parent_id) c, \
+                                  (select it.idea_id,  \
+                                          listagg(it.tag, ' ') within group (order by it.tag) tags \
+                                     from idea_tags it \
+                                    group by it.idea_id) t \
+                            where c.parent_id = i.id \
+                              and i.id = t.idea_id ) x ) a  \
+           where rownum <= 10 ) \
+  where id=" + id;
+
+	runSqlHandleError(sql, function(data) {
+		console.log('found %s record(s)',data.length);
+		if (data.length === 0) successHandler(undefined);
+		var resultItem = convertFromDataToTransport(data[0]);
+		successHandler(resultItem);
+	}, errorHandler);
 };
 
 exports.fetchIdeaVoteResultForUser = fetchIdea = function(id, user) {
