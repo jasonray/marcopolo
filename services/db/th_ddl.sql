@@ -2,6 +2,7 @@ drop table votes;
 drop table ignored_ideas;
 drop table tracked_ideas;
 drop table tag_black_list;
+drop table suspension_requests;
 drop table topic_tags;
 drop table idea_tags;
 drop table tags;
@@ -183,6 +184,15 @@ alter table idea_tags
 add constraint idea_tags_ideas_fk 
 foreign key (idea_id)
 references ideas;
+
+
+create table suspension_requests (
+	parent_id	number		not null,
+	parent_type	varchar2(40)	not null,
+	suspender	varchar2(200)	not null,
+	suspended_date	date
+);
+
 
 
 create table tag_black_list (
