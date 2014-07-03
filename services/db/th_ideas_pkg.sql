@@ -57,18 +57,26 @@ create or replace package th_ideas_pkg as
 			p_comment_txt		comments.comment_txt%type,
 			p_commenter		comments.owner%type);
 
+	-- ignore an idea
+	procedure ignore_idea (p_id		ignored_ideas.idea_id%type,
+			p_ignorer		ignored_ideas.ignoring_user%type);
+
+	-- unignore an idea
+	procedure unignore_idea (p_id		ignored_ideas.idea_id%type,
+			p_ignorer		ignored_ideas.ignoring_user%type);
+
 	-- vote on an idea
 	procedure vote_on_idea (p_id		votes.idea_id%type,
 			p_voter			votes.voter%type,
 			p_vote			votes.vote%type);
 
 	-- track an idea
-	procedure track_an_idea (p_id		votes.idea_id%type,
-			p_user			votes.voter%type);
+	procedure track_an_idea (p_id		tracked_ideas.idea_id%type,
+			p_user			tracked_ideas.tracking_user%type);
 
 	-- stop tracking an idea
-	procedure untrack_an_idea (p_id		votes.idea_id%type,
-			p_user			votes.voter%type);
+	procedure untrack_an_idea (p_id		tracked_ideas.idea_id%type,
+			p_user			tracked_ideas.tracking_user%type);
 
 	-- remove all associated records for a particular idea
 	--  votes, comments, tracking, suspension, revocation, closing, tags
@@ -344,9 +352,40 @@ create or replace package body th_ideas_pkg as
 	end vote_on_idea;
 
 
+
+	-- ignore an idea
+	procedure ignore_idea (p_id		ignored_ideas.idea_id%type,
+			p_ignorer		ignored_ideas.ignoring_user%type)
+	is
+	begin
+		insert into ignored_ideas (idea_id, ignoring_user)
+		values (p_id, p_ignorer);
+	exception
+		when dup_val_on_index then
+			--TODO: log the duplicate ignore. WHY did we get a dupe?!
+			raise_application_error(th_constants_pkg.ALREADY_IGNORED_CODE,
+						th_constants_pkg.ALREADY_IGNORED_MSG);
+	end ignore_idea;
+
+	-- unignore an idea
+	procedure unignore_idea (p_id		ignored_ideas.idea_id%type,
+			p_ignorer		ignored_ideas.ignoring_user%type)
+	is
+	begin
+		delete from ignored_ideas
+		 where idea_id = p_id
+ 		   and ignoring_user = p_ignorer;
+		--
+		if SQL%ROWCOUNT = 0 then
+			-- TODO: log tried to unignore an idea that the user isn't ignoring
+			null;
+		end if;
+	end unignore_idea;
+
+
 	-- track an idea
-	procedure track_an_idea (p_id		votes.idea_id%type,
-			p_user			votes.voter%type)
+	procedure track_an_idea (p_id		tracked_ideas.idea_id%type,
+			p_user			tracked_ideas.tracking_user%type)
 
 	is
 	begin
@@ -360,8 +399,8 @@ create or replace package body th_ideas_pkg as
 
 
 	-- stop tracking an idea
-	procedure untrack_an_idea (p_id		votes.idea_id%type,
-			p_user			votes.voter%type)
+	procedure untrack_an_idea (p_id		tracked_ideas.idea_id%type,
+			p_user			tracked_ideas.tracking_user%type)
 	is
 	begin
 		delete 

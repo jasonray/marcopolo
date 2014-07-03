@@ -52,6 +52,12 @@ select id, owner, comment_txt
    and parent_id = 999
 /
 
+prompt ..USERS IGNORING
+select ignoring_user
+  from ignored_ideas
+ where idea_id = 999
+/
+
 prompt ..VOTES
 select idea_id, voter, vote
   from votes

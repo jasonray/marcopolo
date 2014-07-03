@@ -1,4 +1,5 @@
 drop table votes;
+drop table ignored_ideas;
 drop table tracked_ideas;
 drop table tag_black_list;
 drop table topic_tags;
@@ -223,6 +224,27 @@ references ideas;
 alter table tracked_ideas
 add constraint tracked_ideas_user_fk
 foreign key (tracking_user)
+references users;
+
+
+
+create table ignored_ideas (
+	idea_id		number,
+	ignoring_user	varchar2(200)
+);
+
+alter table ignored_ideas
+add constraint ignored_ideas_pk
+primary key (idea_id, ignoring_user);
+
+alter table ignored_ideas
+add constraint ignored_ideas_idea_fk
+foreign key (idea_id)
+references ideas;
+
+alter table ignored_ideas
+add constraint ignored_ideas_user_fk
+foreign key (ignoring_user)
 references users;
 
 

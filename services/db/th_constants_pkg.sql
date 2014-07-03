@@ -100,6 +100,11 @@ create or replace package th_constants_pkg as
 	ALREADY_TRACKED_MSG varchar2(100) := 'EXCEPTION: This tracking user is already tracking this idea';
 	PRAGMA EXCEPTION_INIT(ALREADY_TRACKED_EXCEPTION, -20104);
 
+	ALREADY_IGNORED_EXCEPTION EXCEPTION;
+	ALREADY_IGNORED_CODE number := -20205;
+	ALREADY_IGNORED_MSG varchar2(100) := 'EXCEPTION: This user is already ignoring this idea';
+	PRAGMA EXCEPTION_INIT(ALREADY_IGNORED_EXCEPTION, -20105);
+
 		
 
 	---------------------------------------------
