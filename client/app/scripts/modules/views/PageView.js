@@ -196,12 +196,15 @@ define(function(require, exports, module) {
     }
 
     function _setListeners() {
-        var that = this;
         this.hamburgerSurface.on('click', function() {
             this._eventOutput.emit('menuToggle');
         }.bind(this));
 
         this.bodySurface.pipe(this._eventOutput);
+
+        // this._eventInput.on('deleteTask', function(task) {
+        //     this.model.get('tasks').remove(task);
+        // }.bind(this));
 
         this.addIdeaSurface.on("mouseover", function(){
             this.setProperties({
@@ -225,8 +228,8 @@ define(function(require, exports, module) {
 
         this.addItemView.on('newFeed:add', function(item){
             var Ideas           = require('entities/ideas');
-            that.lightbox.hide();
-            _closeModal.call(that);
+            this.lightbox.hide();
+            _closeModal.call(this);
             FeedData.unshift(item);
 
             new Ideas.Idea(item).save({}, {
@@ -237,13 +240,13 @@ define(function(require, exports, module) {
 
             Store.set('newFeed', FeedData)
             
-            that.feedView.render = function(){ return null; }
-            _createFeedView.call(that);
-        });
+            this.feedView.render = function(){ return null; }
+            _createFeedView.call(this);
+        }.bind(this));
         this.addItemView.on('newFeed:close', function(){
-           that.lightbox.hide();
-            _closeModal.call(that);
-        });
+           this.lightbox.hide();
+            _closeModal.call(this);
+        }.bind(this));
     }
 
     module.exports = PageView;
