@@ -71,6 +71,7 @@ exports.fetchIdeaVoteResultForUser = fetchIdea = function(id, user) {
 };
 
 exports.voteYes = voteYes = function(id, user) {
+	console.log('in voteYes w id:' + id + ', user:' + user);
 	vote(id, user, true);
 };
 exports.voteNo = voteNo = function(id, user) {
@@ -79,6 +80,7 @@ exports.voteNo = voteNo = function(id, user) {
 
 exports.vote = vote = function(id, user, rawVotingResult) {
 	//ensure voting result parses
+	console.log('in vote w/ function(id, user, rawVotingResult)');
 	var votingResult = stringToBoolean(rawVotingResult);
 	console.log('parsed %s => %s', rawVotingResult, votingResult);
 
@@ -163,6 +165,7 @@ exports.createIdea = createIdea = function(item) {
 	// todo: validate input data
 	if (!item.id) item.id = uuid.v4();
 	item = initializeSampleIdea(item.id, item.short_description, item.long_description, new Date());
+	console.log("In createIdea.. short_desc = " + item.short_description);
 	data.push(item);
 	return item;
 };
@@ -175,6 +178,7 @@ exports.fetchComments = fetchComments = function(id) {
 		return null;
 	}
 };
+
 exports.saveComment = saveComment = function(id, user, comment) {
 	var matchingRawItem = findMatchingItem(id);
 	if (matchingRawItem) {

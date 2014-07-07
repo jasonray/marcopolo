@@ -52,6 +52,7 @@ app.get('/ideas/id/:id', function(req, res, next) {
 app.use('/ideas', bodyParser.json({
 	strict: true
 }));
+
 app.post('/ideas', function(req, res, next) {
 	var newIdea = req.body;
 	console.log('received request to create new idea [%s][%s]', newIdea, newIdea.short_description);
@@ -91,6 +92,7 @@ app.post('/ideas/id/:id/operations/voteYes', function(req, res, next) {
 	var user = determineUser(req);
 	console.log('vote by id [%s][%s]', id, user);
 	dataAdapter.voteYes(id, user);
+	console.log('passed dataAdapter.voteYes');
 	res.send(200);
 });
 app.post('/ideas/id/:id/operations/voteNo', function(req, res, next) {

@@ -33,10 +33,9 @@ function runSql(sql, callback) {
 
 	oracle.connect(connectData, function(err, connection) {
 		if (err) {
-			console.log('XError connecting to db:', err);
+			console.log('Error connecting to db:', err);
 			return callback(err);
 		}
-
 		console.log('execute oracle query [%s]', sql);
 		connection.execute(sql, [], function(err, results) {
 			if (err) {
@@ -177,6 +176,9 @@ function convertFromDataToTransport(dataItem) {
 	transport.id = dataItem.ID;
 	transport.owner = dataItem.OWNER;
 	transport.created = new Date(dataItem.CREATED);
+	transport.revoked = new Date(dataItem.REVOKED);
+	transport.suspended = new Date(dataItem.SUSPENDED);
+	transport.closed = new Date(dataItem.CLOSED);
 	transport.title = dataItem.TITLE;
 	transport.short_description = dataItem.SHORT_DESC;
 	transport.description = dataItem.DESCRIPTION;
