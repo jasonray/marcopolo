@@ -154,8 +154,8 @@ define(function(require, exports, module) {
     function _setListeners() {
         this.submitSurface.on("click", function(){
             this.newIdea = {comments:''};
-            this.newIdea.title = this.summaryInput.getValue();
-            this.newIdea.description = this.descriptionInput.getValue();
+            this.newIdea.short_description = this.summaryInput.getValue();
+            this.newIdea.long_description = this.descriptionInput.getValue();
             this._eventOutput.emit('newFeed:add', this.newIdea);
             this.descriptionInput.setValue('');
         }.bind(this));

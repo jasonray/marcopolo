@@ -5,12 +5,13 @@ define(function(require, exports, module) {
     var StateModifier   = require('famous/modifiers/StateModifier');
     var HeaderFooter    = require('famous/views/HeaderFooterLayout');
     var ImageSurface    = require('famous/surfaces/ImageSurface');
-     var Lightbox       = require('famous/views/Lightbox');
+    var Lightbox        = require('famous/views/Lightbox');
     var Easing          = require('famous/transitions/Easing');
 
     var AddItemView     = require('modules/views/AddItemView');
     var FeedView        = require('modules/views/FeedView');
     var FeedData        = [];
+    var Store           = require("store");
 
     function PageView() {
         View.apply(this, arguments);
@@ -42,8 +43,8 @@ define(function(require, exports, module) {
             showOrigin: [.5, .5],
             inTransform: Transform.thenMove(Transform.rotateX(0.9), [0, -300, 500]),
             outTransform: Transform.thenMove(Transform.rotateZ(0.7), [0, window.innerHeight, 500]),
-            inTransition: { duration: 500, curve: 'easeOut' },
-            outTransition: { duration: 100, curve: Easing.inCubic }
+            inTransition: { duration: 600, curve: 'easeOut' },
+            outTransition: { duration: 300, curve: Easing.inCubic }
         }
     };
 
@@ -195,12 +196,15 @@ define(function(require, exports, module) {
     }
 
     function _setListeners() {
-        var that = this;
         this.hamburgerSurface.on('click', function() {
             this._eventOutput.emit('menuToggle');
         }.bind(this));
 
         this.bodySurface.pipe(this._eventOutput);
+
+        // this._eventInput.on('deleteTask', function(task) {
+        //     this.model.get('tasks').remove(task);
+        // }.bind(this));
 
         this.addIdeaSurface.on("mouseover", function(){
             this.setProperties({
@@ -223,19 +227,26 @@ define(function(require, exports, module) {
         }.bind(this));
 
         this.addItemView.on('newFeed:add', function(item){
-           that.lightbox.hide();
-            _closeModal.call(that);
+            var Ideas           = require('entities/ideas');
+            this.lightbox.hide();
+            _closeModal.call(this);
             FeedData.unshift(item);
-            if (Modernizr.localstorage) {
-                window.localStorage["newFeed"] = JSON.stringify(FeedData);
-            } 
-            that.feedView.render = function(){ return null; }
-            _createFeedView.call(that);
-        });
+
+            new Ideas.Idea(item).save({}, {
+                success: function(resp) {
+                    console.log(resp)
+                }
+            });
+
+            Store.set('newFeed', FeedData)
+            
+            this.feedView.render = function(){ return null; }
+            _createFeedView.call(this);
+        }.bind(this));
         this.addItemView.on('newFeed:close', function(){
-           that.lightbox.hide();
-            _closeModal.call(that);
-        });
+           this.lightbox.hide();
+            _closeModal.call(this);
+        }.bind(this));
     }
 
     module.exports = PageView;

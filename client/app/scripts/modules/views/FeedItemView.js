@@ -6,7 +6,10 @@ define(function(require, exports, module) {
     var Transform     = require('famous/core/Transform');
     var StateModifier = require('famous/modifiers/StateModifier');
     var ImageSurface  = require('famous/surfaces/ImageSurface');
-    var EventHandler = require('famous/core/EventHandler');
+    var EventHandler  = require('famous/core/EventHandler');
+    var Transitionable   = require('famous/transitions/Transitionable');
+
+    var Ideas           = require('entities/ideas');
 
     function FeedItemView() {
         View.apply(this, arguments);
@@ -14,13 +17,15 @@ define(function(require, exports, module) {
         this.voteUpEvent = new EventHandler();
         this.voteDownEvent = new EventHandler();
 
+        // this.transform = new Transitionable([0, 0, 0]);
+        // this.size = new Transitionable(100);
+
         _createBackground.call(this);
         _createButtons.call(this);
-        _createTitle.call(this);
-        if (this.options.data.comments) {
-            _createComments.call(this);
-        }
+        _createContent.call(this);
         _setListeners.call(this);
+        
+        this.setContent();
     }
 
     FeedItemView.prototype = Object.create(View.prototype);
@@ -33,7 +38,13 @@ define(function(require, exports, module) {
         iconUrl: 'img/strip-icons/famous.png',
         title: 'Famo.us',
         primaryFontSize: 18,
-        secondaryFontSize: 12
+        secondaryFontSize: 12,
+        stripOffset: 58,
+        staggerDelay: 38,
+        transition: {
+            duration: 400,
+            curve: 'easeOut'
+        }
     };
 
     function _createBackground() {
@@ -83,10 +94,10 @@ define(function(require, exports, module) {
         this.add(viewModifier).add(buttonView);
     }
 
-    function _createTitle() {
-        var titleSurface = new Surface({
+    function _createContent() {
+        this.contentSurface = new Surface({
             size: [true, true],
-            content: this.options.data.title,
+            classes: ["feedItem"],
             properties: {
                 color: '#4f4f4f',
                 fontFamily: 'AvenirNextCondensed-DemiBold',
@@ -99,26 +110,9 @@ define(function(require, exports, module) {
             transform: Transform.translate(15, 10, 0)
         });
 
-        this.add(titleModifier).add(titleSurface);
+        this.add(titleModifier).add(this.contentSurface);
     }
-    function _createComments() {
-        var commentSurface = new Surface({
-            size: [true, true],
-            content: 'Comments: '+this.options.data.comments,
-            properties: {
-                color: '#b2b2b2',
-                fontFamily: 'AvenirNextCondensed-DemiBold',
-                fontSize: this.options.secondaryFontSize + 'px',
-                pointerEvents : 'none'
-            }
-        });
-
-        var commentModifier = new StateModifier({
-            transform: Transform.translate(15, 30, 0)
-        });
-
-        this.add(commentModifier).add(commentSurface);
-    }
+    
 
     function _setListeners() {
         this.backgroundSurface.on("mouseover", function(){
@@ -154,18 +148,47 @@ define(function(require, exports, module) {
             });
         });
 
-        this.voteUpSurface.on("click", function(){
-            this._eventOutput.emit('idea:yes', this.options.data);
-        }.bind(this));
-
         this.voteDownSurface.on("click", function(){
-            this._eventOutput.emit('idea:no', this.options.data);
-        }.bind(this));
+            var id = this.options.data.id;
+            var tempIdea = new Ideas.Idea(this.options.data);
+            tempIdea.unset('id');
+            tempIdea.save({
+                url: 'http://localhost:9999/ideas/id/'+id+'/operations/voteNo?user=cushingb'
+                }, {
+                success: function(resp) {
+                 //   console.log(resp)
+                }
+            });
+        
+            this._eventOutput.emit("idea:delete", this);
 
-        this.backgroundSurface.on("click", function(){
-            this._eventOutput.emit('ides:open', this.options.data);
+            // this.delete(function() {
+            //    // this.viewSequence.splice(removalData.index, 1);
+            // }.bind(this));
         }.bind(this));
-    }
+        this.voteUpSurface.on("click", function(){
+            var id = this.options.data.id;
+            var tempIdea = new Ideas.Idea(this.options.data);
+            tempIdea.unset('id');
+            tempIdea.save({
+                url: 'http://localhost:9999/ideas/id/'+id+'/operations/voteYes?user=cushingb'
+                }, {
+                success: function(resp) {
+                 //   console.log(resp)
+                }
+            });
+            this._eventOutput.emit("idea:delete", this);
+        }.bind(this));
+    };
+
+    FeedItemView.prototype.setContent = function() {
+        this.contentSurface.setContent(template.call(this));
+    };
+    var template = function() {
+        var title = this.options.data.short_description;
+        return "<h3>" + title + "</h3>";
+        // "<div class='checkbox'>&#xf10c;</div>"
+    };
 
     module.exports = FeedItemView;
 });

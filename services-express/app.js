@@ -1,6 +1,7 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 var app = express();
+var cors = require('cors');
 
 var dataAdapter = require('./sampleDataAdapter');
 var apexClient = require('./apexclient');
@@ -38,6 +39,9 @@ app.get('/topic/id/:id', function(req, res, next) {
 	var id = req.param('id');
 	apexClient.fetchTopic(id, onSuccessReturnResults(res), errorHandler(res));
 });
+
+
+app.use(cors());
 
 app.get('/ideas', function(req, res, next) {
 	apexClient.fetchIdeas(onSuccessReturnResults(res), errorHandler(res));
