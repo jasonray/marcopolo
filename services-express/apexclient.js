@@ -98,6 +98,33 @@ exports.fetchTopics = fetchTopics = function(successHandler, errorHandler) {
 	console.log('past fetchTopics.runSqlHandleError');
 };
 
+exports.fetchTopic = fetchTopic = function(id, successHandler, errorHandler) {
+	var sql = "select t.id, decode(u.first_name || ' ' || u.last_name, ' ', t.owner, " +
+                  "                u.first_name || ' ' || u.last_name) owner, " +
+                  "       t.title title, t.description, " +
+                  "       t.created, c.comment_count, tt.tags " +
+                  "  from topics t, users u, " +
+                  "       (select count(*) comment_count, parent_id  " +
+                  "          from comments " +
+                  "         where parent_type = 'topic' " +
+                  "         group by parent_id) c, " +
+                  "       (select tt.topic_id,  " +
+                  "               listagg(tt.tag, ' ') within group (order by tt.tag) tags " +
+                  "          from topic_tags tt " +
+                  "         group by tt.topic_id) tt " +
+                  " where t.owner = u.username " +
+                  "   and t.id = c.parent_id (+) " +
+                  "   and t.id = tt.topic_id (+) " +
+                  "   and t.id = " + id;
+
+	runSqlHandleError(sql, function(data) {
+		console.log('found %s record(s)',data.length);
+		if (data.length === 0) successHandler(undefined);
+		var resultItem = convertFromDataToTransport(data[0]);
+		successHandler(resultItem);
+	}, errorHandler);
+};
+
 exports.fetchIdeas = fetchIdeas = function(successHandler, errorHandler) {
 	//update sql statement here
 	var lowerRowCount = 1;
@@ -162,7 +189,6 @@ function convertFromDataToTransport(dataItem) {
 }
 
 exports.fetchIdea = fetchIdea = function(id, successHandler, errorHandler) {
-
 	var sql = "select i.id, decode(u.first_name || ' ' || u.last_name, ' ', i.owner, " +
                   "                    u.first_name || ' ' || u.last_name) owner, " +
                   "       i.short_desc short_desc, i.description, " +

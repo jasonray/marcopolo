@@ -34,6 +34,11 @@ app.get('/topics', function(req, res, next) {
 });
 
 
+app.get('/topic/id/:id', function(req, res, next) {
+	var id = req.param('id');
+	apexClient.fetchTopic(id, onSuccessReturnResults(res), errorHandler(res));
+});
+
 app.get('/ideas', function(req, res, next) {
 	apexClient.fetchIdeas(onSuccessReturnResults(res), errorHandler(res));
 	console.log('past /ideas request');
