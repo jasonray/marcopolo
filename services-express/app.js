@@ -28,6 +28,12 @@ app.get('/health', function(req, res, next) {
 	}, errorHandler(res));
 });
 
+app.get('/topics', function(req, res, next) {
+	apexClient.fetchTopics(onSuccessReturnResults(res), errorHandler(res));
+	console.log('past /topics request');
+});
+
+
 app.get('/ideas', function(req, res, next) {
 	apexClient.fetchIdeas(onSuccessReturnResults(res), errorHandler(res));
 	console.log('past /ideas request');
