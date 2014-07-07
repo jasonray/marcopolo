@@ -6,8 +6,7 @@ define(function(require, exports, module) {
     var Transform     = require('famous/core/Transform');
     var StateModifier = require('famous/modifiers/StateModifier');
     var ImageSurface  = require('famous/surfaces/ImageSurface');
-    var EventHandler    = require('famous/core/EventHandler');
-    var Timer         = require('famous/utilities/Timer');
+    var EventHandler  = require('famous/core/EventHandler');
     var Transitionable   = require('famous/transitions/Transitionable');
 
     var Ideas           = require('entities/ideas');
@@ -18,12 +17,14 @@ define(function(require, exports, module) {
         this.voteUpEvent = new EventHandler();
         this.voteDownEvent = new EventHandler();
 
+        // this.transform = new Transitionable([0, 0, 0]);
+        // this.size = new Transitionable(100);
+
         _createBackground.call(this);
         _createButtons.call(this);
         _createContent.call(this);
         _setListeners.call(this);
-        this.transform = new Transitionable([0, 0, 0]);
-        this.size = new Transitionable(100);
+        
         this.setContent();
     }
 
@@ -101,8 +102,7 @@ define(function(require, exports, module) {
                 color: '#4f4f4f',
                 fontFamily: 'AvenirNextCondensed-DemiBold',
                 fontSize: this.options.primaryFontSize + 'px',
-                pointerEvents : 'none',
-                backgroundColor: '#e9e9e9'
+                pointerEvents : 'none'
             }
         });
 
@@ -115,16 +115,16 @@ define(function(require, exports, module) {
     
 
     function _setListeners() {
-        // this.backgroundSurface.on("mouseover", function(){
-        //     this.setProperties({
-        //         backgroundColor: 'white'
-        //     });
-        // });
-        // this.backgroundSurface.on("mouseout", function(){
-        //     this.setProperties({
-        //         backgroundColor: '#e9e9e9'
-        //     });
-        // });
+        this.backgroundSurface.on("mouseover", function(){
+            this.setProperties({
+                backgroundColor: 'white'
+            });
+        });
+        this.backgroundSurface.on("mouseout", function(){
+            this.setProperties({
+                backgroundColor: '#e9e9e9'
+            });
+        });
 
         this.voteUpSurface.on("mouseover", function(){
             this.setProperties({
@@ -148,10 +148,6 @@ define(function(require, exports, module) {
             });
         });
 
-        this.voteUpSurface.on("click", function(){
-            this._eventOutput.emit('idea:yes', this.options.data);
-        }.bind(this));
-
         this.voteDownSurface.on("click", function(){
             var id = this.options.data.id;
             var tempIdea = new Ideas.Idea(this.options.data);
@@ -160,12 +156,15 @@ define(function(require, exports, module) {
                 url: 'http://localhost:9999/ideas/id/'+id+'/operations/voteNo?user=cushingb'
                 }, {
                 success: function(resp) {
-                    console.log(resp)
+                 //   console.log(resp)
                 }
             });
-            this.delete(function() {
-               // this.viewSequence.splice(removalData.index, 1);
-            }.bind(this));
+        
+            this._eventOutput.emit("idea:delete", this);
+
+            // this.delete(function() {
+            //    // this.viewSequence.splice(removalData.index, 1);
+            // }.bind(this));
         }.bind(this));
         this.voteUpSurface.on("click", function(){
             var id = this.options.data.id;
@@ -175,23 +174,13 @@ define(function(require, exports, module) {
                 url: 'http://localhost:9999/ideas/id/'+id+'/operations/voteYes?user=cushingb'
                 }, {
                 success: function(resp) {
-                    console.log(resp)
+                 //   console.log(resp)
                 }
             });
-            this.delete(function() {
-               // this.viewSequence.splice(removalData.index, 1);
-            }.bind(this));
-        }.bind(this));
-    }
-
-    FeedItemView.prototype.delete = function(cb) {
-        this.transform.set([window.innerWidth + 100, 0, 0], {duration: 1000, curve: 'easeInOut'}, function() {
-            this.size.set(0, {duration: 300, curve: 'easeOut'}, function() {
-             //   cb();
-                this._eventOutput.emit('closed');
-            }.bind(this));
+            this._eventOutput.emit("idea:delete", this);
         }.bind(this));
     };
+
     FeedItemView.prototype.setContent = function() {
         this.contentSurface.setContent(template.call(this));
     };

@@ -7,6 +7,7 @@ define(function(require, exports, module) {
     var Transform     = require('famous/core/Transform');
     var StateModifier = require('famous/modifiers/StateModifier');
     var Timer         = require('famous/utilities/Timer');
+    // var Transitionable   = require('famous/transitions/Transitionable');
 
     var FeedItemView     = require('modules/views/FeedItemView');
 
@@ -40,7 +41,7 @@ define(function(require, exports, module) {
         var yOffset = this.options.topOffset;
 
         for (var i = 0; i < this.options.feedData.length; i++) {
-            this.feedItemView = new FeedItemView({data: this.options.feedData[i]});
+            this.feedItemView = new FeedItemView({data: this.options.feedData[i], yOffset: yOffset});
 
             var stripModifier = new StateModifier({
                 transform: Transform.translate(0, yOffset, 0)
@@ -49,10 +50,14 @@ define(function(require, exports, module) {
             this.stripModifiers.push(stripModifier);
             this.add(stripModifier).add(this.feedItemView);
 
-            this.animateStrips();
-
             yOffset += this.options.stripOffset;
+
+            this.feedItemView.on("idea:delete", function(item){
+                this.delete(item)
+            }.bind(this));
+         
         }
+        this.animateStrips();
     }
 
     FeedView.prototype.resetStrips = function() {
@@ -64,8 +69,15 @@ define(function(require, exports, module) {
 
             this.stripModifiers[i].setTransform(Transform.translate(initX, initY, 0));
         }
+    };
 
-        // this.featuredMod.setOpacity(0);
+    FeedView.prototype.restack = function(item, index) {
+        console.log('delete');
+        for(var i = index; i < this.stripModifiers.length; i++) {
+            var initY = this.options.topOffset
+                + this.options.stripOffset * i;
+            this.stripModifiers[i].setTransform(Transform.translate(0, initY - this.options.stripHeight, 0));
+        }
     };
 
     FeedView.prototype.animateStrips = function() {
@@ -91,10 +103,34 @@ define(function(require, exports, module) {
     };
 
     function _setListeners() {
-        this.feedItemView.on("idea:yes", function(){
-            console.log('vote Up');
-        });
+        // this.feedItemView.on("idea:down", function(){
+        //     alert('down')
+        // }.bind(this));
+
+        // this.feedItemView.on("idea:up", function(){
+        //     alert('yes')
+        // }.bind(this));
+
     }
+
+    FeedView.prototype.delete = function(item) {
+        
+        var index = this.options.feedData.indexOf(item.options.data);
+        this.restack(item, index);
+        if (index > -1) {
+            this.stripModifiers.splice(index, 1);
+            this.options.feedData.splice(index, 1);
+        }
+        item.render = function(){ return null; }
+        
+
+
+        // Timer.setTimeout(function(i) {
+        //     item.stripModifier.setTransform(
+        //         Transform.translate( offSet, 0, 0), transition);
+        // }.bind(this), delay);
+        
+    };
 
     module.exports = FeedView;
 });
