@@ -16,10 +16,14 @@ function errorHandler(res) {
 
 function onSuccessReturnResults(res) {
 	return function(results) {
-		console.log('success handler firing');
 		res.send(results);
 	};
 }
+
+app.use(function(req, res, next) {
+	console.log('request: %s %s', req.method, req.url);
+	next();
+});
 
 app.use(express.static('client/app'));
 
@@ -32,7 +36,6 @@ app.get('/health', function(req, res, next) {
 
 app.get('/topics', function(req, res, next) {
 	apexClient.fetchTopics(onSuccessReturnResults(res), errorHandler(res));
-	console.log('past /topics request');
 });
 
 
@@ -46,7 +49,6 @@ app.use(cors());
 
 app.get('/ideas', function(req, res, next) {
 	apexClient.fetchIdeas(onSuccessReturnResults(res), errorHandler(res));
-	console.log('past /ideas request');
 });
 
 app.get('/ideas/id/:id', function(req, res, next) {
@@ -61,12 +63,7 @@ app.use('/ideas', bodyParser.json({
 app.post('/ideas', function(req, res, next) {
 	var newIdea = req.body;
 	console.log('received request to create new idea [%s][%s]', newIdea, newIdea.short_description);
-
-	var util = require('util');
-	console.log(util.inspect(req.body, {
-		showHidden: true,
-		depth: null
-	}));
+	console.dir(newIdea);
 
 	var idea = dataAdapter.createIdea(newIdea);
 	// i am returning the version from the data adapter to ensure that the links get built, there are better ways to accomplish this

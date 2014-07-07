@@ -11,9 +11,6 @@ exports.isHealthy = function(successHandler, errorHandler) {
 // provide callback `function(results)` and `function(err)` for handling exceptions
 function runSqlHandleError(sql, successHandler, errorHandler) {
 	runSql(sql, function(err, results) {
-		console.log('firing runSqlHandleError handler');
-		console.log('err [%s]', err);
-		console.log('results [%s]', results);
 		if (err) return errorHandler(err);
 		else return successHandler(results);
 	});
@@ -94,7 +91,6 @@ exports.fetchTopics = fetchTopics = function(successHandler, errorHandler) {
 		});
 		successHandler(resultData);
 	}, errorHandler);
-	console.log('past fetchTopics.runSqlHandleError');
 };
 
 exports.fetchTopic = fetchTopic = function(id, successHandler, errorHandler) {
@@ -163,13 +159,11 @@ exports.fetchIdeas = fetchIdeas = function(successHandler, errorHandler) {
 		});
 		successHandler(resultData);
 	}, errorHandler);
-	console.log('past fetchIdeas.runSqlHandleError');
 };
 
 // customize this if needed to convert from oracle response to transport
 function convertFromDataToTransport(dataItem) {
 
-	console.log('converting from data to transport for ' + dataItem);
 	if (!dataItem) return dataItem;
 
 	var transport = {};
