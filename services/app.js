@@ -120,9 +120,7 @@ app.post('/ideas/id/:id/comments', function(req, res, next) {
 	var id = req.param('id');
 	var user = determineUser(req);
 	var commentText = req.body;
-	console.log('storing comment [%s][%s][%s]', id, user, commentText);
-	dataAdapter.saveComment(id, user, commentText);
-	res.send(200);
+	apexClient.method(id, user, commentText, onSuccessReturnResults(res), errorHandler(res));
 });
 
 app.post('/ideas/id/:id/operations/suspend', function(req, res, next) {

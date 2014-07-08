@@ -273,12 +273,11 @@ exports.fetchComments = fetchComments = function(id, successHandler, errorHandle
 	runSqlWithParametersHandleError(sql, params, successHandler, errorHandler);
 };
 
-exports.saveComment = saveComment = function(id, user, comment) {
-	// save comment:
-	// commentEntry.id = uuid.v4();
-	// commentEntry.comment = comment;
-	// commentEntry.user = user;
-	// commentEntry.created = new Date();
+exports.saveComment = saveComment = function(id, user, comment, successHandler, errorHandler) {
+	var sql = "procedure name(:1,:2,:3)"; //TODO
+	var params = [id,user,comment];
+
+	runSqlWithParametersHandleError(sql, params, successHandler, errorHandler);
 };
 
 exports.suspendIdea = suspendIdea = function(id, user) {
