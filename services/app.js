@@ -121,6 +121,10 @@ app.post('/ideas/id/:id/operations/suspend', function(req, res, next) {
 	apexClient.suspendIdea(req.param('id'), determineUser(req), onSuccessReturnResults(res), errorHandler(res));
 });
 
+app.post('/ideas/id/:id/operations/ignore', function(req, res, next) {
+	apexClient.ignoreIdea(req.param('id'), determineUser(req), onSuccessReturnResults(res), errorHandler(res));
+});
+
 function determineUser(req) {
 	return req.param('user');
 }

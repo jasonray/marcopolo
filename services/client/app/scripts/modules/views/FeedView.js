@@ -1,7 +1,7 @@
 /*** FeedView.js ***/
 
 define(function(require, exports, module) {
-    var View          = require('famous/core/view');
+    var View          = require('famous/core/View');
     var ScrollView    = require('famous/views/Scrollview');
     var Surface       = require('famous/core/Surface');
     var Transform     = require('famous/core/Transform');

@@ -87,7 +87,7 @@ exports.fetchTopic = fetchTopic = function(id, successHandler, errorHandler) {
 exports.fetchIdeas = fetchIdeas = function(successHandler, errorHandler) {
 	logger.info('apexClient.fetchIdeas');
 	var lowerRowCount = 1;
-	var upperRowCount = 10;
+	var upperRowCount = 25;
 	var sql =
 		"select *  " +
 		"  from ( select rownum rnum, a.* " +
@@ -115,7 +115,7 @@ exports.fetchIdeas = fetchIdeas = function(successHandler, errorHandler) {
 exports.newIdeasFeed = newIdeasFeed = function(user, successHandler, errorHandler) {
 	logger.info('apexClient.newIdeasFeed(%s)', user);
 	var lowerRowCount = 1;
-	var upperRowCount = 10;
+	var upperRowCount = 25;
 	var sql =
 		"select *  " +
 		"  from ( select rownum rnum, a.* " +
@@ -142,7 +142,7 @@ exports.newIdeasFeed = newIdeasFeed = function(user, successHandler, errorHandle
 exports.trackedIdeasFeed = trackedIdeasFeed = function(user, successHandler, errorHandler) {
 	logger.info('apexClient.trackedIdeasFeed(%s)', user);
 	var lowerRowCount = 1;
-	var upperRowCount = 10;
+	var upperRowCount = 25;
 	var sql =
 		"select *  " +
 		"  from ( select rownum rnum, a.* " +
@@ -337,16 +337,25 @@ exports.fetchTrackingValueForUser = fetchTrackingValueForUser = function(id, use
 exports.trackItem = trackItem = function(id, user, successHandler, errorHandler) {
 	logger.info('apexClient.trackItem(%s,%s)', id, user);
 
-	var sql = "th_ideas_pkg.track_an_idea(:1,:2)";
-	var params = (id, user);
+	var sql = "call th_ideas_pkg.track_an_idea(:1,:2)";
+	var params = [id, user];
 
 	runSql(sql, params, successHandler, errorHandler);
 };
 exports.untrackItem = untrackItem = function(id, user, successHandler, errorHandler) {
 	logger.info('apexClient.unTrackItem(%s,%s)', id, user);
 
-	var sql = "th_ideas_pkg.untrack_an_idea(:1,:2)";
-	var params = (id, user);
+	var sql = "call th_ideas_pkg.untrack_an_idea(:1,:2)";
+	var params = [id, user];
+
+	runSql(sql, params, successHandler, errorHandler);
+};
+
+exports.ignoreIdea = ignoreIdea = function(id, user, successHandler, errorHandler) {
+	logger.info('apexClient.ignoreIdea(%s,%s)', id, user);
+
+	var sql = "call th_ideas_pkg.ignore_idea(:1,:2)";
+	var params = [id, user];
 
 	runSql(sql, params, successHandler, errorHandler);
 };
