@@ -18,6 +18,7 @@
   "homepage": "https://github.com/jasonray/marcopolo",
   "dependencies": {
     "body-parser": "^1.4.3",
+    "bunyan": "^0.23.1",
     "cors": "^2.3.1",
     "express": "^4.4.5",
     "jasmine-node": "^1.14.3",
