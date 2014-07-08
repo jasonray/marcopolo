@@ -208,26 +208,11 @@ exports.voteNo = voteNo = function(id, user, successHandler, errorHandler) {
 exports.vote = vote = function(id, user, rawVotingResult, successHandler, errorHandler) {
 	logger.info('apexClient.vote(%s,%s,%s)', id, user, rawVotingResult);
 
-	//ensure voting result parses
 	var votingResult = stringToYesNo(rawVotingResult);
-	// save voting result
-
-	console.log('this is where apex client would set [id=%s][user=%s]=>[%s]', id, user, votingResult);
-	console.log('successHandler => %s', successHandler);
-	console.log('errorHandler => %s', errorHandler);
-	// var sql = "call th_ideas_pkg.vote_on_idea(110,'dillons’,'yes')";
 	var sql = "call th_ideas_pkg.vote_on_idea(:1,:2,:3)";
 	var params = [id, user, votingResult];
 
 	runSqlWithParametersHandleError(sql, params, successHandler, errorHandler);
-
-	// runSqlHandleError(sql, function(data) {
-	// 	console.log('found %s record(s)', data.length);
-	// 	if (data.length === 0) successHandler(undefined);
-	// 	var resultItem = convertFromDataToTransport(data[0]);
-	// 	successHandler(resultItem);
-	// }, errorHandler);
-
 };
 
 exports.fetchTrackingValueForUser = fetchTrackingValueForUser = function(id, user, successHandler, errorHandler) {
@@ -335,21 +320,21 @@ function runSqlWithParameters(sql, params, callback) {
 		"ConnectionTimeout": "1"
 	};
 
-	console.log('connecting to oracle');
+	logger.info('connecting to oracle');
 
 	oracle.connect(connectData, function(err, connection) {
 		if (err) {
-			console.log('Error connecting to db:', err);
+			logger.warn('Error connecting to db:', err);
 			return callback(err);
 		}
-		console.log('execute sql [%s][%s]', sql, params);
+		logger.info('execute sql [%s][%s]', sql, params);
 		connection.execute(sql, params, function(err, results) {
 			if (err) {
 				console.log('Error executing sql [%s]', err);
 				return callback(err);
 			}
 
-			console.log('complete executing sql');
+			logger.debug('complete executing sql');
 			connection.close(); // call only when query is finished executing
 			return callback(null, results);
 		});
