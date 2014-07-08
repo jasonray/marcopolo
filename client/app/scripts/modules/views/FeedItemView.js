@@ -152,12 +152,11 @@ define(function(require, exports, module) {
             var id = this.options.data.id;
             var tempIdea = new Ideas.Idea(this.options.data);
             tempIdea.unset('id');
-            tempIdea.save({
-                url: 'http://localhost:9999/ideas/id/'+id+'/operations/voteNo?user=cushingb'
-                }, {
+            tempIdea.save({},{
                 success: function(resp) {
                  //   console.log(resp)
-                }
+                },
+                url: 'http://localhost:9999/ideas/id/'+id+'/operations/voteNo?user=cushingb'
             });
         
             this._eventOutput.emit("idea:delete", this);
@@ -170,12 +169,11 @@ define(function(require, exports, module) {
             var id = this.options.data.id;
             var tempIdea = new Ideas.Idea(this.options.data);
             tempIdea.unset('id');
-            tempIdea.save({
-                url: 'http://localhost:9999/ideas/id/'+id+'/operations/voteYes?user=cushingb'
-                }, {
+            tempIdea.save({},{
                 success: function(resp) {
                  //   console.log(resp)
-                }
+                },
+                url: 'http://localhost:9999/ideas/id/'+id+'/operations/voteYes?user=cushingb'
             });
             this._eventOutput.emit("idea:delete", this);
         }.bind(this));
