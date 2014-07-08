@@ -223,6 +223,10 @@ exports.pastItemsFeed = pastItemsFeed = function(user, successHandler, errorHand
 
 var ideaFeed = function(sql, params, successHandler, errorHandler) {
 	logger.info('apexClient.ideaFeed');
+	logger.info('sql [%s]', sql);
+	logger.info('params [%s]', params);
+	logger.info('successHandler [%s]', successHandler);
+	logger.info('errorHandler [%s]', errorHandler);
 
 	function transformAndThenInvokeNativeSuccessHandler(data) {
 		logger.info('found %s ideas', data.length);
@@ -378,7 +382,7 @@ exports.createIdea = createIdea = function(item, user, successHandler, errorHand
 	//   7         p_tags        => '#onetag #twotag #threetag #four');
 
 	var sql = "call th_ideas_pkg.create_idea(:1,:2,:3,:4,:5)";
-	var params = [item.short_description, 'dillons', item.long_description, null, '#testdata'];
+	var params = [item.short_description, 'dillons', item.long_description, '#testdata', null];
 	runSql(sql, params, successHandler, errorHandler);
 };
 
@@ -437,7 +441,7 @@ function runSql(sql, params, successHandler, errorHandler) {
 				return errorHandler(err);
 			}
 
-			logger.debug('complete executing sql');
+			logger.info('complete executing sql');
 			connection.close(); // call only when query is finished executing
 			return successHandler(results);
 		});

@@ -48,7 +48,7 @@ app.get('/topic/id/:id', function(req, res, next) {
 app.use(cors());
 
 app.get('/ideas', function(req, res, next) {
-	apexClient.fetchIdeas(onSuccessReturnResults(req), errorHandler(res));
+	apexClient.fetchIdeas(onSuccessReturnResults(res), errorHandler(res));
 });
 
 app.get('/ideas/new', function(req, res, next) {
