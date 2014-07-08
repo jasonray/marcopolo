@@ -303,7 +303,6 @@ exports.suspendIdea = suspendIdea = function(id, user, successHandler, errorHand
 	runSqlWithParametersHandleError(sql, params, successHandler, errorHandler);
 };
 
-
 function runSqlHandleError(sql, successHandler, errorHandler) {
 	runSqlWithParametersHandleError(sql, [], successHandler, errorHandler);
 }
