@@ -275,13 +275,16 @@ exports.fetchComments = fetchComments = function(id, successHandler, errorHandle
 
 exports.saveComment = saveComment = function(id, user, comment, successHandler, errorHandler) {
 	var sql = "procedure name(:1,:2,:3)"; //TODO
-	var params = [id,user,comment];
+	var params = [id, user, comment];
 
 	runSqlWithParametersHandleError(sql, params, successHandler, errorHandler);
 };
 
-exports.suspendIdea = suspendIdea = function(id, user) {
-	// save suspended value
+exports.suspendIdea = suspendIdea = function(id, user, successHandler, errorHandler) {
+	var sql = "procedure name(:1,:2)"; //TODO
+	var params = [id, user];
+
+	runSqlWithParametersHandleError(sql, params, successHandler, errorHandler);
 };
 
 

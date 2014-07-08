@@ -120,15 +120,13 @@ app.post('/ideas/id/:id/comments', function(req, res, next) {
 	var id = req.param('id');
 	var user = determineUser(req);
 	var commentText = req.body;
-	apexClient.method(id, user, commentText, onSuccessReturnResults(res), errorHandler(res));
+	apexClient.saveComment(id, user, commentText, onSuccessReturnResults(res), errorHandler(res));
 });
 
 app.post('/ideas/id/:id/operations/suspend', function(req, res, next) {
 	var id = req.param('id');
 	var user = determineUser(req);
-	console.log('suspend item [%s][%s]', id, user);
-	dataAdapter.suspendIdea(id, user);
-	res.send(200);
+	apexClient.suspendIdea(id, user, onSuccessReturnResults(res), errorHandler(res));
 });
 
 function determineUser(req) {
