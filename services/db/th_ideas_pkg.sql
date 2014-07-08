@@ -6,6 +6,14 @@ create or replace package th_ideas_pkg as
 			p_owner			ideas.owner%type,
 			p_description		ideas.description%type,
 			p_tags			clob default null,
+			p_topic_id		ideas.topic_id%type default null,
+                        p_id		out	ideas.id%type);
+
+
+	procedure create_idea (p_short_desc	ideas.short_desc%type, 
+			p_owner			ideas.owner%type,
+			p_description		ideas.description%type,
+			p_tags			clob default null,
 			p_topic_id		ideas.topic_id%type default null);
 
 
@@ -91,6 +99,22 @@ create or replace package body th_ideas_pkg as
 
 	---------------------------------------------
 	-- create an idea
+	procedure create_idea (p_short_desc	ideas.short_desc%type, 
+			p_owner			ideas.owner%type,
+			p_description		ideas.description%type,
+			p_tags			clob default null,
+			p_topic_id		ideas.topic_id%type default null,
+                        p_id		out	ideas.id%type)
+        is
+        begin
+		p_id := create_idea (p_short_desc	=> p_short_desc,
+					p_owner		=> p_owner,
+					p_description	=> p_description,
+					p_topic_id	=> p_topic_id,
+					p_tags		=> p_tags);
+        end create_idea;
+
+
 	procedure create_idea (p_short_desc	ideas.short_desc%type, 
 			p_owner			ideas.owner%type,
 			p_description		ideas.description%type,
