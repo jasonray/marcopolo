@@ -315,7 +315,6 @@ function runSqlWithParametersHandleError(sql, params, successHandler, errorHandl
 }
 
 var pd = require('pretty-data').pd;
-
 function runSqlWithParameters(sql, params, callback) {
 	var connString = "(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=demos.agilex.com)(PORT=1521))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=XE)))";
 	var connectData = {
