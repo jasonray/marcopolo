@@ -266,8 +266,11 @@ exports.createIdea = createIdea = function(item, user, successHandler, errorHand
 	runSqlWithParametersHandleError(sql, params, successHandler, errorHandler);
 };
 
-exports.fetchComments = fetchComments = function(id) {
-	// fetch list of comments
+exports.fetchComments = fetchComments = function(id, successHandler, errorHandler) {
+	var sql = "select comments ..."; //TODO
+	var params = [];
+
+	runSqlWithParametersHandleError(sql, params, successHandler, errorHandler);
 };
 
 exports.saveComment = saveComment = function(id, user, comment) {

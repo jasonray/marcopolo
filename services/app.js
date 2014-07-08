@@ -111,9 +111,7 @@ app.post('/ideas/id/:id/operations/untrack', function(req, res, next) {
 
 app.get('/ideas/id/:id/comments', function(req, res, next) {
 	var id = req.param('id');
-	console.log('fetch comments [%s][%s]', id);
-	var comments = dataAdapter.fetchComments(id);
-	res.send(comments);
+	apexClient.method(id, onSuccessReturnResults(res), errorHandler(res));
 });
 app.use('/ideas/id/:id/comments', bodyParser.text({
 	limit: '1kb'
