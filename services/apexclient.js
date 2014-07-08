@@ -45,7 +45,7 @@ exports.fetchTopics = fetchTopics = function(successHandler, errorHandler) {
 	// that function will parse data to "transport model"
 	// and then hand back to the "successHandler"
 	// passed in from app.js, which just perfroms result.send(transportdata);
-	runSql(sql,[], function(data) {
+	runSql(sql, [], function(data) {
 		var resultData = [];
 		_.each(data, function(rawItem) {
 			var resultItem = convertFromDataToTransport(rawItem);
@@ -76,7 +76,7 @@ exports.fetchTopic = fetchTopic = function(id, successHandler, errorHandler) {
 		"   and t.id = tt.topic_id (+) " +
 		"   and t.id = " + id;
 
-	runSql(sql,[], function(data) {
+	runSql(sql, [], function(data) {
 		logger.debug('found %s record(s)', data.length);
 		if (data.length === 0) successHandler(undefined);
 		var resultItem = convertFromDataToTransport(data[0]);
@@ -109,12 +109,121 @@ exports.fetchIdeas = fetchIdeas = function(successHandler, errorHandler) {
 		"          where rownum <= " + upperRowCount + " ) " +
 		" where rnum >= " + lowerRowCount;
 
+	ideaFeed(sql, [], successHandler, errorHandler);
+};
 
-	// this is going to run a sql statement, and on success
-	// of oracle client it will run the function(data)
-	// that function will parse data to "transport model"
-	// and then hand back to the "successHandler"
-	// passed in from app.js, which just perfroms result.send(transportdata);
+exports.newIdeasFeed = newIdeasFeed = function(user, successHandler, errorHandler) {
+	logger.info('apexClient.newIdeasFeed(%s)', user);
+	var lowerRowCount = 1;
+	var upperRowCount = 10;
+	var sql =
+		"select *  " +
+		"  from ( select rownum rnum, a.* " +
+		"           from ( select x.id, x.short_desc, x.description, x.created, " +
+		"                         x.comment_count, x.tags, x.rn " +
+		"                    from (select i.id, i.short_desc, i.description, i.created, " +
+		"                                 c.comment_count, rownum rn, t.tags   " +
+		"                            from ideas i, " +
+		"                                 (select count(*) comment_count, parent_id " +
+		"                                    from comments " +
+		"                                   where parent_type = 'idea' " +
+		"                                   group by parent_id) c, " +
+		"                                 (select it.idea_id,  " +
+		"                                         listagg(it.tag, ' ') within group (order by it.tag) tags " +
+		"                                    from idea_tags it " +
+		"                                   group by it.idea_id) t " +
+		"                           where c.parent_id(+) = i.id " +
+		"                             and i.id = t.idea_id(+) ) x ) a  " +
+		"          where rownum <= " + upperRowCount + " ) " +
+		" where rnum >= " + lowerRowCount;
+
+	ideaFeed(sql, [], successHandler, errorHandler);
+};
+exports.trackedIdeasFeed = trackedIdeasFeed = function(user, successHandler, errorHandler) {
+	logger.info('apexClient.trackedIdeasFeed(%s)', user);
+	var lowerRowCount = 1;
+	var upperRowCount = 10;
+	var sql =
+		"select *  " +
+		"  from ( select rownum rnum, a.* " +
+		"           from ( select x.id, x.short_desc, x.description, x.created, " +
+		"                         x.comment_count, x.tags, x.rn " +
+		"                    from (select i.id, i.short_desc, i.description, i.created, " +
+		"                                 c.comment_count, rownum rn, t.tags   " +
+		"                            from ideas i, " +
+		"                                 (select count(*) comment_count, parent_id " +
+		"                                    from comments " +
+		"                                   where parent_type = 'idea' " +
+		"                                   group by parent_id) c, " +
+		"                                 (select it.idea_id,  " +
+		"                                         listagg(it.tag, ' ') within group (order by it.tag) tags " +
+		"                                    from idea_tags it " +
+		"                                   group by it.idea_id) t " +
+		"                           where c.parent_id(+) = i.id " +
+		"                             and i.id = t.idea_id(+) ) x ) a  " +
+		"          where rownum <= " + upperRowCount + " ) " +
+		" where rnum >= " + lowerRowCount;
+
+	ideaFeed(sql, [], successHandler, errorHandler);
+};
+exports.myItemsFeed = myItemsFeed = function(user, successHandler, errorHandler) {
+	logger.info('apexClient.myItemsFeed(%s)', user);
+	var lowerRowCount = 1;
+	var upperRowCount = 10;
+	var sql =
+		"select *  " +
+		"  from ( select rownum rnum, a.* " +
+		"           from ( select x.id, x.short_desc, x.description, x.created, " +
+		"                         x.comment_count, x.tags, x.rn " +
+		"                    from (select i.id, i.short_desc, i.description, i.created, " +
+		"                                 c.comment_count, rownum rn, t.tags   " +
+		"                            from ideas i, " +
+		"                                 (select count(*) comment_count, parent_id " +
+		"                                    from comments " +
+		"                                   where parent_type = 'idea' " +
+		"                                   group by parent_id) c, " +
+		"                                 (select it.idea_id,  " +
+		"                                         listagg(it.tag, ' ') within group (order by it.tag) tags " +
+		"                                    from idea_tags it " +
+		"                                   group by it.idea_id) t " +
+		"                           where c.parent_id(+) = i.id " +
+		"                             and i.id = t.idea_id(+) ) x ) a  " +
+		"          where rownum <= " + upperRowCount + " ) " +
+		" where rnum >= " + lowerRowCount;
+
+	ideaFeed(sql, [], successHandler, errorHandler);
+};
+exports.pastItemsFeed = pastItemsFeed = function(user, successHandler, errorHandler) {
+	logger.info('apexClient.pastItemsFeed(%s)', user);
+	var lowerRowCount = 1;
+	var upperRowCount = 10;
+	var sql =
+		"select *  " +
+		"  from ( select rownum rnum, a.* " +
+		"           from ( select x.id, x.short_desc, x.description, x.created, " +
+		"                         x.comment_count, x.tags, x.rn " +
+		"                    from (select i.id, i.short_desc, i.description, i.created, " +
+		"                                 c.comment_count, rownum rn, t.tags   " +
+		"                            from ideas i, " +
+		"                                 (select count(*) comment_count, parent_id " +
+		"                                    from comments " +
+		"                                   where parent_type = 'idea' " +
+		"                                   group by parent_id) c, " +
+		"                                 (select it.idea_id,  " +
+		"                                         listagg(it.tag, ' ') within group (order by it.tag) tags " +
+		"                                    from idea_tags it " +
+		"                                   group by it.idea_id) t " +
+		"                           where c.parent_id(+) = i.id " +
+		"                             and i.id = t.idea_id(+) ) x ) a  " +
+		"          where rownum <= " + upperRowCount + " ) " +
+		" where rnum >= " + lowerRowCount;
+
+	ideaFeed(sql, [], successHandler, errorHandler);
+};
+
+var ideaFeed = function(sql, params, successHandler, errorHandler) {
+	logger.info('apexClient.ideaFeed');
+
 	function transformAndThenInvokeNativeSuccessHandler(data) {
 		logger.info('found %s ideas', data.length);
 		var resultData = [];
@@ -125,7 +234,7 @@ exports.fetchIdeas = fetchIdeas = function(successHandler, errorHandler) {
 		successHandler(resultData);
 	}
 
-	runSql(sql, [], transformAndThenInvokeNativeSuccessHandler, errorHandler);
+	runSql(sql, params, transformAndThenInvokeNativeSuccessHandler, errorHandler);
 };
 
 // customize this if needed to convert from oracle response to transport
@@ -183,7 +292,7 @@ exports.fetchIdea = fetchIdea = function(id, successHandler, errorHandler) {
 		"   and i.id = v2.idea_id (+) " +
 		"   and i.id = " + id;
 
-	runSql(sql,[], function(data) {
+	runSql(sql, [], function(data) {
 		console.log('found %s record(s)', data.length);
 		if (data.length === 0) successHandler(undefined);
 		var resultItem = convertFromDataToTransport(data[0]);
@@ -301,6 +410,7 @@ exports.suspendIdea = suspendIdea = function(id, user, successHandler, errorHand
 };
 
 var pd = require('pretty-data').pd;
+
 function runSql(sql, params, successHandler, errorHandler) {
 	var connString = "(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=demos.agilex.com)(PORT=1521))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=XE)))";
 	var connectData = {

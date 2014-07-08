@@ -48,7 +48,20 @@ app.get('/topic/id/:id', function(req, res, next) {
 app.use(cors());
 
 app.get('/ideas', function(req, res, next) {
-	apexClient.fetchIdeas(onSuccessReturnResults(res), errorHandler(res));
+	apexClient.fetchIdeas(onSuccessReturnResults(req), errorHandler(res));
+});
+
+app.get('/ideas/new', function(req, res, next) {
+	apexClient.newIdeasFeed(determineUser(req), onSuccessReturnResults(res), errorHandler(res));
+});
+app.get('/ideas/tracked', function(req, res, next) {
+	apexClient.trackedIdeasFeed(determineUser(req), onSuccessReturnResults(res), errorHandler(res));
+});
+app.get('/ideas/mine', function(req, res, next) {
+	apexClient.myItemsFeed(determineUser(req), onSuccessReturnResults(res), errorHandler(res));
+});
+app.get('/ideas/past', function(req, res, next) {
+	apexClient.pastItemsFeed(determineUser(req), onSuccessReturnResults(res), errorHandler(res));
 });
 
 app.get('/ideas/id/:id', function(req, res, next) {
