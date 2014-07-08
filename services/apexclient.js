@@ -396,7 +396,12 @@ exports.createIdea = createIdea = function(item, user, successHandler, errorHand
 
 	var sql = "call th_ideas_pkg.create_idea(:1,:2,:3,:4,:5,:6)";
 	var params = [item.short_description, 'dillons', item.long_description, '#testdata', null, new oracle.OutParam(oracle.OCCIINT)];
-	runSql(sql, params, successHandler, errorHandler);
+
+	function formatAndCallSuccessHandler(data) {
+		if (data.returnParam) data.itemId = data.returnParam;
+		successHandler(data);
+	}
+	runSql(sql, params, formatAndCallSuccessHandler, errorHandler);
 };
 
 exports.fetchComments = fetchComments = function(id, successHandler, errorHandler) {
