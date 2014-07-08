@@ -6,6 +6,11 @@ var cors = require('cors');
 var dataAdapter = require('./sampleDataAdapter');
 var apexClient = require('./apexclient');
 
+var logger = require('bunyan').createLogger({
+	name: "apexclient"
+});
+
+
 function errorHandler(res) {
 	return function(err) {
 		console.log('error handler firing');
@@ -73,7 +78,7 @@ app.post('/ideas', function(req, res, next) {
 //// i like "PUT /ideas/id/:id/votingResult" for rest considerations
 //// but i like "POST /ideas/id/:id/operations/voteYes" for simplicity
 app.get('/ideas/id/:id/votingResult', function(req, res, next) {
-	res.send(dataAdapter.fetchIdeaVoteResultForUser(req.param('id'), determineUser(req)));
+	apexClient.fetchVotingResult(id, user, onSuccessReturnResults(res), errorHandler(res));
 });
 app.use('/ideas/id/:id/votingResult', bodyParser.text({
 	limit: '1kb'

@@ -190,8 +190,8 @@ exports.fetchIdea = fetchIdea = function(id, successHandler, errorHandler) {
 	}, errorHandler);
 };
 
-exports.fetchIdeaVoteResultForUser = fetchIdea = function(id, user, successHandler, errorHandler) {
-	logger.info('apexClient.fetchIdeaVoteResultForUser(%s,%s)', id, user);
+exports.fetchVotingResult = fetchIdea = function(id, user, successHandler, errorHandler) {
+	logger.info('apexClient.fetchVotingResult(%s,%s)', id, user);
 	logger.error('not implemented');
 	// return true/false/null to indicate user's vote for this item
 };
