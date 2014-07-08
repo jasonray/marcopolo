@@ -8,45 +8,6 @@ exports.isHealthy = function(successHandler, errorHandler) {
 	}, errorHandler);
 };
 
-// provide callback `function(results)` and `function(err)` for handling exceptions
-function runSqlHandleError(sql, successHandler, errorHandler) {
-	runSql(sql, function(err, results) {
-		if (err) return errorHandler(err);
-		else return successHandler(results);
-	});
-}
-
-// provide callback `function(err, results)`
-function runSql(sql, callback) {
-	var connString = "(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=demos.agilex.com)(PORT=1521))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=XE)))";
-	var connectData = {
-		"tns": connString,
-		"user": "th",
-		"password": "th",
-		"ConnectionTimeout": "1"
-	};
-
-	console.log('connecting to oracle');
-
-	oracle.connect(connectData, function(err, connection) {
-		if (err) {
-			console.log('Error connecting to db:', err);
-			return callback(err);
-		}
-		console.log('execute oracle query [%s]', sql);
-		connection.execute(sql, [], function(err, results) {
-			if (err) {
-				console.log('Error executing query [%s]', err);
-				return callback(err);
-			}
-
-			console.log('complete executing oracle query');
-			connection.close(); // call only when query is finished executing
-			return callback(null, results);
-		});
-	});
-}
-
 exports.fetchTopics = fetchTopics = function(successHandler, errorHandler) {
 
 	var lowerRowCount = 1;
@@ -243,12 +204,9 @@ exports.vote = vote = function(id, user, rawVotingResult, successHandler, errorH
 	console.log('errorHandler => %s', errorHandler);
 	// var sql = "call th_ideas_pkg.vote_on_idea(110,'dillons’,'yes')";
 	var sql = "call th_ideas_pkg.vote_on_idea(:1,:2,:3)";
-	var params = [id, user, 'yes'];
+	var params = [id, user, votingResult];
 
-	executeProcedure(sql, params, function(err, results) {
-		if (err) return errorHandler(err);
-		else return successHandler(results);
-	});
+	runSqlWithParametersHandleError(sql, params, successHandler, errorHandler);
 
 	// runSqlHandleError(sql, function(data) {
 	// 	console.log('found %s record(s)', data.length);
@@ -274,8 +232,8 @@ exports.setTrackItem = setTrackItem = function(id, user, rawTrackValue) {
 };
 
 var stringToYesNo = function(string) {
-	// todo: extract this
-	if (typeof string === 'boolean') return string;
+	if (string === true) return "yes";
+	if (string === false) return "no";
 
 	switch (string.toLowerCase()) {
 		case "true":
@@ -294,21 +252,17 @@ var stringToYesNo = function(string) {
 
 exports.createIdea = createIdea = function(item, user, successHandler, errorHandler) {
 
-// th_ideas_pkg.create_idea(
-//   3         p_short_desc  => 'Hey I have an idea!',
-//   4         p_owner       => 'dillons',
-//   5         p_description => 'More descriptive text',
-//   6         p_topic_id    => null,
-//   7         p_tags        => '#onetag #twotag #threetag #four');
+	// th_ideas_pkg.create_idea(
+	//   3         p_short_desc  => 'Hey I have an idea!',
+	//   4         p_owner       => 'dillons',
+	//   5         p_description => 'More descriptive text',
+	//   6         p_topic_id    => null,
+	//   7         p_tags        => '#onetag #twotag #threetag #four');
 
 	var sql = "call th_ideas_pkg.create_idea(:1,:2,:3,:4,:5)";
-	var params = [item.short_description, 'dillons', item.long_description,null,'#testdata'];
+	var params = [item.short_description, 'dillons', item.long_description, null, '#testdata'];
 
-	executeProcedure(sql, params, function(err, results) {
-		if (err) return errorHandler(err);
-		else return successHandler(results);
-	});
-
+	runSqlWithParametersHandleError(sql, params, successHandler, errorHandler);
 };
 
 exports.fetchComments = fetchComments = function(id) {
@@ -328,7 +282,18 @@ exports.suspendIdea = suspendIdea = function(id, user) {
 };
 
 
-function executeProcedure(sql, params, callback) {
+function runSqlHandleError(sql, successHandler, errorHandler) {
+	runSqlWithParametersHandleError(sql, [], successHandler, errorHandler);
+}
+
+function runSqlWithParametersHandleError(sql, params, successHandler, errorHandler) {
+	runSqlWithParameters(sql, params, function(err, results) {
+		if (err) return errorHandler(err);
+		else return successHandler(results);
+	});
+}
+
+function runSqlWithParameters(sql, params, callback) {
 	var connString = "(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=demos.agilex.com)(PORT=1521))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=XE)))";
 	var connectData = {
 		"tns": connString,
@@ -344,14 +309,14 @@ function executeProcedure(sql, params, callback) {
 			console.log('Error connecting to db:', err);
 			return callback(err);
 		}
-		console.log('execute oracle procedure [%s][%s]', sql, params);
+		console.log('execute sql [%s][%s]', sql, params);
 		connection.execute(sql, params, function(err, results) {
 			if (err) {
-				console.log('Error executing oracle procedure [%s]', err);
+				console.log('Error executing sql [%s]', err);
 				return callback(err);
 			}
 
-			console.log('complete executing oracle procedure');
+			console.log('complete executing sql');
 			connection.close(); // call only when query is finished executing
 			return callback(null, results);
 		});
