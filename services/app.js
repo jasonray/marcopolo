@@ -40,8 +40,7 @@ app.get('/topics', function(req, res, next) {
 
 
 app.get('/topic/id/:id', function(req, res, next) {
-	var id = req.param('id');
-	apexClient.fetchTopic(id, onSuccessReturnResults(res), errorHandler(res));
+	apexClient.fetchTopic(req.param('id'), onSuccessReturnResults(res), errorHandler(res));
 });
 
 
