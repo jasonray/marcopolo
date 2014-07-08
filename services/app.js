@@ -104,27 +104,17 @@ app.get('/ideas/id/:id/tracking', function(req, res, next) {
 app.use('/ideas/id/:id/tracking', bodyParser.text({
 	limit: '1kb'
 }));
-app.put('/ideas/id/:id/tracking', function(req, res, next) {
-	var id = req.param('id');
-	var user = determineUser(req);
-	var trackingValue = req.body;
-	console.log('tracking [%s][%s][%s]', id, user, trackingValue);
-	dataAdapter.setTrackItem(id, user, votingResult);
-	res.send(200);
-});
 app.post('/ideas/id/:id/operations/track', function(req, res, next) {
 	var id = req.param('id');
 	var user = determineUser(req);
 	console.log('track item [%s][%s]', id, user);
-	dataAdapter.trackItem(id, user);
-	res.send(200);
+	apexClient.trackItem(id, user, onSuccessReturnResults(res), errorHandler(res));
 });
 app.post('/ideas/id/:id/operations/untrack', function(req, res, next) {
 	var id = req.param('id');
 	var user = determineUser(req);
 	console.log('untrack item [%s][%s]', id, user);
-	dataAdapter.untrackItem(id, user);
-	res.send(200);
+	apexClient.untrackItem(id, user, onSuccessReturnResults(res), errorHandler(res));
 });
 
 app.get('/ideas/id/:id/comments', function(req, res, next) {

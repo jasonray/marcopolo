@@ -220,15 +220,17 @@ exports.vote = vote = function(id, user, rawVotingResult, successHandler, errorH
 exports.fetchTrackingValueForUser = fetchTrackingValueForUser = function(id, user) {
 	// return true/false
 };
-exports.trackItem = trackItem = function(id, user) {
-	setTrackItem(id, user, true);
+exports.trackItem = trackItem = function(id, user, successHandler, errorHandler) {
+	var sql = "th_ideas_pkg.track_an_idea(:1,:2)";
+	var params = (id, user);
+
+	runSqlWithParametersHandleError(sql, params, successHandler, errorHandler);
 };
-exports.untrackItem = untrackItem = function(id, user) {
-	setTrackItem(id, user, false);
-};
-exports.setTrackItem = setTrackItem = function(id, user, rawTrackValue) {
-	var trackValue = stringToBoolean(rawTrackValue);
-	// save tracking value for id/user
+exports.untrackItem = untrackItem = function(id, user, successHandler, errorHandler) {
+	var sql = "th_ideas_pkg.untrack_an_idea(:1,:2)";
+	var params = (id, user);
+
+	runSqlWithParametersHandleError(sql, params, successHandler, errorHandler);
 };
 
 var stringToYesNo = function(string) {
@@ -261,7 +263,6 @@ exports.createIdea = createIdea = function(item, user, successHandler, errorHand
 
 	var sql = "call th_ideas_pkg.create_idea(:1,:2,:3,:4,:5)";
 	var params = [item.short_description, 'dillons', item.long_description, null, '#testdata'];
-
 	runSqlWithParametersHandleError(sql, params, successHandler, errorHandler);
 };
 
