@@ -84,6 +84,7 @@ exports.fetchTopic = fetchTopic = function(id, successHandler, errorHandler) {
 	}, errorHandler);
 };
 
+// DEPRECATED!!!
 exports.fetchIdeas = fetchIdeas = function(successHandler, errorHandler) {
 	logger.info('apexClient.fetchIdeas');
 	var lowerRowCount = 1;
@@ -144,23 +145,26 @@ exports.trackedIdeasFeed = trackedIdeasFeed = function(user, successHandler, err
 	var lowerRowCount = 1;
 	var upperRowCount = 25;
 	var sql =
-		"select *  " +
+		"select * " +
 		"  from ( select rownum rnum, a.* " +
-		"           from ( select x.id, x.short_desc, x.description, x.created, " +
-		"                         x.comment_count, x.tags, x.rn " +
-		"                    from (select i.id, i.short_desc, i.description, i.created, " +
-		"                                 c.comment_count, rownum rn, t.tags   " +
-		"                            from ideas i, " +
+		"           from ( select x.id, x.owner, x.topic_id, x.topic_title, x.short_desc, x.description, " +
+		"                         x.created, x.comment_count, x.tags, x.rn " +
+		"                    from (select i.id, i.owner, t.id topic_id, t.title topic_title, i.short_desc, " +
+		"                                 i.description, i.created, c.comment_count, rownum rn, t.tags " +
+		"                            from ideas i, topics t, tracked_ideas ti, " +
 		"                                 (select count(*) comment_count, parent_id " +
 		"                                    from comments " +
 		"                                   where parent_type = 'idea' " +
 		"                                   group by parent_id) c, " +
-		"                                 (select it.idea_id,  " +
+		"                                 (select it.idea_id, " +
 		"                                         listagg(it.tag, ' ') within group (order by it.tag) tags " +
 		"                                    from idea_tags it " +
 		"                                   group by it.idea_id) t " +
-		"                           where c.parent_id(+) = i.id " +
-		"                             and i.id = t.idea_id(+) ) x ) a  " +
+		"                           where i.topic_id = t.id(+) " +
+		"                             and c.parent_id(+) = i.id " +
+		"                             and i.id = t.idea_id(+) " +
+		"                             and i.id = ti.idea_id " +
+		"                             and ti.tracking_user = '" + user + "' ) x ) a " +
 		"          where rownum <= " + upperRowCount + " ) " +
 		" where rnum >= " + lowerRowCount;
 
