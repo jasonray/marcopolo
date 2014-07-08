@@ -6,9 +6,7 @@ var logger = require('bunyan').createLogger({
 
 exports.isHealthy = function(successHandler, errorHandler) {
 	sql = "SELECT systimestamp FROM dual";
-	runSqlHandleError(sql, function() {
-		return successHandler();
-	}, errorHandler);
+	runSql(sql, [], successHandler, errorHandler);
 };
 
 exports.fetchTopics = fetchTopics = function(successHandler, errorHandler) {
@@ -48,7 +46,7 @@ exports.fetchTopics = fetchTopics = function(successHandler, errorHandler) {
 	// that function will parse data to "transport model"
 	// and then hand back to the "successHandler"
 	// passed in from app.js, which just perfroms result.send(transportdata);
-	runSqlHandleError(sql, function(data) {
+	runSql(sql,[], function(data) {
 		var resultData = [];
 		_.each(data, function(rawItem) {
 			var resultItem = convertFromDataToTransport(rawItem);
@@ -79,7 +77,7 @@ exports.fetchTopic = fetchTopic = function(id, successHandler, errorHandler) {
 		"   and t.id = tt.topic_id (+) " +
 		"   and t.id = " + id;
 
-	runSqlHandleError(sql, function(data) {
+	runSql(sql,[], function(data) {
 		logger.debug('found %s record(s)', data.length);
 		if (data.length === 0) successHandler(undefined);
 		var resultItem = convertFromDataToTransport(data[0]);
@@ -128,7 +126,7 @@ exports.fetchIdeas = fetchIdeas = function(successHandler, errorHandler) {
 		successHandler(resultData);
 	}
 
-	runSqlWithParametersHandleError(sql, [], transformAndThenInvokeNativeSuccessHandler, errorHandler);
+	runSql(sql, [], transformAndThenInvokeNativeSuccessHandler, errorHandler);
 };
 
 // customize this if needed to convert from oracle response to transport
@@ -186,7 +184,7 @@ exports.fetchIdea = fetchIdea = function(id, successHandler, errorHandler) {
 		"   and i.id = v2.idea_id (+) " +
 		"   and i.id = " + id;
 
-	runSqlHandleError(sql, function(data) {
+	runSql(sql,[], function(data) {
 		console.log('found %s record(s)', data.length);
 		if (data.length === 0) successHandler(undefined);
 		var resultItem = convertFromDataToTransport(data[0]);
@@ -216,7 +214,7 @@ exports.vote = vote = function(id, user, rawVotingResult, successHandler, errorH
 	var sql = "call th_ideas_pkg.vote_on_idea(:1,:2,:3)";
 	var params = [id, user, votingResult];
 
-	runSqlWithParametersHandleError(sql, params, successHandler, errorHandler);
+	runSql(sql, params, successHandler, errorHandler);
 };
 
 exports.fetchTrackingValueForUser = fetchTrackingValueForUser = function(id, user, successHandler, errorHandler) {
@@ -230,7 +228,7 @@ exports.trackItem = trackItem = function(id, user, successHandler, errorHandler)
 	var sql = "th_ideas_pkg.track_an_idea(:1,:2)";
 	var params = (id, user);
 
-	runSqlWithParametersHandleError(sql, params, successHandler, errorHandler);
+	runSql(sql, params, successHandler, errorHandler);
 };
 exports.untrackItem = untrackItem = function(id, user, successHandler, errorHandler) {
 	logger.info('apexClient.unTrackItem(%s,%s)', id, user);
@@ -238,7 +236,7 @@ exports.untrackItem = untrackItem = function(id, user, successHandler, errorHand
 	var sql = "th_ideas_pkg.untrack_an_idea(:1,:2)";
 	var params = (id, user);
 
-	runSqlWithParametersHandleError(sql, params, successHandler, errorHandler);
+	runSql(sql, params, successHandler, errorHandler);
 };
 
 var stringToYesNo = function(string) {
@@ -273,7 +271,7 @@ exports.createIdea = createIdea = function(item, user, successHandler, errorHand
 
 	var sql = "call th_ideas_pkg.create_idea(:1,:2,:3,:4,:5)";
 	var params = [item.short_description, 'dillons', item.long_description, null, '#testdata'];
-	runSqlWithParametersHandleError(sql, params, successHandler, errorHandler);
+	runSql(sql, params, successHandler, errorHandler);
 };
 
 exports.fetchComments = fetchComments = function(id, successHandler, errorHandler) {
@@ -282,7 +280,7 @@ exports.fetchComments = fetchComments = function(id, successHandler, errorHandle
 	var sql = "select comments ..."; //TODO
 	var params = [];
 
-	runSqlWithParametersHandleError(sql, params, successHandler, errorHandler);
+	runSql(sql, params, successHandler, errorHandler);
 };
 
 exports.saveComment = saveComment = function(id, user, comment, successHandler, errorHandler) {
@@ -291,7 +289,7 @@ exports.saveComment = saveComment = function(id, user, comment, successHandler, 
 	var sql = "procedure name(:1,:2,:3)"; //TODO
 	var params = [id, user, comment];
 
-	runSqlWithParametersHandleError(sql, params, successHandler, errorHandler);
+	runSql(sql, params, successHandler, errorHandler);
 };
 
 exports.suspendIdea = suspendIdea = function(id, user, successHandler, errorHandler) {
@@ -300,22 +298,11 @@ exports.suspendIdea = suspendIdea = function(id, user, successHandler, errorHand
 	var sql = "procedure name(:1,:2)"; //TODO
 	var params = [id, user];
 
-	runSqlWithParametersHandleError(sql, params, successHandler, errorHandler);
+	runSql(sql, params, successHandler, errorHandler);
 };
 
-function runSqlHandleError(sql, successHandler, errorHandler) {
-	runSqlWithParametersHandleError(sql, [], successHandler, errorHandler);
-}
-
-function runSqlWithParametersHandleError(sql, params, successHandler, errorHandler) {
-	runSqlWithParameters(sql, params, function(err, results) {
-		if (err) return errorHandler(err);
-		else return successHandler(results);
-	});
-}
-
 var pd = require('pretty-data').pd;
-function runSqlWithParameters(sql, params, callback) {
+function runSql(sql, params, successHandler, errorHandler) {
 	var connString = "(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=demos.agilex.com)(PORT=1521))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=XE)))";
 	var connectData = {
 		"tns": connString,
@@ -329,7 +316,7 @@ function runSqlWithParameters(sql, params, callback) {
 	oracle.connect(connectData, function(err, connection) {
 		if (err) {
 			logger.warn('Error connecting to db:', err);
-			return callback(err);
+			return errorHandler(err);
 		}
 
 		var prettySql = pd.sql(sql);
@@ -338,12 +325,12 @@ function runSqlWithParameters(sql, params, callback) {
 		connection.execute(sql, params, function(err, results) {
 			if (err) {
 				console.log('Error executing sql [%s]', err);
-				return callback(err);
+				return errorHandler(err);
 			}
 
 			logger.debug('complete executing sql');
 			connection.close(); // call only when query is finished executing
-			return callback(null, results);
+			return successHandler(results);
 		});
 	});
 }
