@@ -62,7 +62,7 @@ app.post('/ideas', function(req, res, next) {
 	var newIdea = req.body;
 	var user = determineUser(req);
 
-	console.log('received request to create new idea [%s][%s]', newIdea, newIdea.short_description);
+	console.log('received request to create new idea');
 	console.dir(newIdea);
 
 	apexClient.createIdea(newIdea, user, onSuccessReturnResults(res), errorHandler(res));
@@ -97,22 +97,16 @@ app.post('/ideas/id/:id/operations/voteNo', function(req, res, next) {
 
 // tracking
 app.get('/ideas/id/:id/tracking', function(req, res, next) {
-	res.send(dataAdapter.fetchTrackingValueForUser(req.param('id'), determineUser(req)));
+	apexClient.method(req.param('id'), determineUser(req), onSuccessReturnResults(res), errorHandler(res));
 });
 app.use('/ideas/id/:id/tracking', bodyParser.text({
 	limit: '1kb'
 }));
 app.post('/ideas/id/:id/operations/track', function(req, res, next) {
-	var id = req.param('id');
-	var user = determineUser(req);
-	console.log('track item [%s][%s]', id, user);
-	apexClient.trackItem(id, user, onSuccessReturnResults(res), errorHandler(res));
+	apexClient.trackItem(req.param('id'), determineUser(req), onSuccessReturnResults(res), errorHandler(res));
 });
 app.post('/ideas/id/:id/operations/untrack', function(req, res, next) {
-	var id = req.param('id');
-	var user = determineUser(req);
-	console.log('untrack item [%s][%s]', id, user);
-	apexClient.untrackItem(id, user, onSuccessReturnResults(res), errorHandler(res));
+	apexClient.untrackItem(req.param('id'), determineUser(req), onSuccessReturnResults(res), errorHandler(res));
 });
 
 app.get('/ideas/id/:id/comments', function(req, res, next) {

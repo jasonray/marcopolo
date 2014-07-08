@@ -217,7 +217,7 @@ exports.vote = vote = function(id, user, rawVotingResult, successHandler, errorH
 
 };
 
-exports.fetchTrackingValueForUser = fetchTrackingValueForUser = function(id, user) {
+exports.fetchTrackingValueForUser = fetchTrackingValueForUser = function(id, user, successHandler, errorHandler) {
 	// return true/false
 };
 exports.trackItem = trackItem = function(id, user, successHandler, errorHandler) {
