@@ -40,7 +40,6 @@ exports.fetchTopics = fetchTopics = function(successHandler, errorHandler) {
 		"           where rownum <= " + upperRowCount + " ) " +
 		" where rnum >= " + lowerRowCount;
 
-
 	// this is going to run a sql statement, and on success
 	// of oracle client it will run the function(data)
 	// that function will parse data to "transport model"
