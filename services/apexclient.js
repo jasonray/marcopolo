@@ -286,7 +286,7 @@ exports.fetchComments = fetchComments = function(id, successHandler, errorHandle
 };
 
 exports.saveComment = saveComment = function(id, user, comment, successHandler, errorHandler) {
-	logger.info('apexClient.saveComment(%s,%s,%s)', item,user,comment);
+	logger.info('apexClient.saveComment(%s,%s,%s)', item, user, comment);
 
 	var sql = "procedure name(:1,:2,:3)"; //TODO
 	var params = [id, user, comment];
@@ -295,7 +295,7 @@ exports.saveComment = saveComment = function(id, user, comment, successHandler, 
 };
 
 exports.suspendIdea = suspendIdea = function(id, user, successHandler, errorHandler) {
-	logger.info('apexClient.suspendIdea(%s,%s)', item,user);
+	logger.info('apexClient.suspendIdea(%s,%s)', item, user);
 
 	var sql = "procedure name(:1,:2)"; //TODO
 	var params = [id, user];
@@ -315,6 +315,8 @@ function runSqlWithParametersHandleError(sql, params, successHandler, errorHandl
 	});
 }
 
+var pd = require('pretty-data').pd;
+
 function runSqlWithParameters(sql, params, callback) {
 	var connString = "(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=demos.agilex.com)(PORT=1521))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=XE)))";
 	var connectData = {
@@ -331,7 +333,10 @@ function runSqlWithParameters(sql, params, callback) {
 			logger.warn('Error connecting to db:', err);
 			return callback(err);
 		}
-		logger.info('execute sql [%s][%s]', sql, params);
+
+		var prettySql = pd.sql(sql);
+
+		logger.info('execute sql [%s][%s]', prettySql, params);
 		connection.execute(sql, params, function(err, results) {
 			if (err) {
 				console.log('Error executing sql [%s]', err);
