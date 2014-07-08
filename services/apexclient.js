@@ -85,6 +85,7 @@ exports.fetchTopic = fetchTopic = function(id, successHandler, errorHandler) {
 };
 
 exports.fetchIdeas = fetchIdeas = function(successHandler, errorHandler) {
+	logger.info('apexClient.fetchIdeas');
 	var lowerRowCount = 1;
 	var upperRowCount = 10;
 	var sql =
@@ -150,6 +151,8 @@ function convertFromDataToTransport(dataItem) {
 }
 
 exports.fetchIdea = fetchIdea = function(id, successHandler, errorHandler) {
+	logger.info('apexClient.fetchIdea(%s)', id);
+
 	var sql = "select i.id, decode(u.first_name || ' ' || u.last_name, ' ', i.owner, " +
 		"                    u.first_name || ' ' || u.last_name) owner, " +
 		"       i.short_desc short_desc, i.description, " +
@@ -187,18 +190,24 @@ exports.fetchIdea = fetchIdea = function(id, successHandler, errorHandler) {
 	}, errorHandler);
 };
 
-exports.fetchIdeaVoteResultForUser = fetchIdea = function(id, user) {
+exports.fetchIdeaVoteResultForUser = fetchIdea = function(id, user, successHandler, errorHandler) {
+	logger.info('apexClient.fetchIdeaVoteResultForUser(%s,%s)', id, user);
+	logger.error('not implemented');
 	// return true/false/null to indicate user's vote for this item
 };
 
 exports.voteYes = voteYes = function(id, user, successHandler, errorHandler) {
+	logger.info('apexClient.voteYes(%s,%s)', id, user);
 	vote(id, user, true, successHandler, errorHandler);
 };
 exports.voteNo = voteNo = function(id, user, successHandler, errorHandler) {
+	logger.info('apexClient.voteNo(%s,%s)', id, user);
 	vote(id, user, false, successHandler, errorHandler);
 };
 
 exports.vote = vote = function(id, user, rawVotingResult, successHandler, errorHandler) {
+	logger.info('apexClient.vote(%s,%s,%s)', id, user, rawVotingResult);
+
 	//ensure voting result parses
 	var votingResult = stringToYesNo(rawVotingResult);
 	// save voting result
@@ -222,15 +231,21 @@ exports.vote = vote = function(id, user, rawVotingResult, successHandler, errorH
 };
 
 exports.fetchTrackingValueForUser = fetchTrackingValueForUser = function(id, user, successHandler, errorHandler) {
+	logger.info('apexClient.fetchTrackingValueForUser(%s,%s)', id, user);
+	logger.error('not implemented');
 	// return true/false
 };
 exports.trackItem = trackItem = function(id, user, successHandler, errorHandler) {
+	logger.info('apexClient.trackItem(%s,%s)', id, user);
+
 	var sql = "th_ideas_pkg.track_an_idea(:1,:2)";
 	var params = (id, user);
 
 	runSqlWithParametersHandleError(sql, params, successHandler, errorHandler);
 };
 exports.untrackItem = untrackItem = function(id, user, successHandler, errorHandler) {
+	logger.info('apexClient.unTrackItem(%s,%s)', id, user);
+
 	var sql = "th_ideas_pkg.untrack_an_idea(:1,:2)";
 	var params = (id, user);
 
@@ -257,6 +272,8 @@ var stringToYesNo = function(string) {
 };
 
 exports.createIdea = createIdea = function(item, user, successHandler, errorHandler) {
+	logger.info('apexClient.createIdea(%s,%s)', item, user);
+	console.dir(item);
 
 	// th_ideas_pkg.create_idea(
 	//   3         p_short_desc  => 'Hey I have an idea!',
@@ -271,6 +288,8 @@ exports.createIdea = createIdea = function(item, user, successHandler, errorHand
 };
 
 exports.fetchComments = fetchComments = function(id, successHandler, errorHandler) {
+	logger.info('apexClient.fetchComments(%s)', item);
+
 	var sql = "select comments ..."; //TODO
 	var params = [];
 
@@ -278,6 +297,8 @@ exports.fetchComments = fetchComments = function(id, successHandler, errorHandle
 };
 
 exports.saveComment = saveComment = function(id, user, comment, successHandler, errorHandler) {
+	logger.info('apexClient.saveComment(%s,%s,%s)', item,user,comment);
+
 	var sql = "procedure name(:1,:2,:3)"; //TODO
 	var params = [id, user, comment];
 
@@ -285,6 +306,8 @@ exports.saveComment = saveComment = function(id, user, comment, successHandler, 
 };
 
 exports.suspendIdea = suspendIdea = function(id, user, successHandler, errorHandler) {
+	logger.info('apexClient.suspendIdea(%s,%s)', item,user);
+
 	var sql = "procedure name(:1,:2)"; //TODO
 	var params = [id, user];
 
