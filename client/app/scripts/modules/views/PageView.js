@@ -15,7 +15,7 @@ define(function(require, exports, module) {
 
     function PageView() {
         View.apply(this, arguments);
-        FeedData = JSON.parse(window.localStorage['newFeed']);
+        FeedData = new Backbone.Collection(JSON.parse(window.localStorage['newFeed']));
 
         _createBacking.call(this);
         _createLayout.call(this);
@@ -131,7 +131,7 @@ define(function(require, exports, module) {
 
         this.layout.header.add(backgroundModifier).add(backgroundSurface);
         this.layout.header.add(hamburgerModifier).add(this.hamburgerSurface);
-        this.layout.header.add(searchModifier).add(searchSurface);
+        // this.layout.header.add(searchModifier).add(searchSurface);
         this.layout.header.add(addItemModifier).add(this.addIdeaSurface);
         this.layout.header.add(titleModifier).add(this.titleSurface);
     }
@@ -177,7 +177,7 @@ define(function(require, exports, module) {
         this.addItemView = new AddItemView();
     }
     function _createFeedView() {
-        this.feedView = new FeedView({ feedData: FeedData });
+        this.feedView = new FeedView({ feedData: FeedData.toJSON() });
         // this.feedModifier = new Modifier({
         //     transform: function() {
         //         return Transform.translate(this.pageViewPos.get(), 0, 0);
@@ -230,15 +230,17 @@ define(function(require, exports, module) {
             var Ideas           = require('entities/ideas');
             this.lightbox.hide();
             _closeModal.call(this);
-            FeedData.unshift(item);
+            var newIdea = new Ideas.Idea(item);
+            FeedData.add(newIdea, { at: 0 });
 
-            new Ideas.Idea(item).save({}, {
+            newIdea.save({}, {
                 success: function(resp) {
-                    console.log(resp)
+                    FeedData.get(resp.cid).set(resp.attriputes);
+                    Store.set('newFeed', FeedData.toJSON())
                 }
             });
 
-            Store.set('newFeed', FeedData)
+            Store.set('newFeed', FeedData.toJSON())
             
             this.feedView.render = function(){ return null; }
             _createFeedView.call(this);

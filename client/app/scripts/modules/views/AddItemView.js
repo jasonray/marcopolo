@@ -23,13 +23,13 @@ define(function(require, exports, module) {
 
         this.mainNode = this.add(this.rootModifier);
         
-        
-        _createLayout.call(this);
-        _createInputs.call(this);
         _createBackground.call(this);
+        _createContent.call(this);
         // _createTitle.call(this);
         // _createComments.call(this);
         _setListeners.call(this);
+
+        this.setContent();
         
     }
 
@@ -63,7 +63,6 @@ define(function(require, exports, module) {
     function _createBackground() {
         this.backgroundSurface = new Surface({
             size : [320, 500],
-            content : this.options.title,
             properties: {
                 color: 'white',
                 textAlign: 'center',
@@ -77,92 +76,83 @@ define(function(require, exports, module) {
 
         this.add(formModifier).add(this.backgroundSurface);
     }
-    function _createInputs() {
-        var buttonView = new View();
-        var oneView = new View();
-        var twoView = new View();
-        this.summaryInput = new InputSurface({
-            size: this.options.inputs.size,
-            name: 'input-summary',
-            placeholder: 'Type idea here',
-            value: '',
-            type: 'text',
-            properties: {
-                zIndex: this.options.zIndex
-            }
-        });
-        this.descriptionInput = new TextareaSurface({
-            size: [this.options.inputs.size[0], 200],
-            name: 'input-description',
-            placeholder: 'Type description',
-            value: '',
-            type: 'textarea',
-            properties: {
-                zIndex: this.options.zIndex
-            }
-        });
-        
-        this.submitSurface = new Surface({
-            size: [120, 50],
-            content: 'Submit',
-            properties: {
-                zIndex: this.options.zIndex,
-                lineHeight: '30px',
-                verticalAlign: 'middle',
-                border: 'none',
-                backgroundColor: '#00a9a6',
-                color: 'white',
-                textAlign: 'center',
-                borderRadius: '5px',
-                padding: '10px',
-                textDecoration: 'none'
-              //  pointerEvents : 'none'
 
-            }
-        }); 
-        this.cancelSurface = new Surface({
-            size: [120, 50],
-            content: 'Cancel',
+    function _createContent() {
+        this.contentSurface = new Surface({
+            size: [true, true],
             properties: {
-                zIndex: this.options.zIndex,
-                lineHeight: '30px',
-                verticalAlign: 'middle',
-                border: 'none',
-                backgroundColor: '#5e5e5e',
-                color: 'white',
-                textAlign: 'center',
-                borderRadius: '5px',
-                padding: '10px',
-                textDecoration: 'none'
+                color: '#4f4f4f',
+                fontFamily: 'AvenirNextCondensed-DemiBold',
+                fontSize: this.options.primaryFontSize + 'px',
+                zIndex : this.options.zIndex
             }
-        }); 
-        var submitModifier = new StateModifier({
-            transform: Transform.translate(140,20,0)
         });
-        var cancelModifier = new StateModifier({
-            transform: Transform.translate(0,20,0)
+
+        var titleModifier = new StateModifier({
+            transform: Transform.translate(0, 0, 0)
         });
-        oneView.add(this.summaryInput);
-        twoView.add(this.descriptionInput);
-        buttonView.add(submitModifier).add(this.submitSurface);
-        buttonView.add(cancelModifier).add(this.cancelSurface);
-        this.inputs.push(oneView);
-        this.inputs.push(twoView);
-        this.inputs.push(buttonView); 
+
+        this.add(titleModifier).add(this.contentSurface);
     }
 
     function _setListeners() {
-        this.submitSurface.on("click", function(){
-            this.newIdea = {comments:''};
-            this.newIdea.short_description = this.summaryInput.getValue();
-            this.newIdea.long_description = this.descriptionInput.getValue();
-            this._eventOutput.emit('newFeed:add', this.newIdea);
-            this.descriptionInput.setValue('');
-        }.bind(this));
-        this.cancelSurface.on("click", function(){
-            this._eventOutput.emit('newFeed:close');
-        }.bind(this));
+        // this.submitSurface.on("click", function(){
+        //     this.newIdea = {comments:''};
+        //     this.newIdea.short_description = this.summaryInput.getValue();
+        //     this.newIdea.long_description = this.descriptionInput.getValue();
+        //     this._eventOutput.emit('newFeed:add', this.newIdea);
+        //     this.descriptionInput.setValue('');
+        // }.bind(this));
+        // this.cancelSurface.on("click", function(){
+        //     this._eventOutput.emit('newFeed:close');
+        // }.bind(this));
     }
+    AddItemView.prototype.setContent = function() {
+        this.contentSurface.setContent(template.call(this));
+    };
+    var template = function() {
+        return '<form class="form-horizontal"> \
+            <fieldset> \
+                <!-- Form Name --> \
+                <legend>New Idea!</legend> \
+                <!-- Text input--> \
+                <div class="form-group"> \
+                    <label class="col-md-4 control-label" for="short_description">Summary</label> \
+                    <div class="col-md-5"> \
+                        <input id="short_description" name="short_description" type="text" placeholder="Type idea here" class="form-control input-md" required=""> \
+                        <span class="help-block">Keep it succint!</span> \
+                    </div> \
+                </div> \
+                <!-- Textarea --> \
+                <div class="form-group"> \
+                    <label class="col-md-4 control-label" for="long_description">Description</label> \
+                    <div class="col-md-4"> \
+                        <textarea class="form-control" id="long_description" name="long_description"></textarea> \
+                    </div> \
+                </div> \
+                <!-- Select Basic --> \
+                <div class="form-group"> \
+                  <label class="col-md-4 control-label" for="ideaDuration">Duration</label> \
+                  <div class="col-md-5"> \
+                    <select id="ideaDuration" name="ideaDuration" class="form-control"> \
+                      <option value="1209600000">Month</option> \
+                      <option value="302400000">Week</option> \
+                      <option value="43200000">Day</option> \
+                      <option value="3600000">Hour</option> \
+                    </select> \
+                  </div> \
+                </div> \
+                <!-- Button (Double) --> \
+                <div class="form-group"> \
+                  <label class="col-md-4 control-label" for="newIdeaCancel"></label> \
+                  <div class="col-md-8"> \
+                    <button id="newIdeaCancel" name="newIdeaCancel" class="btn btn-default">Cancel</button> \
+                    <button id="newIdeaSubmit" name="newIdeaSubmit" class="btn btn-primary">Submit</button> \
+                  </div> \
+                </div> \
+            </fieldset> \
+        </form>';        
+    };
 
     module.exports = AddItemView;
 });
