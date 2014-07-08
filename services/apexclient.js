@@ -1,5 +1,8 @@
 var oracle = require("oracle");
 var _ = require('underscore');
+var logger = require('bunyan').createLogger({
+	name: "apexclient"
+});
 
 exports.isHealthy = function(successHandler, errorHandler) {
 	sql = "SELECT systimestamp FROM dual";
@@ -82,7 +85,6 @@ exports.fetchTopic = fetchTopic = function(id, successHandler, errorHandler) {
 };
 
 exports.fetchIdeas = fetchIdeas = function(successHandler, errorHandler) {
-	//update sql statement here
 	var lowerRowCount = 1;
 	var upperRowCount = 10;
 	var sql =
@@ -112,14 +114,16 @@ exports.fetchIdeas = fetchIdeas = function(successHandler, errorHandler) {
 	// that function will parse data to "transport model"
 	// and then hand back to the "successHandler"
 	// passed in from app.js, which just perfroms result.send(transportdata);
-	runSqlHandleError(sql, function(data) {
+	function transformAndThenInvokeNativeSuccessHandler(data) {
 		var resultData = [];
 		_.each(data, function(rawItem) {
 			var resultItem = convertFromDataToTransport(rawItem);
 			resultData.push(resultItem);
 		});
 		successHandler(resultData);
-	}, errorHandler);
+	}
+
+	runSqlWithParametersHandleError(sql, [], transformAndThenInvokeNativeSuccessHandler, errorHandler);
 };
 
 // customize this if needed to convert from oracle response to transport
