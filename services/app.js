@@ -3,7 +3,6 @@ var bodyParser = require('body-parser');
 var app = express();
 var cors = require('cors');
 
-var dataAdapter = require('./sampleDataAdapter');
 var apexClient = require('./apexclient');
 
 var logger = require('bunyan').createLogger({
