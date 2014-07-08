@@ -9,7 +9,6 @@ var logger = require('bunyan').createLogger({
 	name: "resource"
 });
 
-
 function errorHandler(res) {
 	return function(err) {
 		logger.warn('firing resource error handler');
