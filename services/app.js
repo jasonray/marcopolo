@@ -51,8 +51,7 @@ app.get('/ideas', function(req, res, next) {
 });
 
 app.get('/ideas/id/:id', function(req, res, next) {
-	var id = req.param('id');
-	apexClient.fetchIdea(id, onSuccessReturnResults(res), errorHandler(res));
+	apexClient.fetchIdea(req.param('id'), onSuccessReturnResults(res), errorHandler(res));
 });
 
 app.use('/ideas', bodyParser.json({
