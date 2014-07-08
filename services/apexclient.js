@@ -12,6 +12,7 @@ exports.isHealthy = function(successHandler, errorHandler) {
 };
 
 exports.fetchTopics = fetchTopics = function(successHandler, errorHandler) {
+	logger.info('apexClient.fetchTopics');
 
 	var lowerRowCount = 1;
 	var upperRowCount = 10;
@@ -58,6 +59,8 @@ exports.fetchTopics = fetchTopics = function(successHandler, errorHandler) {
 };
 
 exports.fetchTopic = fetchTopic = function(id, successHandler, errorHandler) {
+	logger.info('apexClient.fetchTopic(%s)', id);
+
 	var sql = "select t.id, decode(u.first_name || ' ' || u.last_name, ' ', t.owner, " +
 		"                u.first_name || ' ' || u.last_name) owner, " +
 		"       t.title title, t.description, " +
@@ -77,7 +80,7 @@ exports.fetchTopic = fetchTopic = function(id, successHandler, errorHandler) {
 		"   and t.id = " + id;
 
 	runSqlHandleError(sql, function(data) {
-		console.log('found %s record(s)', data.length);
+		logger.debug('found %s record(s)', data.length);
 		if (data.length === 0) successHandler(undefined);
 		var resultItem = convertFromDataToTransport(data[0]);
 		successHandler(resultItem);
@@ -116,6 +119,7 @@ exports.fetchIdeas = fetchIdeas = function(successHandler, errorHandler) {
 	// and then hand back to the "successHandler"
 	// passed in from app.js, which just perfroms result.send(transportdata);
 	function transformAndThenInvokeNativeSuccessHandler(data) {
+		logger.info('found %s ideas', data.length);
 		var resultData = [];
 		_.each(data, function(rawItem) {
 			var resultItem = convertFromDataToTransport(rawItem);
