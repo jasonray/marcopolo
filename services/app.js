@@ -93,9 +93,8 @@ app.post('/ideas/id/:id/operations/voteYes', function(req, res, next) {
 	var id = req.param('id');
 	var user = determineUser(req);
 	console.log('vote by id [%s][%s]', id, user);
-	dataAdapter.voteYes(id, user);
-	console.log('passed dataAdapter.voteYes');
-	res.send(200);
+
+	apexClient.voteYes(id, user, onSuccessReturnResults(res), errorHandler(res));
 });
 app.post('/ideas/id/:id/operations/voteNo', function(req, res, next) {
 	var id = req.param('id');
