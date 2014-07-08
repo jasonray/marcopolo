@@ -85,23 +85,17 @@ app.put('/ideas/id/:id/votingResult', function(req, res, next) {
 	var id = req.param('id');
 	var user = determineUser(req);
 	var votingResult = req.body;
-	console.log('voting [%s][%s][%s]', id, user, votingResult);
-	dataAdapter.vote(id, user, votingResult);
-	res.send(200);
+	apexClient.vote(id, user, onSuccessReturnResults(res), errorHandler(res));
 });
 app.post('/ideas/id/:id/operations/voteYes', function(req, res, next) {
 	var id = req.param('id');
 	var user = determineUser(req);
-	console.log('vote by id [%s][%s]', id, user);
-
 	apexClient.voteYes(id, user, onSuccessReturnResults(res), errorHandler(res));
 });
 app.post('/ideas/id/:id/operations/voteNo', function(req, res, next) {
 	var id = req.param('id');
 	var user = determineUser(req);
-	console.log('vote by id [%s][%s]', id, user);
-	dataAdapter.voteNo(id, user);
-	res.send(200);
+	apexClient.voteNo(id, user, onSuccessReturnResults(res), errorHandler(res));
 });
 
 // tracking
