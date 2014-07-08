@@ -292,8 +292,23 @@ var stringToYesNo = function(string) {
 	}
 };
 
-exports.createIdea = createIdea = function(item) {
-	// save and return newly created item with id filled in
+exports.createIdea = createIdea = function(item, user, successHandler, errorHandler) {
+
+// th_ideas_pkg.create_idea(
+//   3         p_short_desc  => 'Hey I have an idea!',
+//   4         p_owner       => 'dillons',
+//   5         p_description => 'More descriptive text',
+//   6         p_topic_id    => null,
+//   7         p_tags        => '#onetag #twotag #threetag #four');
+
+	var sql = "call th_ideas_pkg.create_idea(:1,:2,:3,:4,:5)";
+	var params = [item.short_description, 'dillons', item.long_description,null,'#testdata'];
+
+	executeProcedure(sql, params, function(err, results) {
+		if (err) return errorHandler(err);
+		else return successHandler(results);
+	});
+
 };
 
 exports.fetchComments = fetchComments = function(id) {

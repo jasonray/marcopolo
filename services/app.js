@@ -62,13 +62,12 @@ app.use('/ideas', bodyParser.json({
 
 app.post('/ideas', function(req, res, next) {
 	var newIdea = req.body;
+	var user = determineUser(req);
+
 	console.log('received request to create new idea [%s][%s]', newIdea, newIdea.short_description);
 	console.dir(newIdea);
 
-	var idea = dataAdapter.createIdea(newIdea);
-	// i am returning the version from the data adapter to ensure that the links get built, there are better ways to accomplish this
-	var result = dataAdapter.fetchIdea(idea.id);
-	res.send(result);
+	apexClient.createIdea(newIdea, user, onSuccessReturnResults(res), errorHandler(res));
 });
 
 //// a couple of different ways to model voting
