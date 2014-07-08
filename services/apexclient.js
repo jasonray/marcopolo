@@ -390,6 +390,10 @@ exports.createIdea = createIdea = function(item, user, successHandler, errorHand
 	//   6         p_topic_id    => null,
 	//   7         p_tags        => '#onetag #twotag #threetag #four');
 
+	// add another params
+	// :6   ... , new oracle.OutParam(oracle.OCCIINT)
+	// get it from results.returnParam
+
 	var sql = "call th_ideas_pkg.create_idea(:1,:2,:3,:4,:5)";
 	var params = [item.short_description, 'dillons', item.long_description, '#testdata', null];
 	runSql(sql, params, successHandler, errorHandler);
