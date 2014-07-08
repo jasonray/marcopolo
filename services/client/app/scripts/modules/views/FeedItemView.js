@@ -156,7 +156,7 @@ define(function(require, exports, module) {
                 success: function(resp) {
                  //   console.log(resp)
                 },
-                url: 'http://localhost:9999/ideas/id/'+id+'/operations/voteNo?user=cushingb'
+                url: '/ideas/id/'+id+'/operations/voteNo?user=cushingb'
             });
         
             this._eventOutput.emit("idea:delete", this);
@@ -173,7 +173,7 @@ define(function(require, exports, module) {
                 success: function(resp) {
                  //   console.log(resp)
                 },
-                url: 'http://localhost:9999/ideas/id/'+id+'/operations/voteYes?user=cushingb'
+                url: '/ideas/id/'+id+'/operations/voteYes?user=cushingb'
             });
             this._eventOutput.emit("idea:delete", this);
         }.bind(this));
