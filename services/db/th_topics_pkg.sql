@@ -2,13 +2,27 @@ set define off
 create or replace package th_topics_pkg as
 
 
-	-- create an topic
+	-- create a topic
 	-- * p_title
 	--   p_description
 	-- * p_creator
+	-- * p_duration
+	procedure create_topic (p_title		topics.title%type, 
+			p_description		topics.description%type, 
+			p_creator		topics.owner%type,
+                        p_duration		topics.duration%type default 'quarter');
+
+	procedure create_topic (p_title		topics.title%type, 
+			p_description		topics.description%type, 
+			p_creator		topics.owner%type,
+                        p_duration		topics.duration%type default 'quarter',
+                        p_id		out	topics.id%type);
+
 	function create_topic (p_title		topics.title%type, 
 			p_description		topics.description%type, 
-			p_creator		topics.owner%type) return topics.id%type;
+			p_creator		topics.owner%type,
+                        p_duration		topics.duration%type default 'quarter') 
+		return topics.id%type;
 
 
 	-- update topic description(s)
@@ -72,12 +86,42 @@ create or replace package body th_topics_pkg as
 
 	---------------------------------------------
 	-- create an topic
+	procedure create_topic (p_title		topics.title%type, 
+			p_description		topics.description%type, 
+			p_creator		topics.owner%type,
+                        p_duration		topics.duration%type default 'quarter')
+	is
+		l_id topics.id%type;
+	begin
+		l_id := create_topic(p_title	=> p_title,
+				p_description	=> p_description,
+				p_creator	=> p_creator,
+				p_duration	=> p_duration);
+	end create_topic;
+
+
+	procedure create_topic (p_title		topics.title%type, 
+			p_description		topics.description%type, 
+			p_creator		topics.owner%type,
+                        p_duration		topics.duration%type default 'quarter',
+                        p_id		out	topics.id%type)
+	is
+	begin
+		p_id := create_topic(p_title	=> p_title,
+				p_description	=> p_description,
+				p_creator	=> p_creator,
+				p_duration	=> p_duration);
+	end create_topic;
+
+
 	function create_topic (p_title		topics.title%type, 
 			p_description		topics.description%type, 
-			p_creator		topics.owner%type) return topics.id%type
+			p_creator		topics.owner%type,
+			p_duration		topics.duration%type) return topics.id%type
 	is
-		l_id	topics.id%type;
-		l_now	date	:= sysdate;
+		l_id		topics.id%type;
+		l_now		date	:= sysdate;
+		l_duration	number(4,2);
 	begin
 		if (p_title is null or length(p_title) > th_constants_pkg.G_TITLE_MAXLEN) then
 			raise_application_error(th_constants_pkg.NO_TITLE_CODE,
@@ -87,8 +131,23 @@ create or replace package body th_topics_pkg as
 						th_constants_pkg.NO_CREATOR_MSG);
 		end if;
 		--
-		insert into topics (title, description, owner)
-		values (p_title, p_description, p_creator)
+		case lower(p_duration)
+			when 'hour' then
+				l_duration := 60/1440;
+			when 'day' then
+				l_duration := 1;
+			when 'week' then
+				l_duration := 7;
+			when 'month' then
+				l_duration := 30;
+			when 'quarter' then
+				l_duration := 120;
+			when 'year' then
+				l_duration := 365;
+		end case;
+		--
+		insert into topics (title, description, owner, duration, created, closed)
+		values (p_title, p_description, p_creator, p_duration, l_now, l_now + l_duration)
 		returning id into l_id;
 		return l_id;
 	exception

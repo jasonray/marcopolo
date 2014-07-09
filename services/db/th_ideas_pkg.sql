@@ -6,6 +6,7 @@ create or replace package th_ideas_pkg as
 			p_owner			ideas.owner%type,
 			p_description		ideas.description%type,
 			p_tags			clob default null,
+			p_duration		ideas.duration%type default 'month',
 			p_topic_id		ideas.topic_id%type default null,
                         p_id		out	ideas.id%type);
 
@@ -14,6 +15,7 @@ create or replace package th_ideas_pkg as
 			p_owner			ideas.owner%type,
 			p_description		ideas.description%type,
 			p_tags			clob default null,
+			p_duration		ideas.duration%type default 'month',
 			p_topic_id		ideas.topic_id%type default null);
 
 
@@ -22,6 +24,7 @@ create or replace package th_ideas_pkg as
 			p_owner			ideas.owner%type,
 			p_description		ideas.description%type,
 			p_tags			clob default null,
+			p_duration		ideas.duration%type default 'month',
 			p_topic_id		ideas.topic_id%type default null)
 		return ideas.id%type;
 
@@ -103,6 +106,7 @@ create or replace package body th_ideas_pkg as
 			p_owner			ideas.owner%type,
 			p_description		ideas.description%type,
 			p_tags			clob default null,
+			p_duration		ideas.duration%type default 'month',
 			p_topic_id		ideas.topic_id%type default null,
                         p_id		out	ideas.id%type)
         is
@@ -110,6 +114,7 @@ create or replace package body th_ideas_pkg as
 		p_id := create_idea (p_short_desc	=> p_short_desc,
 					p_owner		=> p_owner,
 					p_description	=> p_description,
+					p_duration	=> p_duration,
 					p_topic_id	=> p_topic_id,
 					p_tags		=> p_tags);
         end create_idea;
@@ -119,6 +124,7 @@ create or replace package body th_ideas_pkg as
 			p_owner			ideas.owner%type,
 			p_description		ideas.description%type,
 			p_tags			clob default null,
+			p_duration		ideas.duration%type default 'month',
 			p_topic_id		ideas.topic_id%type default null)
         is
 		l_id	ideas.id%type;
@@ -126,6 +132,7 @@ create or replace package body th_ideas_pkg as
 		l_id := create_idea (p_short_desc	=> p_short_desc,
 					p_owner		=> p_owner,
 					p_description	=> p_description,
+					p_duration	=> p_duration,
 					p_topic_id	=> p_topic_id,
 					p_tags		=> p_tags);
         end create_idea;
@@ -137,11 +144,13 @@ create or replace package body th_ideas_pkg as
 			p_owner			ideas.owner%type,
 			p_description		ideas.description%type, 
 			p_tags			clob default null,
+			p_duration		ideas.duration%type default 'month',
 			p_topic_id		ideas.topic_id%type default null)
 		return ideas.id%type
 	is
-		l_id	ideas.id%type;
-		l_now	date	:= sysdate;
+		l_id		ideas.id%type;
+		l_now		date := sysdate;
+		l_duration 	number(4,2);
 	begin
 		if (p_short_desc is null or length(p_short_desc) > th_constants_pkg.G_SHORTDESC_MAXLEN) then
 			raise_application_error(th_constants_pkg.NO_SHORTDESC_CODE,
@@ -151,8 +160,23 @@ create or replace package body th_ideas_pkg as
 						th_constants_pkg.NO_CREATOR_MSG);
 		end if;
 		--
-		insert into ideas (short_desc, description, owner, topic_id)
-		values (p_short_desc, p_description, p_owner, p_topic_id)
+                case lower(p_duration)
+                        when 'hour' then
+                                l_duration := 60/1440;
+                        when 'day' then
+                                l_duration := 1;
+                        when 'week' then
+                                l_duration := 7;
+                        when 'month' then
+                                l_duration := 30;
+                        when 'quarter' then
+                                l_duration := 120;
+                        when 'year' then
+                                l_duration := 365;
+                end case;
+		--
+		insert into ideas (short_desc, description, owner, topic_id, created, duration, closed)
+		values (p_short_desc, p_description, p_owner, p_topic_id, l_now, p_duration, l_now + l_duration)
 		returning id into l_id;
 		return l_id;
 
@@ -382,8 +406,8 @@ create or replace package body th_ideas_pkg as
 			p_ignorer		ignored_ideas.ignoring_user%type)
 	is
 	begin
-		insert into ignored_ideas (idea_id, ignoring_user)
-		values (p_id, p_ignorer);
+		insert into ignored_ideas (idea_id, ignoring_user, ignored)
+		values (p_id, p_ignorer, sysdate);
 	exception
 		when dup_val_on_index then
 			--TODO: log the duplicate ignore. WHY did we get a dupe?!
@@ -439,6 +463,8 @@ create or replace package body th_ideas_pkg as
 	--  votes, comments, tracking, suspension, revocation, closing, tags
 	procedure reset_idea (p_id		ideas.id%type)
 	is
+		l_created date;
+		l_duration number(4,2) := 30;
 	begin
 		delete from comments
 		 where parent_type = 'idea'
@@ -453,8 +479,18 @@ create or replace package body th_ideas_pkg as
 		delete from tracked_ideas
 		 where idea_id = p_id;
 		--
+		select created, decode(lower(duration),'hour',60/1440,
+                                              'day',1,
+                                              'week',7,
+                                              'month',30,
+                                              'quarter',120,
+                                              'year',365,30)
+                  into l_created, l_duration
+                  from ideas
+                 where id = p_id;
+		--
 		update ideas
-		   set closed = null,
+		   set closed = l_created + l_duration,
 			closed_by = null,
 			revoked = null,
 			revoked_by = null,

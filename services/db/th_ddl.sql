@@ -35,6 +35,7 @@ create table topics (
 	description	clob,				-- description of the topic
 	owner		varchar2(200) 	not null,	-- created by
 	created		date 		not null,	-- created date
+	duration	varchar2(30)	not null,	-- how long should the topic be available?
 	last_edited	date		not null,	-- last edited date
 	last_edited_by	varchar2(200) 	not null,	-- who was the last user to edit this topic
 	closed		date,				-- when this topic is closed for voting
@@ -54,6 +55,10 @@ add constraint topics_username_fk
 foreign key (owner)
 references users;
 
+alter table topics
+add constraint topics_duration_ck
+check (duration in ('hour', 'day', 'week', 'month', 'quarter', 'year'));
+
 
 create table ideas (
 	id		number		not null,
@@ -61,6 +66,7 @@ create table ideas (
 	description	clob,
 	owner		varchar2(200)	not null,
 	created		date		not null,	-- when was this idea created 
+	duration	varchar2(30)	not null,	-- how long should the idea be available?
 	last_edited_by	varchar2(200)	not null,	-- who was the last user to edit the idea
 	last_edited	date		not null,	-- when was the last time this idea was edited
 	available	date,				-- when is/was this idea open for voting
@@ -91,6 +97,10 @@ alter table ideas
 add constraint ideas_topics_fk
 foreign key (topic_id) 
 references topics;
+
+alter table ideas
+add constraint ideas_duration_ck
+check (duration in ('hour', 'day', 'week', 'month', 'quarter', 'year'));
 
 
 create table comments (
