@@ -101,6 +101,22 @@ define(function(require, exports, module) {
 
         this.add(layoutModifier).add(this.layout);
     }
+    function _createTitleSurface() {
+        this.titleSurface = new Surface({
+            size: [200, 44],
+            content : this.options.title,
+            properties: {
+                color: 'white',
+                fontFamily: 'AvenirNextCondensed-DemiBold',
+                fontSize: '26px',
+                textTransform: 'uppercase',
+                pointerEvents : 'none'
+            }
+        });
+        this.titleModifier = new StateModifier({
+            transform: Transform.translate(60, 4, 0)
+        });
+    }
 
     function _createHeader() {
         var backgroundSurface = new Surface({
@@ -113,18 +129,7 @@ define(function(require, exports, module) {
             size: [44, 44],
             content : './images/hamburger.png'
         });
-        this.titleSurface = new Surface({
-            size: [200, 44],
-            content : 'NEW IDEAS',
-            properties: {
-                color: 'white',
-                fontFamily: 'AvenirNextCondensed-DemiBold',
-                fontSize: '26px',
-                textTransform: 'uppercase',
-                pointerEvents : 'none'
-            }
-        });
-
+        
         var searchSurface = new ImageSurface({
             size: [232, 44],
             content : './images/search.png'
@@ -151,20 +156,19 @@ define(function(require, exports, module) {
             origin: [0, 0.5],
             align : [0, 0.5]
         });
-        var titleModifier = new StateModifier({
-            transform: Transform.translate(60, 4, 0)
-        });
 
         var searchModifier = new StateModifier({
             origin: [1, 1],
             transform: Transform.translate(-60, 0, 60),   
         });
 
+        _createTitleSurface.call(this);
+
         this.layout.header.add(backgroundModifier).add(backgroundSurface);
         this.layout.header.add(hamburgerModifier).add(this.hamburgerSurface);
-        this.layout.header.add(searchModifier).add(searchSurface);
+        //this.layout.header.add(searchModifier).add(searchSurface);
         this.layout.header.add(addItemModifier).add(this.addIdeaSurface);
-        this.layout.header.add(titleModifier).add(this.titleSurface);
+        this.layout.header.add(this.titleModifier).add(this.titleSurface);
     }
 
     function _createBody() {
