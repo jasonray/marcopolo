@@ -8,8 +8,9 @@ Install It! (services)
 
 - Ensure that you have node installed [http://nodejs.org/download/]
 
-- Run `npm install`
+- Run `npm install` from /services directory
 
+- From the /services/app directory, run `npm install`, then run `bower update` (you may need to execute bower from node_modules/bower/bin/bower)
 
 Run it! (services)
 ==================

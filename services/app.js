@@ -48,7 +48,7 @@ app.get('/topic/id/:id', function(req, res, next) {
 app.use(cors());
 
 app.get('/ideas', function(req, res, next) {
-	apexClient.fetchIdeas(onSuccessReturnResults(req), errorHandler(res));
+	apexClient.fetchIdeas(onSuccessReturnResults(res), errorHandler(res));
 });
 
 app.get('/ideas/new', function(req, res, next) {
@@ -62,6 +62,9 @@ app.get('/ideas/mine', function(req, res, next) {
 });
 app.get('/ideas/past', function(req, res, next) {
 	apexClient.pastItemsFeed(determineUser(req), onSuccessReturnResults(res), errorHandler(res));
+});
+app.get('/ideas/ignored', function(req, res, next) {
+	apexClient.ignoredIdeasFeed(determineUser(req), onSuccessReturnResults(res), errorHandler(res));
 });
 
 app.get('/ideas/id/:id', function(req, res, next) {
@@ -119,6 +122,10 @@ app.post('/ideas/id/:id/comments', function(req, res, next) {
 
 app.post('/ideas/id/:id/operations/suspend', function(req, res, next) {
 	apexClient.suspendIdea(req.param('id'), determineUser(req), onSuccessReturnResults(res), errorHandler(res));
+});
+
+app.post('/ideas/id/:id/operations/ignore', function(req, res, next) {
+	apexClient.ignoreIdea(req.param('id'), determineUser(req), onSuccessReturnResults(res), errorHandler(res));
 });
 
 function determineUser(req) {
