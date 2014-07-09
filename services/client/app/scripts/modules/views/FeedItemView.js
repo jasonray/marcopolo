@@ -40,8 +40,8 @@ define(function(require, exports, module) {
         iconSize: 32,
         iconUrl: 'img/strip-icons/famous.png',
         title: 'Famo.us',
-        primaryFontSize: 18,
-        secondaryFontSize: 12,
+        primaryFontSize: 14,
+        secondaryFontSize: 10,
         stripOffset: 58,
         staggerDelay: 38,
         transition: {
@@ -105,7 +105,8 @@ define(function(require, exports, module) {
                 color: '#4f4f4f',
                 fontFamily: 'AvenirNextCondensed-DemiBold',
                 fontSize: this.options.primaryFontSize + 'px',
-                pointerEvents : 'none'
+                pointerEvents : 'none',
+                zIndex: '3000'
             }
         });
 
@@ -159,7 +160,7 @@ define(function(require, exports, module) {
                 success: function(resp) {
                  //   console.log(resp)
                 },
-                url: '/ideas/id/'+id+'/operations/voteNo?user=cushingb'
+                url: env+'/ideas/id/'+id+'/operations/voteNo?user=cushingb'
             });
         
             this._eventOutput.emit("idea:delete", this);
@@ -176,7 +177,7 @@ define(function(require, exports, module) {
                 success: function(resp) {
                  //   console.log(resp)
                 },
-                url: '/ideas/id/'+id+'/operations/voteYes?user=cushingb'
+                url: env+'/ideas/id/'+id+'/operations/voteYes?user=cushingb'
             });
             this._eventOutput.emit("idea:delete", this);
         }.bind(this));
