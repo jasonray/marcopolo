@@ -40,19 +40,20 @@ define(function(require, exports, module) {
         var yOffset = this.options.topOffset;
 
         for (var i = 0; i < this.options.stripData.length; i++) {
-            var stripView = new StripView({
-                iconUrl: this.options.stripData[i].iconUrl,
-                title: this.options.stripData[i].title
-            });
+            this.stripView = new StripView(this.options.stripData[i]);
 
             var stripModifier = new StateModifier({
                 transform: Transform.translate(0, yOffset, 0)
             });
 
             this.stripModifiers.push(stripModifier);
-            this.add(stripModifier).add(stripView);
+            this.add(stripModifier).add(this.stripView);
 
             yOffset += this.options.stripOffset;
+
+            this.stripView.on("menuToggle", function(feed){
+                this._eventOutput.emit('menuToggle', feed);
+            }.bind(this));
         }
     }
 

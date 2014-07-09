@@ -30,9 +30,12 @@ define(function(require, exports, module) {
         }
 
         var test = new Ideas.newIdeas();
+        var test = new Ideas.myIdeas();
+        var test = new Ideas.pastIdeas();
+        var test = new Ideas.trackedIdeas();
 
         function onStorageEvent(e){
-                alert(e);
+               // alert(e);
             }
 
             window.addEventListener('storage', onStorageEvent, true);

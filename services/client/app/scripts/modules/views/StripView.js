@@ -96,7 +96,7 @@ define(function(require, exports, module) {
             });
         });
         this.backgroundSurface.on("click", function(){
-            this._eventOutput.emit('menuToggle');
+            this._eventOutput.emit('menuToggle', this.options);
         }.bind(this));
     }
 

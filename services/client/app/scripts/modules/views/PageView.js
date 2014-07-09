@@ -16,19 +16,21 @@ define(function(require, exports, module) {
 
     function PageView() {
         View.apply(this, arguments);
-        FeedData = JSON.parse(window.localStorage['newFeed']);
 
+        _createLightbox.call(this);
         _createBacking.call(this);
         _createLayout.call(this);
         _createHeader.call(this);
         _createBody.call(this);
-        _createFeedView.call(this);
-        _createLightbox.call(this);
         _createModal.call(this);
         //_authenticate.call(this);
+        _createFeedView.call(this);
+        
         _createAddItemView.call(this);
 
         _setListeners.call(this);
+
+        _createPublicFunctions.call(this);
 
     }
     
@@ -58,6 +60,25 @@ define(function(require, exports, module) {
             _createLoginView.call(this);
         }
     }
+
+    function _createLoginView() {
+        _openModal.call(this);
+        this.loginView = new LoginView();
+        this.lightbox.show(this.loginView, function() {
+            this.ready = true;   
+        }.bind(this));
+    }
+
+    function _createPublicFunctions() {
+        this.refreshFeed = function() {
+            this.feedView.render = function(){ return null; }
+            this.titleSurface.render = function(){ return null; }
+            _createFeedView.call(this);
+            _createTitleSurface.call(this);
+            this.layout.header.add(this.titleModifier).add(this.titleSurface);
+        }
+    }
+
     function _createBacking() {
         var backing = new Surface({
             properties: {
@@ -187,7 +208,7 @@ define(function(require, exports, module) {
         this.addItemView = new AddItemView();
     }
     function _createFeedView() {
-        this.feedView = new FeedView({ feedData: FeedData });
+        this.feedView = new FeedView({ feedData: this.options.feed });
         // this.feedModifier = new Modifier({
         //     transform: function() {
         //         return Transform.translate(this.pageViewPos.get(), 0, 0);
@@ -240,7 +261,7 @@ define(function(require, exports, module) {
             var Ideas           = require('entities/ideas');
             this.lightbox.hide();
             _closeModal.call(this);
-            FeedData.unshift(item);
+            this.options.feed.unshift(item);
 
             new Ideas.Idea(item).save({}, {
                 success: function(resp) {
@@ -248,7 +269,7 @@ define(function(require, exports, module) {
                 }
             });
 
-            Store.set('newFeed', FeedData)
+            Store.set('newFeed', this.options.feed)
             
             this.feedView.render = function(){ return null; }
             _createFeedView.call(this);

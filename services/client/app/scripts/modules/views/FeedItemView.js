@@ -11,6 +11,9 @@ define(function(require, exports, module) {
 
     var Ideas           = require('entities/ideas');
 
+    //dev
+    var env = 'http://demos.agilex.com:9998'
+
     function FeedItemView() {
         View.apply(this, arguments);
 

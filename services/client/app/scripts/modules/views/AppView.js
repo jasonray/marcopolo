@@ -17,9 +17,11 @@ define(function(require, exports, module) {
     var MenuView      = require('modules/views/MenuView');
     var StripData     = require('modules/data/StripData');
     var FeedView        = require('modules/views/FeedItemView');
+    var FeedData        = [];
 
     function AppView() {
         View.apply(this, arguments);
+        FeedData = JSON.parse(window.localStorage['newFeed']);
 
         this.menuToggle = false;
         this.pageViewPos = new Transitionable(0);
@@ -45,7 +47,7 @@ define(function(require, exports, module) {
     };
 
     function _createPageView() {
-        this.pageView = new PageView();
+        this.pageView = new PageView({feed: FeedData, title: 'NEW'});
         this.pageModifier = new Modifier({
             transform: function() {
                 return Transform.translate(this.pageViewPos.get(), 0, 0);
@@ -67,6 +69,13 @@ define(function(require, exports, module) {
 
     function _setListeners() {
         this.pageView.on('menuToggle', this.toggleMenu.bind(this));
+
+        this.menuView.on("menuToggle", function(feed){
+            this.toggleMenu();
+            this.pageView.options.feed = JSON.parse(window.localStorage[feed.name]);
+            this.pageView.options.title = feed.title
+            this.pageView.refreshFeed();
+        }.bind(this));
     }
 
     function _handleSwipe() {
