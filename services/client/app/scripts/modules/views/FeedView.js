@@ -1,8 +1,9 @@
 /*** FeedView.js ***/
 
 define(function(require, exports, module) {
-    var View          = require('famous/core/view');
+    var View          = require('famous/core/View');
     var ScrollView    = require('famous/views/Scrollview');
+    var ViewSequence = require('famous/core/viewSequence');
     var Surface       = require('famous/core/Surface');
     var Transform     = require('famous/core/Transform');
     var StateModifier = require('famous/modifiers/StateModifier');
@@ -39,6 +40,12 @@ define(function(require, exports, module) {
     function _createFeedItemViews() {
         this.stripModifiers = [];
         var yOffset = this.options.topOffset;
+        var itemArray = [];
+        var feedSequence = new ViewSequence(itemArray)
+        var feedScroll = new ScrollView({
+            paginated: 'false'
+        });
+        feedScroll.sequenceFrom(feedSequence);
 
         for (var i = 0; i < this.options.feedData.length; i++) {
             this.feedItemView = new FeedItemView({data: this.options.feedData[i], yOffset: yOffset});
@@ -48,6 +55,7 @@ define(function(require, exports, module) {
             });
 
             this.stripModifiers.push(stripModifier);
+
             this.add(stripModifier).add(this.feedItemView);
 
             yOffset += this.options.stripOffset;
@@ -55,8 +63,12 @@ define(function(require, exports, module) {
             this.feedItemView.on("idea:delete", function(item){
                 this.delete(item)
             }.bind(this));
-         
+
+            itemArray.push(this.feedItemView);
         }
+        
+        // this.add(feedScroll);
+        
         this.animateStrips();
     }
 
@@ -72,7 +84,6 @@ define(function(require, exports, module) {
     };
 
     FeedView.prototype.restack = function(item, index) {
-        console.log('delete');
         for(var i = index; i < this.stripModifiers.length; i++) {
             var initY = this.options.topOffset
                 + this.options.stripOffset * i;
@@ -96,20 +107,10 @@ define(function(require, exports, module) {
                     Transform.translate( 0, yOffset, 0), transition);
             }.bind(this, i), i * delay);
         }
-
-        // Timer.setTimeout((function() {
-        //     this.featuredMod.setOpacity(1, transition);
-        // }).bind(this), transition.duration);
     };
 
     function _setListeners() {
-        // this.feedItemView.on("idea:down", function(){
-        //     alert('down')
-        // }.bind(this));
-
-        // this.feedItemView.on("idea:up", function(){
-        //     alert('yes')
-        // }.bind(this));
+    
 
     }
 
@@ -123,8 +124,6 @@ define(function(require, exports, module) {
         }
         item.render = function(){ return null; }
         
-
-
         // Timer.setTimeout(function(i) {
         //     item.stripModifier.setTransform(
         //         Transform.translate( offSet, 0, 0), transition);
