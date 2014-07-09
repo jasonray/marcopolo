@@ -63,6 +63,9 @@ app.get('/ideas/mine', function(req, res, next) {
 app.get('/ideas/past', function(req, res, next) {
 	apexClient.pastItemsFeed(determineUser(req), onSuccessReturnResults(res), errorHandler(res));
 });
+app.get('/ideas/ignored', function(req, res, next) {
+	apexClient.ignoredIdeasFeed(determineUser(req), onSuccessReturnResults(res), errorHandler(res));
+});
 
 app.get('/ideas/id/:id', function(req, res, next) {
 	apexClient.fetchIdea(req.param('id'), onSuccessReturnResults(res), errorHandler(res));

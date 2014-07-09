@@ -113,35 +113,9 @@ exports.fetchIdeas = fetchIdeas = function(successHandler, errorHandler) {
 	ideaFeed(sql, [], successHandler, errorHandler);
 };
 
+// I assume we DO NOT need to see my vote, my tracking status for NEW ideas?
 exports.newIdeasFeed = newIdeasFeed = function(user, successHandler, errorHandler) {
 	logger.info('apexClient.newIdeasFeed(%s)', user);
-	var lowerRowCount = 1;
-	var upperRowCount = 25;
-	var sql =
-		"select *  " +
-		"  from ( select rownum rnum, a.* " +
-		"           from ( select x.id, x.short_desc, x.description, x.created, " +
-		"                         x.comment_count, x.tags, x.rn " +
-		"                    from (select i.id, i.short_desc, i.description, i.created, " +
-		"                                 c.comment_count, rownum rn, t.tags   " +
-		"                            from ideas i, " +
-		"                                 (select count(*) comment_count, parent_id " +
-		"                                    from comments " +
-		"                                   where parent_type = 'idea' " +
-		"                                   group by parent_id) c, " +
-		"                                 (select it.idea_id,  " +
-		"                                         listagg(it.tag, ' ') within group (order by it.tag) tags " +
-		"                                    from idea_tags it " +
-		"                                   group by it.idea_id) t " +
-		"                           where c.parent_id(+) = i.id " +
-		"                             and i.id = t.idea_id(+) ) x ) a  " +
-		"          where rownum <= " + upperRowCount + " ) " +
-		" where rnum >= " + lowerRowCount;
-
-	ideaFeed(sql, [], successHandler, errorHandler);
-};
-exports.trackedIdeasFeed = trackedIdeasFeed = function(user, successHandler, errorHandler) {
-	logger.info('apexClient.trackedIdeasFeed(%s)', user);
 	var lowerRowCount = 1;
 	var upperRowCount = 25;
 	var sql =
@@ -151,7 +125,39 @@ exports.trackedIdeasFeed = trackedIdeasFeed = function(user, successHandler, err
 		"                         x.created, x.comment_count, x.tags, x.rn " +
 		"                    from (select i.id, i.owner, t.id topic_id, t.title topic_title, i.short_desc, " +
 		"                                 i.description, i.created, c.comment_count, rownum rn, t.tags " +
-		"                            from ideas i, topics t, tracked_ideas ti, " +
+		"                            from ideas i, topics t, " +
+		"                                 (select count(*) comment_count, parent_id " +
+		"                                    from comments " +
+		"                                   where parent_type = 'idea' " +
+		"                                   group by parent_id) c, " +
+		"                                 (select it.idea_id, " +
+		"                                         listagg(it.tag, ' ') within group (order by it.tag) tags " +
+		"                                    from idea_tags it " +
+		"                                   group by it.idea_id) t " +
+		"                           where i.topic_id = t.id(+) " +
+		"                             and c.parent_id(+) = i.id " +
+		"                             and i.id = t.idea_id(+) ) x ) a " +
+		"          where rownum <= " + upperRowCount + " ) " +
+		" where rnum >= " + lowerRowCount +
+		"   and id not in (select distinct idea_id from votes where voter = '" + user + "' union all " +
+		"                  select idea_id from ignored_ideas where ignoring_user = '" + user + "')";
+
+	ideaFeed(sql, [], successHandler, errorHandler);
+};
+
+exports.trackedIdeasFeed = trackedIdeasFeed = function(user, successHandler, errorHandler) {
+	logger.info('apexClient.trackedIdeasFeed(%s)', user);
+	var lowerRowCount = 1;
+	var upperRowCount = 25;
+	var sql =
+		"select * " +
+		"  from ( select rownum rnum, a.* " +
+		"           from ( select x.id, x.owner, x.topic_id, x.topic_title, x.short_desc, x.description, " +
+		"                         x.created, x.comment_count, x.tags, x.vote, x.rn " +
+		"                    from (select i.id, i.owner, t.id topic_id, t.title topic_title, i.short_desc, " +
+		"                                 i.description, i.created, c.comment_count, rownum rn, t.tags, " +
+		"                                 v.vote  " +
+		"                            from ideas i, topics t, tracked_ideas ti, votes v, " +
 		"                                 (select count(*) comment_count, parent_id " +
 		"                                    from comments " +
 		"                                   where parent_type = 'idea' " +
@@ -164,12 +170,15 @@ exports.trackedIdeasFeed = trackedIdeasFeed = function(user, successHandler, err
 		"                             and c.parent_id(+) = i.id " +
 		"                             and i.id = t.idea_id(+) " +
 		"                             and i.id = ti.idea_id " +
+		"                             and v.voter(+) = '" + user + "' " +
+		"                             and i.id = v.idea_id (+) " +
 		"                             and ti.tracking_user = '" + user + "' ) x ) a " +
 		"          where rownum <= " + upperRowCount + " ) " +
 		" where rnum >= " + lowerRowCount;
 
 	ideaFeed(sql, [], successHandler, errorHandler);
 };
+
 exports.myItemsFeed = myItemsFeed = function(user, successHandler, errorHandler) {
 	logger.info('apexClient.myItemsFeed(%s)', user);
 	var lowerRowCount = 1;
@@ -178,10 +187,11 @@ exports.myItemsFeed = myItemsFeed = function(user, successHandler, errorHandler)
 		"select * " +
 		"  from ( select rownum rnum, a.* " +
 		"           from ( select x.id, x.owner, x.topic_id, x.topic_title, x.short_desc, x.description, " +
-		"                         x.created, x.comment_count, x.tags, x.rn " +
+		"                         x.created, x.comment_count, x.tags, x.vote, x.tracked, x.rn " +
 		"                    from (select i.id, i.owner, t.id topic_id, t.title topic_title, i.short_desc, " +
-		"                                 i.description, i.created, c.comment_count, rownum rn, t.tags " +
-		"                            from ideas i, topics t, " +
+		"                                 i.description, i.created, c.comment_count, rownum rn, t.tags, " +
+		"                                 decode(ti.tracked,null,'no','yes') tracked, v.vote " +
+		"                            from ideas i, topics t, tracked_ideas ti, votes v, " +
 		"                                 (select count(*) comment_count, parent_id " +
 		"                                    from comments " +
 		"                                   where parent_type = 'idea' " +
@@ -193,24 +203,64 @@ exports.myItemsFeed = myItemsFeed = function(user, successHandler, errorHandler)
 		"                           where i.owner = '" + user + "' " +
 		"                             and i.topic_id = t.id(+) " +
 		"                             and c.parent_id(+) = i.id " +
+		"                             and i.id = v.idea_id (+) " +
+		"                             and v.voter (+) = '" + user + "' " +
+		"                             and i.id = ti.idea_id (+) " +
+		"                             and ti.tracking_user (+) = '" + user + "' " +
 		"                             and i.id = t.idea_id(+) ) x ) a " +
 		"          where rownum <= " + upperRowCount + " ) " +
 		" where rnum >= " + lowerRowCount; 
 
 	ideaFeed(sql, [], successHandler, errorHandler);
 };
-exports.pastItemsFeed = pastItemsFeed = function(user, successHandler, errorHandler) {
-	logger.info('apexClient.pastItemsFeed(%s)', user);
+
+exports.ignoredIdeasFeed = ignoredIdeasFeed = function(user, successHandler, errorHandler) {
+	logger.info('apexClient.myItemsFeed(%s)', user);
 	var lowerRowCount = 1;
-	var upperRowCount = 10;
+	var upperRowCount = 25;
 	var sql =
 		"select * " +
 		"  from ( select rownum rnum, a.* " +
 		"           from ( select x.id, x.owner, x.topic_id, x.topic_title, x.short_desc, x.description, " +
-		"                         x.created, x.comment_count, x.tags, x.rn " +
+		"                         x.created, x.comment_count, x.tags, x.vote, x.rn " +
 		"                    from (select i.id, i.owner, t.id topic_id, t.title topic_title, i.short_desc, " +
-		"                                 i.description, i.created, i.closed, c.comment_count, ta.tags, rownum rn " +
-		"                            from ideas i, topics t, " +
+		"                                 i.description, i.created, c.comment_count, rownum rn, t.tags, " +
+		"                                 v.vote  " +
+		"                            from ideas i, topics t, ignored_ideas ii, votes v, " +
+		"                                 (select count(*) comment_count, parent_id " +
+		"                                    from comments " +
+		"                                   where parent_type = 'idea' " +
+		"                                   group by parent_id) c, " +
+		"                                 (select it.idea_id, " +
+		"                                         listagg(it.tag, ' ') within group (order by it.tag) tags " +
+		"                                    from idea_tags it " +
+		"                                   group by it.idea_id) t " +
+		"                           where i.topic_id = t.id(+) " +
+		"                             and c.parent_id(+) = i.id " +
+		"                             and i.id = t.idea_id(+) " +
+		"                             and i.id = ii.idea_id " +
+		"                             and v.voter(+) = '" + user + "' " +
+		"                             and i.id = v.idea_id (+) " +
+		"                             and ii.ignoring_user = '" + user + "' ) x ) a " +
+		"          where rownum <= " + upperRowCount + " ) " +
+		" where rnum >= " + lowerRowCount;
+
+	ideaFeed(sql, [], successHandler, errorHandler);
+};
+
+exports.pastItemsFeed = pastItemsFeed = function(user, successHandler, errorHandler) {
+	logger.info('apexClient.pastItemsFeed(%s)', user);
+	var lowerRowCount = 1;
+	var upperRowCount = 25;
+	var sql =
+		"select * " +
+		"  from ( select rownum rnum, a.* " +
+		"           from ( select x.id, x.owner, x.topic_id, x.topic_title, x.short_desc, x.description, " +
+		"                         x.created, x.comment_count, x.tags, x.vote, x.tracked, x.rn " +
+		"                    from (select i.id, i.owner, t.id topic_id, t.title topic_title, i.short_desc, " +
+		"                                 i.description, i.created, i.closed, c.comment_count, ta.tags, rownum rn, " +
+		"                                 decode(ti.tracked,null,'no','yes') tracked, v.vote " +
+		"                            from ideas i, topics t, tracked_ideas ti, votes v, " +
 		"                                 (select count(*) comment_count, parent_id " +
 		"                                    from comments " +
 		"                                   where parent_type = 'idea' " +
@@ -222,32 +272,14 @@ exports.pastItemsFeed = pastItemsFeed = function(user, successHandler, errorHand
 		"                           where t.id (+) = i.topic_id " +
 		"                             and i.id = c.parent_id (+) " +
 		"                             and i.id = ta.idea_id (+) " +
+		"                             and i.id = v.idea_id (+) " +
+		"                             and v.voter (+) = '" + user + "' " +
+		"                             and i.id = ti.idea_id (+) " +
+		"                             and ti.tracking_user (+) = '" + user + "' " +
 		"                             and (i.closed is not null or " +
 		"                                  i.id in (select idea_id from votes where voter = '" + user + "'))) x ) a " +
 		"          where rownum <= " + upperRowCount + " ) " +
 		" where rnum >= " + lowerRowCount;
-
-/*
-		"select *  " +
-		"  from ( select rownum rnum, a.* " +
-		"           from ( select x.id, x.short_desc, x.description, x.created, " +
-		"                         x.comment_count, x.tags, x.rn " +
-		"                    from (select i.id, i.short_desc, i.description, i.created, " +
-		"                                 c.comment_count, rownum rn, t.tags   " +
-		"                            from ideas i, " +
-		"                                 (select count(*) comment_count, parent_id " +
-		"                                    from comments " +
-		"                                   where parent_type = 'idea' " +
-		"                                   group by parent_id) c, " +
-		"                                 (select it.idea_id,  " +
-		"                                         listagg(it.tag, ' ') within group (order by it.tag) tags " +
-		"                                    from idea_tags it " +
-		"                                   group by it.idea_id) t " +
-		"                           where c.parent_id(+) = i.id " +
-		"                             and i.id = t.idea_id(+) ) x ) a  " +
-		"          where rownum <= " + upperRowCount + " ) " +
-		" where rnum >= " + lowerRowCount;
-*/
 
 	ideaFeed(sql, [], successHandler, errorHandler);
 };
@@ -279,6 +311,10 @@ function convertFromDataToTransport(dataItem) {
 
 	var transport = {};
 	transport.id = dataItem.ID;
+	transport.topic_id = dataItem.TOPIC_ID;
+	transport.topic_title = dataItem.TOPIC_TITLE;
+	transport.tracked = dataItem.TRACKED;
+	transport.vote = dataItem.VOTE;
 	transport.owner = dataItem.OWNER;
 	transport.created = new Date(dataItem.CREATED);
 	transport.revoked = new Date(dataItem.REVOKED);
@@ -414,19 +450,20 @@ exports.createIdea = createIdea = function(item, user, successHandler, errorHand
 	logger.info('apexClient.createIdea(%s,%s)', item, user);
 	console.dir(item);
 
-	// th_ideas_pkg.create_idea(
-	//   3         p_short_desc  => 'Hey I have an idea!',
-	//   4         p_owner       => 'dillons',
-	//   5         p_description => 'More descriptive text',
-	//   6         p_topic_id    => null,
-	//   7         p_tags        => '#onetag #twotag #threetag #four');
-
-	// add another params
-	// :6   ... , new oracle.OutParam(oracle.OCCIINT)
+	// PROCEDURE CREATE_IDEA
+ 	// Argument Name			Type			In/Out Default?
+ 	// ------------------------------ ----------------------- ------ --------
+ 	// P_SHORT_DESC			VARCHAR2(200)		IN
+ 	// P_OWNER			VARCHAR2(200)		IN
+ 	// P_DESCRIPTION			CLOB			IN
+ 	// P_TAGS 			CLOB			IN     DEFAULT
+ 	// P_DURATION			VARCHAR2(30)		IN     DEFAULT
+ 	// P_TOPIC_ID			NUMBER			IN     DEFAULT
+ 	// P_ID				NUMBER			OUT  (, new oracle.OutParam(oracle.OCCIINT)
 	// get it from results.returnParam
 
-	var sql = "call th_ideas_pkg.create_idea(:1,:2,:3,:4,:5,:6)";
-	var params = [item.short_description, 'dillons', item.long_description, '#testdata', null, new oracle.OutParam(oracle.OCCIINT)];
+	var sql = "call th_ideas_pkg.create_idea(:1,:2,:3,:4,:5,:6,:7)";
+	var params = [item.short_description, 'dillons', item.long_description, '#testdata', 'month', null, new oracle.OutParam(oracle.OCCIINT)];
 
 	function formatAndCallSuccessHandler(data) {
 		if (data.returnParam) data.itemId = data.returnParam;
@@ -447,16 +484,17 @@ exports.fetchComments = fetchComments = function(id, successHandler, errorHandle
 exports.saveComment = saveComment = function(id, user, comment, successHandler, errorHandler) {
 	logger.info('apexClient.saveComment(%s,%s,%s)', item, user, comment);
 
-	var sql = "procedure name(:1,:2,:3)"; //TODO
-	var params = [id, user, comment];
+	var sql = "call th_comments_pkg.create_comment(:1,:2,:3,:4)"; 
+	var params = [id, 'idea', comment, user];
 
 	runSql(sql, params, successHandler, errorHandler);
 };
 
 exports.suspendIdea = suspendIdea = function(id, user, successHandler, errorHandler) {
-	logger.info('apexClient.suspendIdea(%s,%s)', item, user);
+	//logger.info('apexClient.suspendIdea(%s,%s)', item, user);
+	logger.info('apexClient.suspendIdea(%s,%s)', id, user);
 
-	var sql = "procedure name(:1,:2)"; //TODO
+	var sql = "call th_ideas_pkg.suspend_idea(:1,:2)";
 	var params = [id, user];
 
 	runSql(sql, params, successHandler, errorHandler);
