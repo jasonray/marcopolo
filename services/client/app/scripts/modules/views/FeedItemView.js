@@ -9,10 +9,11 @@ define(function(require, exports, module) {
     var EventHandler  = require('famous/core/EventHandler');
     var Transitionable   = require('famous/transitions/Transitionable');
 
-    var Ideas           = require('entities/ideas');
+    var Ideas          = require('entities/ideas');
+    var env            = "";
 
     //dev
-    var env = 'http://demos.agilex.com:9998'
+    // env = 'http://demos.agilex.com:9998'
 
     function FeedItemView() {
         View.apply(this, arguments);
