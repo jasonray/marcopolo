@@ -9,9 +9,10 @@ define(function(require, exports, module) {
     var Easing          = require('famous/transitions/Easing');
 
     var AddItemView     = require('modules/views/AddItemView');
+    var LoginView       = require('modules/views/LoginView')
     var FeedView        = require('modules/views/FeedView');
-    var FeedData        = [];
-    var Store           = require("store");
+    var Store           = require('store');
+    var User            = require('entities/user')
 
     function PageView() {
         View.apply(this, arguments);
@@ -24,6 +25,7 @@ define(function(require, exports, module) {
         _createFeedView.call(this);
         _createLightbox.call(this);
         _createModal.call(this);
+        //_authenticate.call(this);
         _createAddItemView.call(this);
 
         _setListeners.call(this);
@@ -48,6 +50,14 @@ define(function(require, exports, module) {
         }
     };
 
+    function _authenticate() {
+        if (User.get()) {
+            this.user = JSON.parse(User);
+            console.log(user);
+        } else {
+            _createLoginView.call(this);
+        }
+    }
     function _createBacking() {
         var backing = new Surface({
             properties: {

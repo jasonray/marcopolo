@@ -2,6 +2,11 @@ define(function(require, exports, module) {
     var Backbone = require("backbone");
     var Store    = require("store");
     var uuid     = require("uuid");
+    var user     = '?user=cushingb';
+    var env      = '';
+
+    //dev
+    env = 'http://demos.agilex.com:9998'
 
     this.Idea = Backbone.Model.extend({
         defaults: {
@@ -21,7 +26,7 @@ define(function(require, exports, module) {
         model: this.Idea,
         initialize: function() {
             this.fetch({
-                url: '/ideas/',
+                url: env + '/ideas/new'+ user,
                 success: function(data){
                     Store.set("newFeed", data);
                 }
@@ -29,6 +34,52 @@ define(function(require, exports, module) {
         },
         parse: function(data) {
             // console.log(data);
+            return data;
+        }
+    });
+
+    this.trackedIdeas = Backbone.Collection.extend({
+        model: this.Idea,
+        initialize: function() {
+            this.fetch({
+                url: env +'/ideas/tracked'+ user,
+                success: function(data){
+                    Store.set("trackedFeed", data);
+                }
+            })
+        },
+        parse: function(data) {
+            console.log(data);
+            return data;
+        }
+    });
+    this.myIdeas = Backbone.Collection.extend({
+        model: this.Idea,
+        initialize: function() {
+            this.fetch({
+                url: env +'/ideas/mine'+ user,
+                success: function(data){
+                    Store.set("myFeed", data);
+                }
+            })
+        },
+        parse: function(data) {
+            console.log(data);
+            return data;
+        }
+    });
+    this.pastIdeas = Backbone.Collection.extend({
+        model: this.Idea,
+        initialize: function() {
+            this.fetch({
+                url: env + '/ideas/past'+ user,
+                success: function(data){
+                    Store.set("pastFeed", data);
+                }
+            })
+        },
+        parse: function(data) {
+            console.log(data);
             return data;
         }
     });
