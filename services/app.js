@@ -75,6 +75,10 @@ app.use('/ideas', bodyParser.json({
 	strict: true
 }));
 
+app.post('/login', function(req, res, next) {
+	apexClient.loginUser(determineUser(req), req.param('pw'), onSuccessReturnResults(res), errorHandler(res));
+});
+
 app.post('/ideas', function(req, res, next) {
 	apexClient.createIdea(req.body, determineUser(req), onSuccessReturnResults(res), errorHandler(res));
 });

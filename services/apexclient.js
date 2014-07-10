@@ -446,24 +446,28 @@ var stringToYesNo = function(string) {
 	}
 };
 
+
+exports.loginUser = loginUser = function(user, pw, successHandler, errorHandler) {
+	logger.info('apexClient.loginUser(%s,%s)', user, pw);
+
+	var sql = "call th_auth_pkg.login_user(:1,:2,:3)";
+	var params = [user, pw, new oracle.OutParam(oracle.OCCISTRING)];
+
+	function formatAndCallSuccessHandler(data) {
+		if (data.returnParam) data.itemId = data.returnParam;
+		successHandler(data);
+	}
+	runSql(sql, params, formatAndCallSuccessHandler, errorHandler);
+};
+
+
 exports.createIdea = createIdea = function(item, user, successHandler, errorHandler) {
 	logger.info('apexClient.createIdea(%s,%s)', item, user);
 	console.dir(item);
 
-	// PROCEDURE CREATE_IDEA
- 	// Argument Name			Type			In/Out Default?
- 	// ------------------------------ ----------------------- ------ --------
- 	// P_SHORT_DESC			VARCHAR2(200)		IN
- 	// P_OWNER			VARCHAR2(200)		IN
- 	// P_DESCRIPTION			CLOB			IN
- 	// P_TAGS 			CLOB			IN     DEFAULT
- 	// P_DURATION			VARCHAR2(30)		IN     DEFAULT
- 	// P_TOPIC_ID			NUMBER			IN     DEFAULT
- 	// P_ID				NUMBER			OUT  (, new oracle.OutParam(oracle.OCCIINT)
-	// get it from results.returnParam
-
 	var sql = "call th_ideas_pkg.create_idea(:1,:2,:3,:4,:5,:6,:7)";
-	var params = [item.short_description, 'dillons', item.long_description, '#testdata', 'month', null, new oracle.OutParam(oracle.OCCIINT)];
+	var params = [item.short_description, user, item.long_description, 
+                      '#testdata', 'month', null, new oracle.OutParam(oracle.OCCIINT)];
 
 	function formatAndCallSuccessHandler(data) {
 		if (data.returnParam) data.itemId = data.returnParam;
@@ -491,7 +495,6 @@ exports.saveComment = saveComment = function(id, user, comment, successHandler, 
 };
 
 exports.suspendIdea = suspendIdea = function(id, user, successHandler, errorHandler) {
-	//logger.info('apexClient.suspendIdea(%s,%s)', item, user);
 	logger.info('apexClient.suspendIdea(%s,%s)', id, user);
 
 	var sql = "call th_ideas_pkg.suspend_idea(:1,:2)";
