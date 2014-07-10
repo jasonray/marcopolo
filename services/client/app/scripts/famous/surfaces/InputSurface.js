@@ -26,6 +26,7 @@ define(function(require, exports, module) {
         this._value       = options.value || '';
         this._type        = options.type || 'text';
         this._name        = options.name || '';
+        this._attributes = options.attributes || '';
 
         Surface.apply(this, arguments);
         this.on('click', this.focus.bind(this));
@@ -150,6 +151,10 @@ define(function(require, exports, module) {
         target.value = this._value;
         target.type = this._type;
         target.name = this._name;
+
+        for (var n in this._attributes) {
+            target[n] = this._attributes[n];
+        }
     };
 
     module.exports = InputSurface;

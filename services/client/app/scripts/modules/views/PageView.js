@@ -7,6 +7,7 @@ define(function(require, exports, module) {
     var ImageSurface    = require('famous/surfaces/ImageSurface');
     var Lightbox        = require('famous/views/Lightbox');
     var Easing          = require('famous/transitions/Easing');
+    var InputSurface  = require('famous/surfaces/InputSurface');
 
     var AddItemView     = require('modules/views/AddItemView');
     var LoginView       = require('modules/views/LoginView')
@@ -14,6 +15,7 @@ define(function(require, exports, module) {
     var FeedView        = require('modules/views/FeedView');
     var Store           = require('store');
     var User            = require('entities/user')
+    var Ideas           = require('entities/ideas');
 
     var modalClose      = true;
 
@@ -134,9 +136,17 @@ define(function(require, exports, module) {
             content : './images/hamburger.png'
         });
         
-        var searchSurface = new ImageSurface({
-            size: [232, 44],
-            content : './images/search.png'
+        this.searchInput = new InputSurface({
+            size: [232, 30],
+            name: 'input-search',
+            attributes: ['results'],
+            placeholder: 'Start search',
+            value: '',
+            type: 'search',
+            attributes: {
+                results: true,
+                autofocus: true  
+            }
         });
 
         this.addIdeaSurface = new ImageSurface({
@@ -163,14 +173,14 @@ define(function(require, exports, module) {
 
         var searchModifier = new StateModifier({
             origin: [1, 1],
-            transform: Transform.translate(-60, 0, 60),   
+            transform: Transform.translate(-60, -7, 60),   
         });
 
         _createTitleSurface.call(this);
 
         this.layout.header.add(backgroundModifier).add(backgroundSurface);
         this.layout.header.add(hamburgerModifier).add(this.hamburgerSurface);
-        //this.layout.header.add(searchModifier).add(searchSurface);
+        this.layout.header.add(searchModifier).add(this.searchInput);
         this.layout.header.add(addItemModifier).add(this.addIdeaSurface);
         this.layout.header.add(this.titleModifier).add(this.titleSurface);
     }
@@ -263,6 +273,17 @@ define(function(require, exports, module) {
         //     this.model.get('tasks').remove(task);
         // }.bind(this));
 
+        this.searchInput.on("keypress", function(e) {
+            if (e.which == 13) {
+                var callback = function() {
+                    this.options.feed = JSON.parse(window.localStorage['searchFeed']);
+                    this.options.title = "Results"
+                    this.refreshFeed();
+                }.bind(this);
+                var search = new Ideas.searchIdeas(callback); 
+            }
+        }.bind(this));
+
         this.addIdeaSurface.on("mouseover", function(){
             this.setProperties({
                 backgroundColor: '#5e5e5e'
@@ -306,6 +327,6 @@ define(function(require, exports, module) {
         }.bind(this));
 
     }
-
+    
     module.exports = PageView;
 });

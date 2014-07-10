@@ -86,6 +86,22 @@ define(function(require, exports, module) {
             return data;
         }
     });
+    this.searchIdeas = Backbone.Collection.extend({
+        model: this.Idea,
+        initialize: function(callback) {
+            this.fetch({
+                url: env + '/ideas/past'+ '?user='+User.instance().get('username'),
+                success: function(data){
+                    Store.set("searchFeed", data);
+                    callback.call(this);
+                }
+            })
+        },
+        parse: function(data) {
+            console.log(data);
+            return data;
+        }
+    });
 
     module.exports = this;
 });
