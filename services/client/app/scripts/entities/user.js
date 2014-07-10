@@ -2,16 +2,19 @@ define(function(require, exports, module) {
     var Backbone = require("backbone");
     var env      = '';
     
-    var model = Backbone.Model.extend({
+    var Model = Backbone.Model.extend({
         defaults: {
             
+        },
+        initialize: function() {
+            this.get();
         },
         submit: function() {
             
         },
         get: function() {
-            return window.sessionStorage['auth'];
-
+            var auth = window.sessionStorage['auth'];
+            return auth;
         }
 
     })

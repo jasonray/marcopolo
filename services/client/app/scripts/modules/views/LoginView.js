@@ -11,10 +11,12 @@ define(function(require, exports, module) {
     var ImageSurface  = require('famous/surfaces/ImageSurface');
     var Lightbox      = require('famous/views/Lightbox');
     var Easing        = require('famous/transitions/Easing');
-
     var User          = require('entities/user')
+    var env            = "";
+
+    //dev
+    env = 'http://demos.agilex.com:9998'
     
-    console.log(User);
     function LoginView() {
         View.apply(this, arguments);
         this.rootModifier = new StateModifier({
@@ -136,12 +138,16 @@ define(function(require, exports, module) {
     }
 
     function _setListeners() {
-        this.submitSurface.on("click", function(){
-            this.newIdea = {comments:''};
-            this.newIdea.short_description = this.summaryInput.getValue();
-            this.newIdea.long_description = this.descriptionInput.getValue();
-            this._eventOutput.emit('newFeed:add', this.newIdea);
-            this.descriptionInput.setValue('');
+        this.submitSurface.on("click", function() {
+            var auth = {};
+            auth.username = this.usernameInput.getValue();
+            auth.password = this.passwordInput.getValue();
+            new User(auth).save({},{
+                success: function(resp){
+                    console.log(resp);  
+                },
+                url: env + ''
+            });
         }.bind(this));
     }
 
