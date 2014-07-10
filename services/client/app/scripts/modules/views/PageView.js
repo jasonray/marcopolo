@@ -137,7 +137,7 @@ define(function(require, exports, module) {
         });
         
         this.searchInput = new InputSurface({
-            size: [232, 30],
+            size: [180, 30],
             name: 'input-search',
             attributes: ['results'],
             placeholder: 'Start search',
