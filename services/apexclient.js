@@ -450,8 +450,12 @@ var stringToYesNo = function(string) {
 exports.loginUser = loginUser = function(user, pw, successHandler, errorHandler) {
 	logger.info('apexClient.loginUser(%s,%s)', user, pw);
 
-	var sql = "call th_auth_pkg.login_user(:1,:2,:3)";
-	var params = [user, pw, new oracle.OutParam(oracle.OCCISTRING)];
+	var sql = "call th_auth_pkg.login_user(:1,:2,:3,:4,:5,:6,:7)";
+	var params = [user, pw, new oracle.OutParam(oracle.OCCISTRING),
+                                new oracle.OutParam(oracle.OCCISTRING),
+                                new oracle.OutParam(oracle.OCCISTRING),
+                                new oracle.OutParam(oracle.OCCISTRING),
+                                new oracle.OutParam(oracle.OCCISTRING)];
 
 	function formatAndCallSuccessHandler(data) {
 		if (data.returnParam) data.itemId = data.returnParam;
