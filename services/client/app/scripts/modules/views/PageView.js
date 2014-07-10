@@ -14,6 +14,8 @@ define(function(require, exports, module) {
     var Store           = require('store');
     var User            = require('entities/user')
 
+    var modalClose      = true;
+
     function PageView() {
         View.apply(this, arguments);
 
@@ -48,25 +50,23 @@ define(function(require, exports, module) {
             inTransform: Transform.thenMove(Transform.rotateX(0.9), [0, -300, 500]),
             outTransform: Transform.thenMove(Transform.rotateZ(0.7), [0, window.innerHeight, 500]),
             inTransition: { duration: 600, curve: 'easeOut' },
-            outTransition: { duration: 300, curve: Easing.inCubic }
+            outTransition: { duration: 400, curve: 'easeOut' }
         }
     };
 
     function _authenticate() {
         if (!User.instance().auth()) {
             _createLoginView.call(this);
+            modalClose = false;
         }
     }
 
     function _createLoginView() {
-        _openModal.call(this);
         this.loginView = new LoginView();
-        this.lightbox.show(this.loginView, function() {
-            this.ready = true;   
-        }.bind(this));
+        _openLightBox.call(this, this.loginView);
         this.loginView.on('login:close', function(){
-           this.lightbox.hide();
-            _closeModal.call(this);
+            modalClose = true;
+           _closeLightBox.call(this);
         }.bind(this));
     }
 
@@ -190,9 +190,9 @@ define(function(require, exports, module) {
     }
     function _createModal() {
         this.modalbacking = new Surface({
+            classes: ["blur-effect"],
             properties: {
-                backgroundColor: 'white',
-                opacity: '0.7'
+                backgroundColor: 'white'
             }
         });
     }
@@ -224,11 +224,18 @@ define(function(require, exports, module) {
         this.layout.content.add(this.feedView);
 
     }
-    function _openAddItemView() {
+    function _openLightBox(view) {
         _openModal.call(this);
-        this.lightbox.show(this.addItemView, function() {
+        this.lightbox.show(view, function() {
             this.ready = true;   
         }.bind(this));
+    }
+    function _closeLightBox() {
+        this.lightbox.hide();
+        _closeModal.call(this);
+    }
+    function _createFeedItemDetails(item) {
+
     }
 
     function _setListeners() {
@@ -254,18 +261,18 @@ define(function(require, exports, module) {
         });
         this.addIdeaSurface.on("click", function(){
             this._eventOutput.emit('slideLeft');
-            _openAddItemView.call(this);
+            _openLightBox.call(this, this.addItemView);
         }.bind(this));
         
         this.modalbacking.on('click', function() {
-            this.lightbox.hide();
-            _closeModal.call(this);
+            if (modalClose){
+                _closeLightBox.call(this);
+            }
         }.bind(this));
 
         this.addItemView.on('newFeed:add', function(item){
             var Ideas           = require('entities/ideas');
-            this.lightbox.hide();
-            _closeModal.call(this);
+            _closeLightBox.call(this);
             this.options.feed.unshift(item);
 
             new Ideas.Idea(item).save({}, {
@@ -281,8 +288,11 @@ define(function(require, exports, module) {
         }.bind(this));
 
         this.addItemView.on('newFeed:close', function(){
-           this.lightbox.hide();
-            _closeModal.call(this);
+           _closeLightBox.call(this);
+        }.bind(this));
+
+        this.feedView.on('idea:open', function(item){
+            _createFeedItemDetails.call(this, item)
         }.bind(this));
 
     }

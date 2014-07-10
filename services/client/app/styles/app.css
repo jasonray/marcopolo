@@ -22,3 +22,10 @@ h3 {
 .feedItem {
 	width: calc(100% - 130px);
 }
+
+.blur-effect {
+  -webkit-filter: blur(60px) grayscale(50%);
+
+  /* Recede */
+  -webkit-transform: scale(0.9);
+}
