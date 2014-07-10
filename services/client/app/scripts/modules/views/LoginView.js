@@ -41,7 +41,7 @@ define(function(require, exports, module) {
     LoginView.prototype.constructor = LoginView;
 
     LoginView.DEFAULT_OPTIONS = {
-        size: [320, 200],
+        size: [320, 197.77],
         title: 'Login',
         primaryFontSize: 18,
         zIndex: 500,
@@ -72,7 +72,9 @@ define(function(require, exports, module) {
                 color: 'white',
                 textAlign: 'center',
                 backgroundColor: '#3f3f3f',
-                fontSize: 'primaryFontSize'
+                fontSize: this.options.primaryFontSize + 'px',
+                textAlign: 'left',
+                padding: '14px 0 0 30px',
             }
         });   
         var formModifier = new StateModifier({
@@ -87,7 +89,7 @@ define(function(require, exports, module) {
         var twoView = new View();
         this.usernameInput = new InputSurface({
             size: this.options.inputs.size,
-            name: 'input-username',
+            name: 'auth-username',
             placeholder: 'Username',
             value: '',
             type: 'text',
@@ -97,7 +99,7 @@ define(function(require, exports, module) {
         });
         this.passwordInput = new InputSurface({
             size: this.options.inputs.size,
-            name: 'input-password',
+            name: 'auth-password',
             placeholder: 'Password',
             value: '',
             type: 'password',
@@ -107,7 +109,7 @@ define(function(require, exports, module) {
         });
         
         this.submitSurface = new Surface({
-            size: [120, 50],
+            size: [71.19, 44],
             content: 'Submit',
             properties: {
                 zIndex: this.options.zIndex,
@@ -118,7 +120,7 @@ define(function(require, exports, module) {
                 color: 'white',
                 textAlign: 'center',
                 borderRadius: '5px',
-                padding: '10px',
+                padding: '8px',
                 textDecoration: 'none'
               //  pointerEvents : 'none'
 
@@ -126,7 +128,7 @@ define(function(require, exports, module) {
         }); 
         
         var submitModifier = new StateModifier({
-            transform: Transform.translate(140,20,0)
+            transform: Transform.translate(188,20,0)
         });
         
         oneView.add(this.usernameInput);
@@ -140,13 +142,15 @@ define(function(require, exports, module) {
     function _setListeners() {
         this.submitSurface.on("click", function() {
             var auth = {};
+            var that = this;
             auth.username = this.usernameInput.getValue();
             auth.password = this.passwordInput.getValue();
-            new User(auth).save({},{
+            User.instance().save({},{
                 success: function(resp){
-                    console.log(resp);  
+                    resp.submit();
+                    that._eventOutput.emit('login:close');
                 },
-                url: env + ''
+                url: env + '/login?user='+auth.username+'&pw='+auth.password
             });
         }.bind(this));
     }

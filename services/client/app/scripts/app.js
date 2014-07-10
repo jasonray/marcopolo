@@ -1,18 +1,17 @@
 define(function(require, exports, module) {
-    var Marionette = require("marionette"),
-        Backbone = require("backbone"),
-        Engine = require("famous/core/Engine"),
-        AppView = require('modules/views/AppView'),
-        Ideas = require('entities/ideas'),
-        Store = require("store");
-        bootstrapData = require('modules/data/NewFeedData');
+    var Marionette  = require("marionette"),
+        Backbone    = require("backbone"),
+        Engine      = require("famous/core/Engine"),
+        User        = require('entities/user')
+        Store       = require("store");
+        // bootstrapData = require('modules/data/NewFeedData');
         require('famous/inputs/FastClick');
 
     var iRate = new Marionette.Application();
     //Bootstrap data //Delete 
-        if (Modernizr.localstorage && !window.localStorage['newFeed']) {
-            window.localStorage["newFeed"] = JSON.stringify(bootstrapData);
-        } 
+    // if (Modernizr.localstorage && !window.localStorage['newFeed']) {
+    //     window.localStorage["newFeed"] = JSON.stringify(bootstrapData);
+    // } 
 
     iRate.navigate = function(route,  options){
       options || (options = {});
@@ -29,6 +28,8 @@ define(function(require, exports, module) {
             return
         }
 
+        User.instance().auth();
+        var Ideas = require('entities/ideas');
         var test = new Ideas.newIdeas();
         var test = new Ideas.myIdeas();
         var test = new Ideas.pastIdeas();
@@ -49,6 +50,7 @@ define(function(require, exports, module) {
         //   iRate.trigger("contacts:list");
         // }
       }
+        var AppView = require('modules/views/AppView');
 
         var mainContext = Engine.createContext(),
             appView = new AppView();

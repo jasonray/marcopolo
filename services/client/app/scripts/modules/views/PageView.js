@@ -23,7 +23,7 @@ define(function(require, exports, module) {
         _createHeader.call(this);
         _createBody.call(this);
         _createModal.call(this);
-        //_authenticate.call(this);
+        _authenticate.call(this);
         _createFeedView.call(this);
         
         _createAddItemView.call(this);
@@ -53,10 +53,7 @@ define(function(require, exports, module) {
     };
 
     function _authenticate() {
-        if (User.instance().id) {
-            this.user = JSON.parse(User);
-            console.log(user);
-        } else {
+        if (!User.instance().auth()) {
             _createLoginView.call(this);
         }
     }
@@ -278,7 +275,13 @@ define(function(require, exports, module) {
             this.feedView.render = function(){ return null; }
             _createFeedView.call(this);
         }.bind(this));
+
         this.addItemView.on('newFeed:close', function(){
+           this.lightbox.hide();
+            _closeModal.call(this);
+        }.bind(this));
+
+        this.loginView.on('login:close', function(){
            this.lightbox.hide();
             _closeModal.call(this);
         }.bind(this));
