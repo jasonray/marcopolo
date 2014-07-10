@@ -16,7 +16,7 @@ define(function(require, exports, module) {
             "long_description": "long description A",
             "short_description": "ideaA"
         },
-        url: '/ideas/',
+        url: env + '/ideas'+ user,
         generateId: function() {
             return new Date().getTime();
         }
