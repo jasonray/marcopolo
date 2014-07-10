@@ -454,11 +454,18 @@ exports.loginUser = loginUser = function(user, pw, successHandler, errorHandler)
 	var params = [user, pw, new oracle.OutParam(oracle.OCCISTRING)];
 
 	function formatAndCallSuccessHandler(data) {
-		if (data.returnParam) data.itemId = data.returnParam;
-		successHandler(data);
+		var transport = {};
+		if (data.returnParam) {
+			transport.token = data.returnParam;
+			transport.username = data.returnParam1;
+			transport.firstname = data.returnParam2;
+			transport.lastname = returnParam3;
+			successHandler(data);
+		}
 	}
 	runSql(sql, params, formatAndCallSuccessHandler, errorHandler);
 };
+
 
 
 exports.createIdea = createIdea = function(item, user, successHandler, errorHandler) {
