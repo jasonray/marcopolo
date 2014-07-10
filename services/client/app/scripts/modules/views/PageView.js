@@ -53,7 +53,7 @@ define(function(require, exports, module) {
     };
 
     function _authenticate() {
-        if (User.get()) {
+        if (User.instance().id) {
             this.user = JSON.parse(User);
             console.log(user);
         } else {
