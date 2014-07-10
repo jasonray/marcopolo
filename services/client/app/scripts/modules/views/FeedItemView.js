@@ -131,6 +131,13 @@ define(function(require, exports, module) {
             });
         });
 
+        this.backgroundSurface.on("click", function(){
+            var voteDownModifier = new StateModifier()
+            voteDownModifier.setSize(1);
+                
+            this.add(voteDownModifier);
+        });
+
         this.voteUpSurface.on("mouseover", function(){
             this.setProperties({
                 backgroundColor: 'white'
