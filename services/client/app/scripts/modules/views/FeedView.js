@@ -64,6 +64,10 @@ define(function(require, exports, module) {
                 this.delete(item)
             }.bind(this));
 
+            this.feedItemView.on("idea:open", function(item){
+                this._eventOutput.emit("idea:open", item);
+            }.bind(this));
+
             itemArray.push(this.feedItemView);
         }
         

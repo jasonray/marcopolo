@@ -10,6 +10,7 @@ define(function(require, exports, module) {
 
     var AddItemView     = require('modules/views/AddItemView');
     var LoginView       = require('modules/views/LoginView')
+    var FeedItemDetailsView    = require('modules/views/FeedItemDetailsView')
     var FeedView        = require('modules/views/FeedView');
     var Store           = require('store');
     var User            = require('entities/user')
@@ -31,6 +32,7 @@ define(function(require, exports, module) {
         _createAddItemView.call(this);
 
         _setListeners.call(this);
+        _setVolatileListeners.call(this);
 
         _createPublicFunctions.call(this);
 
@@ -77,6 +79,7 @@ define(function(require, exports, module) {
             _createFeedView.call(this);
             _createTitleSurface.call(this);
             this.layout.header.add(this.titleModifier).add(this.titleSurface);
+            _setVolatileListeners.call(this);
         }
     }
 
@@ -235,8 +238,19 @@ define(function(require, exports, module) {
         _closeModal.call(this);
     }
     function _createFeedItemDetails(item) {
-
+        this.feedItemDetailsView = new FeedItemDetailsView(item);
+        _openLightBox.call(this, this.feedItemDetailsView);
+        this.feedItemDetailsView.on('login:close', function(){
+            modalClose = true;
+           _closeLightBox.call(this);
+        }.bind(this));
     }
+
+    function _setVolatileListeners() {
+        this.feedView.on('idea:open', function(item){
+            _createFeedItemDetails.call(this, item)
+        }.bind(this));
+    } 
 
     function _setListeners() {
         this.hamburgerSurface.on('click', function() {
@@ -289,10 +303,6 @@ define(function(require, exports, module) {
 
         this.addItemView.on('newFeed:close', function(){
            _closeLightBox.call(this);
-        }.bind(this));
-
-        this.feedView.on('idea:open', function(item){
-            _createFeedItemDetails.call(this, item)
         }.bind(this));
 
     }
