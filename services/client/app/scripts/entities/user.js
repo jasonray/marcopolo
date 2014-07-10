@@ -7,7 +7,7 @@ define(function(require, exports, module) {
             
         },
         initialize: function() {
-            _.bindAll(this, 'submit', 'get', 'auth');
+            _.bindAll(this, 'submit', 'getItem', 'auth');
         },
         parse: function(resp) {
             var user = {};
@@ -21,12 +21,12 @@ define(function(require, exports, module) {
         submit: function() {
             window.sessionStorage["auth"] = JSON.stringify(this);
         },
-        get: function() {
+        getItem: function() {
             var auth = window.sessionStorage.getItem('auth');
             return auth && JSON.parse(auth);
         },
         auth: function() {
-            var user = this.get();
+            var user = this.getItem();
             if (user) {
                 this.set(user);
             }

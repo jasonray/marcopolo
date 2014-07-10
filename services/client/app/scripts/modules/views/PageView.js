@@ -64,6 +64,10 @@ define(function(require, exports, module) {
         this.lightbox.show(this.loginView, function() {
             this.ready = true;   
         }.bind(this));
+        this.loginView.on('login:close', function(){
+           this.lightbox.hide();
+            _closeModal.call(this);
+        }.bind(this));
     }
 
     function _createPublicFunctions() {
@@ -281,10 +285,6 @@ define(function(require, exports, module) {
             _closeModal.call(this);
         }.bind(this));
 
-        this.loginView.on('login:close', function(){
-           this.lightbox.hide();
-            _closeModal.call(this);
-        }.bind(this));
     }
 
     module.exports = PageView;

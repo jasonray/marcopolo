@@ -2,13 +2,17 @@ define(function(require, exports, module) {
     var Backbone = require("backbone");
     var Store    = require("store");
     var uuid     = require("uuid");
-    var user     = '?user=cushingb';
+    var User     = require('entities/user');
     var env      = '';
 
     //dev
     env = 'http://demos.agilex.com:9998'
 
+
     this.Idea = Backbone.Model.extend({
+        initialize: function() {
+            this.url = env + '/ideas'+ '?user='+User.instance().get('username');
+        },
         defaults: {
             "comment_count": 0,
             "created": new Date(),
@@ -16,7 +20,6 @@ define(function(require, exports, module) {
             "long_description": "long description A",
             "short_description": "ideaA"
         },
-        url: env + '/ideas'+ user,
         generateId: function() {
             return new Date().getTime();
         }
@@ -26,7 +29,7 @@ define(function(require, exports, module) {
         model: this.Idea,
         initialize: function() {
             this.fetch({
-                url: env + '/ideas/new'+ user,
+                url: env + '/ideas/new'+ '?user='+User.instance().get('username'),
                 success: function(data){
                     Store.set("newFeed", data);
                 }
@@ -42,7 +45,7 @@ define(function(require, exports, module) {
         model: this.Idea,
         initialize: function() {
             this.fetch({
-                url: env +'/ideas/tracked'+ user,
+                url: env +'/ideas/tracked'+ '?user='+User.instance().get('username'),
                 success: function(data){
                     Store.set("trackedFeed", data);
                 }
@@ -57,7 +60,7 @@ define(function(require, exports, module) {
         model: this.Idea,
         initialize: function() {
             this.fetch({
-                url: env +'/ideas/mine'+ user,
+                url: env +'/ideas/mine'+ '?user='+User.instance().get('username'),
                 success: function(data){
                     Store.set("myFeed", data);
                 }
@@ -72,7 +75,7 @@ define(function(require, exports, module) {
         model: this.Idea,
         initialize: function() {
             this.fetch({
-                url: env + '/ideas/past'+ user,
+                url: env + '/ideas/past'+ '?user='+User.instance().get('username'),
                 success: function(data){
                     Store.set("pastFeed", data);
                 }

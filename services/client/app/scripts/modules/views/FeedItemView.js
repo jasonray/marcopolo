@@ -9,11 +9,12 @@ define(function(require, exports, module) {
     var EventHandler  = require('famous/core/EventHandler');
     var Transitionable   = require('famous/transitions/Transitionable');
 
+    var User           = require('entities/user');
     var Ideas          = require('entities/ideas');
     var env            = "";
 
-    //dev
-    // env = 'http://demos.agilex.com:9998'
+    // dev
+    env = 'http://demos.agilex.com:9998'
 
     function FeedItemView() {
         View.apply(this, arguments);
@@ -168,7 +169,7 @@ define(function(require, exports, module) {
                 success: function(resp) {
                  //   console.log(resp)
                 },
-                url: env+'/ideas/id/'+id+'/operations/voteNo?user=cushingb'
+                url: env+'/ideas/id/'+id+'/operations/voteNo?user='+User.instance().get('username')
             });
         
             this._eventOutput.emit("idea:delete", this);
@@ -185,7 +186,7 @@ define(function(require, exports, module) {
                 success: function(resp) {
                  //   console.log(resp)
                 },
-                url: env+'/ideas/id/'+id+'/operations/voteYes?user=cushingb'
+                url: env+'/ideas/id/'+id+'/operations/voteYes?user='+User.instance().get('username')
             });
             this._eventOutput.emit("idea:delete", this);
         }.bind(this));
