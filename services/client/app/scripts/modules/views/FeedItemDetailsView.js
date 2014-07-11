@@ -112,6 +112,15 @@ define(function(require, exports, module) {
                zIndex: this.options.zIndex
             }
         });
+        this.trackedSurface = new ImageSurface({
+            size: [55, 55],
+            content : './images/tracked.png',
+            properties: {
+                // backgroundColor: '#4f4f4f',
+                // borderLeft: '5px solid white',
+                zIndex: this.options.zIndex
+            }
+        });
         this.inappropriateSurface = new ImageSurface({
             size: [55, 55],
             content : './images/inapp.png',
@@ -131,17 +140,20 @@ define(function(require, exports, module) {
             }
         });
         var inappropriateModifier = new StateModifier({
-            transform: Transform.translate(225, -25, 0)
+            transform: Transform.translate(195, 70, 0)
         });
 
         var ignoreModifier = new StateModifier({
-            transform: Transform.translate(225, -80, 0)
+            transform: Transform.translate(195, 15, 0)
+        });
+        var trackedModifier = new StateModifier({
+            transform: Transform.translate(195, -40, 0)
         });
         var voteDownModifier = new StateModifier({
-            transform: Transform.translate(225, -135, 0)
+            transform: Transform.translate(195, -95, 0)
         });
         var voteUpModifier = new StateModifier({
-            transform: Transform.translate(225, -190, 0)
+            transform: Transform.translate(195, -150, 0)
         });
         var bgModifier = new StateModifier({
             origin: [1, 0],
@@ -150,6 +162,7 @@ define(function(require, exports, module) {
        // this.buttonView.add(bgModifier).add(this.buttonBgSurface);
         this.buttonView.add(voteDownModifier).add(this.voteDownSurface);
         this.buttonView.add(voteUpModifier).add(this.voteUpSurface);
+        this.buttonView.add(trackedModifier).add(this.trackedSurface);
         this.buttonView.add(ignoreModifier).add(this.ignoreSurface);
         this.buttonView.add(inappropriateModifier).add(this.inappropriateSurface);
         
@@ -158,6 +171,7 @@ define(function(require, exports, module) {
         var footerView = new View();
         var oneView = new View();
         var twoView = new View();
+        var threeView = new View();
         
         this.ideaSummary = new Surface({
             size: [this.options.inputs.size[0] - 60, undefined],
@@ -172,7 +186,7 @@ define(function(require, exports, module) {
             }
         });
         this.ideaDescription = new Surface({
-            size: [this.options.inputs.size[0], undefined],
+            size: [this.options.inputs.size[0]- 60, undefined],
             content : this.options.description,
             properties: {
                 color: 'white',
@@ -180,6 +194,17 @@ define(function(require, exports, module) {
                 fontSize: this.options.secondaryFontSize + 'px',
                 fontFamily: 'AvenirNextCondensed-DemiBold',
                 pointerEvents : 'none',
+                zIndex: this.options.zIndex
+            }
+        });
+
+        this.commentInput = new TextareaSurface({
+            size: [this.options.inputs.size[0]- 60, 50],
+            name: 'input-description',
+            placeholder: 'Add Comment',
+            value: '',
+            type: 'textarea',
+            properties: {
                 zIndex: this.options.zIndex
             }
         });
@@ -204,29 +229,37 @@ define(function(require, exports, module) {
             }
         }); 
         var summaryModifier = new StateModifier({
-            transform: Transform.translate(0,-180,0)
+            transform: Transform.translate(-40,-130,0)
+        });
+        var commentModifier = new StateModifier({
+            transform: Transform.translate(-40,90,0)
         });
         var descriptionModifier = new StateModifier({
-            transform: Transform.translate(0,0,0)
+            transform: Transform.translate(-40,10,0)
         });
         var submitModifier = new StateModifier({
             transform: Transform.translate(140,300,0)
         });
         var cancelModifier = new StateModifier({
-            transform: Transform.translate(140,180,0)
+            transform: Transform.translate(120,130,0)
         });
         oneView.add(summaryModifier).add(this.ideaSummary);
         twoView.add(descriptionModifier).add(this.ideaDescription);
+        threeView.add(commentModifier).add(this.commentInput);
         footerView.add(cancelModifier).add(this.cancelSurface);
         
         this.details.push(oneView);
         this.details.push(twoView);
         this.details.push(this.buttonView); 
+        this.details.push(threeView); 
         this.details.push(footerView); 
     }
 
     function _setListeners() {
         this.voteDownSurface.on("mouseover", function(){
+            this.trackedSurface.setProperties({
+                backgroundColor: null
+            });
             this.ignoreSurface.setProperties({
                 backgroundColor: null
             });
@@ -241,6 +274,9 @@ define(function(require, exports, module) {
             });
         }.bind(this));
         this.voteDownSurface.on("mouseout", function(){
+            this.trackedSurface.setProperties({
+                backgroundColor: null
+            });
             this.ignoreSurface.setProperties({
                 backgroundColor: null
             });
@@ -255,6 +291,9 @@ define(function(require, exports, module) {
             });
         }.bind(this));
         this.voteUpSurface.on("mouseover", function(){
+            this.trackedSurface.setProperties({
+                backgroundColor: null
+            });
             this.ignoreSurface.setProperties({
                 backgroundColor: null
             });
@@ -269,6 +308,9 @@ define(function(require, exports, module) {
             });
         }.bind(this));
         this.voteUpSurface.on("mouseout", function(){
+            this.trackedSurface.setProperties({
+                backgroundColor: null
+            });
             this.ignoreSurface.setProperties({
                 backgroundColor: null
             });
@@ -282,7 +324,11 @@ define(function(require, exports, module) {
                 backgroundColor: null
             });
         }.bind(this));
+
         this.ignoreSurface.on("mouseover", function(){
+            this.trackedSurface.setProperties({
+                backgroundColor: null
+            });
             this.ignoreSurface.setProperties({
                 backgroundColor: 'white'
             });
@@ -297,6 +343,9 @@ define(function(require, exports, module) {
             });
         }.bind(this));
         this.ignoreSurface.on("mouseout", function(){
+            this.trackedSurface.setProperties({
+                backgroundColor: null
+            });
             this.ignoreSurface.setProperties({
                 backgroundColor: null
             });
@@ -311,6 +360,9 @@ define(function(require, exports, module) {
             });
         }.bind(this));
         this.inappropriateSurface.on("mouseover", function(){
+            this.trackedSurface.setProperties({
+                backgroundColor: null
+            });
             this.ignoreSurface.setProperties({
                 backgroundColor: null
             });
@@ -325,6 +377,43 @@ define(function(require, exports, module) {
             });
         }.bind(this));
         this.inappropriateSurface.on("mouseout", function(){
+            this.trackedSurface.setProperties({
+                backgroundColor: null
+            });
+            this.ignoreSurface.setProperties({
+                backgroundColor: null
+            });
+            this.voteDownSurface.setProperties({
+                backgroundColor: null
+            });
+            this.voteUpSurface.setProperties({
+                backgroundColor: null
+            });
+            this.inappropriateSurface.setProperties({
+                backgroundColor: null
+            });
+        }.bind(this));
+        this.trackedSurface.on("mouseover", function(){
+            this.trackedSurface.setProperties({
+                backgroundColor: 'white'
+            });
+            this.ignoreSurface.setProperties({
+                backgroundColor: null
+            });
+            this.voteDownSurface.setProperties({
+                backgroundColor: null
+            });
+            this.voteUpSurface.setProperties({
+                backgroundColor: null
+            });
+            this.inappropriateSurface.setProperties({
+                backgroundColor: null
+            });
+        }.bind(this));
+        this.trackedSurface.on("mouseout", function(){
+            this.trackedSurface.setProperties({
+                backgroundColor: null
+            });
             this.ignoreSurface.setProperties({
                 backgroundColor: null
             });
@@ -354,7 +443,7 @@ define(function(require, exports, module) {
             this._eventOutput.emit('itemDetails:close');
         }.bind(this));
 
-        this.voteDownSurface.on("click", function(){
+        this.voteUpSurface.on("click", function(){
             var id = this.options.id;
             var tempIdea = new Ideas.Idea(this.options);
             tempIdea.unset('id');
@@ -362,7 +451,7 @@ define(function(require, exports, module) {
                 success: function(resp) {
                    new Ideas.pastIdeas();
                 },
-                url: env+'/ideas/id/'+id+'/operations/voteNo?user='+User.instance().get('username')
+                url: env+'/ideas/id/'+id+'/operations/voteYes?user='+User.instance().get('username')
             });
             this._eventOutput.emit('itemDetails:close');
         }.bind(this));
@@ -399,6 +488,16 @@ define(function(require, exports, module) {
                 url: env+'/ideas/id/'+id+'/operations/ignore?user='+User.instance().get('username')
             });
             this._eventOutput.emit("idea:delete", this);
+            this._eventOutput.emit('itemDetails:close');
+        }.bind(this));
+        this.trackedSurface.on("click", function(){
+            var id = this.options.id;
+            var tempIdea = new Ideas.Idea(this.options);
+            tempIdea.unset('id');
+            tempIdea.save({},{
+                success: function(resp) {}, 
+                url: env+'/ideas/id/'+id+'/operations/track?user='+User.instance().get('username')
+            });
             this._eventOutput.emit('itemDetails:close');
         }.bind(this));
     }
