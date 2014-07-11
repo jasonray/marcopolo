@@ -279,7 +279,7 @@ define(function(require, exports, module) {
                     this.options.feed.title = "Results"
                     this.refreshFeed();
                 }.bind(this);
-                var search = new Ideas.searchIdeas(callback); 
+                var search = new Ideas.searchIdeas(this.searchInput.getValue(), callback); 
             }
         }.bind(this));
 
@@ -307,18 +307,23 @@ define(function(require, exports, module) {
         this.addItemView.on('newFeed:add', function(item){
             var Ideas           = require('entities/ideas');
             _closeLightBox.call(this);
-            this.options.feed.data.unshift(item);
-
-            new Ideas.Idea(item).save({}, {
+            var newFeedData = Store.get("newFeed");
+            newFeedData.unshift(item);
+            
+            Store.set("newFeed", newFeedData);
+            var newIdea = new Ideas.Idea(item);
+            newIdea.save({}, {
                 success: function(resp) {
-                    console.log(resp)
+                    var Ideas = require('entities/ideas');
+                    new Ideas.myIdeas();
                 }
             });
 
-            Store.set('newFeed', this.options.feed.data)
-            
-            this.feedView.render = function(){ return null; }
-            _createFeedView.call(this);
+            if (this.options.feed.name === 'newFeed') {
+                this.options.feed.data = newFeedData;
+                this.feedView.render = function(){ return null; }
+                _createFeedView.call(this);
+            }
         }.bind(this));
 
         this.addItemView.on('newFeed:close', function(){

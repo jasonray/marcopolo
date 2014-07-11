@@ -251,7 +251,7 @@ define(function(require, exports, module) {
             tempIdea.unset('id');
             tempIdea.save({},{
                 success: function(resp) {
-                 //   console.log(resp)
+                   new Ideas.pastIdeas();
                 },
                 url: env+'/ideas/id/'+id+'/operations/voteNo?user='+User.instance().get('username')
             });
@@ -264,7 +264,7 @@ define(function(require, exports, module) {
             tempIdea.unset('id');
             tempIdea.save({},{
                 success: function(resp) {
-                 //   console.log(resp)
+                   new Ideas.pastIdeas();
                 },
                 url: env+'/ideas/id/'+id+'/operations/voteYes?user='+User.instance().get('username')
             });
