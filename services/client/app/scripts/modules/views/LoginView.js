@@ -94,7 +94,8 @@ define(function(require, exports, module) {
             value: '',
             type: 'text',
             properties: {
-                zIndex: this.options.zIndex
+                zIndex: this.options.zIndex,
+                paddingLeft: '10px'
             }
         });
         this.passwordInput = new InputSurface({
@@ -104,7 +105,8 @@ define(function(require, exports, module) {
             value: '',
             type: 'password',
             properties: {
-                zIndex: this.options.zIndex
+                zIndex: this.options.zIndex,
+                paddingLeft: '10px'
             }
         });
         this.errorSurface = new Surface({
@@ -113,7 +115,7 @@ define(function(require, exports, module) {
             properties: {
                 zIndex: this.options.zIndex+1,
                 color: 'white',
-                paddingTop: '15px'
+                paddingTop: '12px'
             }
         });
         
@@ -153,7 +155,7 @@ define(function(require, exports, module) {
             var auth = {};
             var that = this;
             auth.username = this.usernameInput.getValue();
-            auth.password = this.passwordInput.getValue();
+            auth.password = encodeURIComponent(this.passwordInput.getValue());
             User.instance().save({},{
                 success: function(resp){
                     resp.submit();
