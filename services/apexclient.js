@@ -153,10 +153,10 @@ exports.searchNewIdeas = searchNewIdeas = function(user, search, successHandler,
 		"select * " +
 		"  from ( select rownum rnum, a.* " +
 		"           from ( select x.id, x.owner, x.topic_id, x.topic_title, x.short_desc, x.description, " +
-		"                         x.created, x.comment_count, x.tags, x.rn " +
+		"                         x.created, x.comment_count, x.tags, x.vote, x.rn " +
 		"                    from (select i.id, i.owner, t.id topic_id, t.title topic_title, i.short_desc, " +
-		"                                 i.description, i.created, c.comment_count, rownum rn, t.tags " +
-		"                            from ideas i, topics t, " +
+		"                                 i.description, i.created, c.comment_count, rownum rn, t.tags, v.vote " +
+		"                            from ideas i, topics t, vote v, " +
 		"                                 (select count(*) comment_count, parent_id " +
 		"                                    from comments " +
 		"                                   where parent_type = 'idea' " +
@@ -168,6 +168,8 @@ exports.searchNewIdeas = searchNewIdeas = function(user, search, successHandler,
 		"                           where i.topic_id = t.id(+) " +
 		"                             and c.parent_id(+) = i.id " +
 		"                             and i.id = t.idea_id(+) " +
+		"                             and i.id = v.idea_id(+) " +
+		"                             and v.voter(+) = '" + user + "' " +
 		"                             and ( contains (i.short_desc, th_parser.simpleSearch('" + search + "')) > 0 " +
 		"                                or contains (i.description, th_parser.simpleSearch('" + search + "')) > 0 ) ) x ) a " +
 		"          where rownum <= " + upperRowCount + " ) " +
@@ -187,10 +189,11 @@ exports.searchIdeas = searchIdeas = function(user, search, successHandler, error
 		"select * " +
 		"  from ( select rownum rnum, a.* " +
 		"           from ( select x.id, x.owner, x.topic_id, x.topic_title, x.short_desc, x.description, " +
-		"                         x.created, x.comment_count, x.tags, x.rn " +
+		"                         x.created, x.comment_count, x.tags, x.vote, x.rn " +
 		"                    from (select i.id, i.owner, t.id topic_id, t.title topic_title, i.short_desc, " +
-		"                                 i.description, i.created, c.comment_count, rownum rn, t.tags " +
-		"                            from ideas i, topics t, " +
+		"                                 i.description, i.created, c.comment_count, rownum rn, t.tags, " +
+		"                                 v.vote " +
+		"                            from ideas i, topics t, votes v, " +
 		"                                 (select count(*) comment_count, parent_id " +
 		"                                    from comments " +
 		"                                   where parent_type = 'idea' " +
@@ -201,6 +204,8 @@ exports.searchIdeas = searchIdeas = function(user, search, successHandler, error
 		"                                   group by it.idea_id) t " +
 		"                           where i.topic_id = t.id(+) " +
 		"                             and c.parent_id(+) = i.id " +
+		"                             and i.id = v.idea_id (+) " +
+		"                             and v.voter (+) = '" + user + "' " +
 		"                             and i.id = t.idea_id(+) " +
 		"                             and ( contains (i.short_desc, th_parser.simpleSearch('" + search + "')) > 0 " +
 		"                                or contains (i.description, th_parser.simpleSearch('" + search + "')) > 0 ) ) x ) a " +
