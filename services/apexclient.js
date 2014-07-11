@@ -588,8 +588,8 @@ exports.fetchComments = fetchComments = function(id, successHandler, errorHandle
 exports.saveComment = saveComment = function(id, user, comment, successHandler, errorHandler) {
 	logger.info('apexClient.saveComment(%s,%s,%s)', item, user, comment);
 
-	var sql = "call th_comments_pkg.create_comment(:1,:2,:3,:4)"; 
-	var params = [id, 'idea', comment, user];
+	var sql = "call th_ideas_pkg.comment_on_idea(:1,:2,:3)"; 
+	var params = [id, comment, user];
 
 	runSql(sql, params, successHandler, errorHandler);
 };

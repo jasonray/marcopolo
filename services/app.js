@@ -131,9 +131,9 @@ app.post('/ideas/id/:id/operations/untrack', function(req, res, next) {
 	apexClient.untrackItem(req.param('id'), determineUser(req), onSuccessReturnResults(res), errorHandler(res));
 });
 
-app.get('/ideas/id/:id/comments', function(req, res, next) {
-	apexClient.method(req.param('id'), onSuccessReturnResults(res), errorHandler(res));
-});
+//app.post('/ideas/id/:id/comments', function(req, res, next) {
+//	apexClient.commentOnIdea(req.param('id'), onSuccessReturnResults(res), errorHandler(res));
+//});
 app.use('/ideas/id/:id/comments', bodyParser.text({
 	limit: '1kb'
 }));
