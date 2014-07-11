@@ -6,8 +6,7 @@ define(function(require, exports, module) {
     var env      = '';
 
     //dev
-    // env = 'http://demos.agilex.com:9998'
-
+    env = 'http://demos.agilex.com:9998'
 
     this.Idea = Backbone.Model.extend({
         initialize: function() {
@@ -17,7 +16,7 @@ define(function(require, exports, module) {
             "comment_count": 0,
             "created": new Date(),
             "guiID": uuid.v1(),
-            "long_description": "long description A",
+            "description": "long description A",
             "short_description": "ideaA"
         },
         generateId: function() {
