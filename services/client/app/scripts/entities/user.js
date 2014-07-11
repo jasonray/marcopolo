@@ -19,11 +19,13 @@ define(function(require, exports, module) {
             return user;
         },
         submit: function() {
-            window.sessionStorage["auth"] = JSON.stringify(this);
+            window.localStorage["auth"] = JSON.stringify(this);
         },
         getItem: function() {
-            var auth = window.sessionStorage.getItem('auth');
-            return auth && JSON.parse(auth);
+            var auth = window.localStorage.getItem('auth');
+            if (auth) {
+                return JSON.parse(auth);
+            }
         },
         auth: function() {
             var user = this.getItem();

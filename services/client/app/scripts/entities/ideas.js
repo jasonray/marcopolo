@@ -6,7 +6,7 @@ define(function(require, exports, module) {
     var env      = '';
 
     //dev
-    env = 'http://demos.agilex.com:9998'
+    // env = 'http://demos.agilex.com:9998'
 
 
     this.Idea = Backbone.Model.extend({
@@ -88,9 +88,10 @@ define(function(require, exports, module) {
     });
     this.searchIdeas = Backbone.Collection.extend({
         model: this.Idea,
-        initialize: function(callback) {
+        initialize: function(value, callback) {
+            var search = encodeURIComponent(value);
             this.fetch({
-                url: env + '/ideas/past'+ '?user='+User.instance().get('username'),
+                url: env + '/ideas/search'+ '?user='+User.instance().get('username')+'&search='+search,
                 success: function(data){
                     Store.set("searchFeed", data);
                     callback.call(this);
