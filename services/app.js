@@ -48,23 +48,32 @@ app.get('/topic/id/:id', function(req, res, next) {
 app.use(cors());
 
 app.get('/ideas', function(req, res, next) {
-	apexClient.fetchIdeas(onSuccessReturnResults(res), errorHandler(res));
+	//apexClient.fetchIdeas(onSuccessReturnResults(res), errorHandler(res));
+	apexClient.newIdeasFeed(determineUser(req), onSuccessReturnResults(res), errorHandler(res));
 });
 
 app.get('/ideas/new', function(req, res, next) {
 	apexClient.newIdeasFeed(determineUser(req), onSuccessReturnResults(res), errorHandler(res));
 });
+
 app.get('/ideas/tracked', function(req, res, next) {
 	apexClient.trackedIdeasFeed(determineUser(req), onSuccessReturnResults(res), errorHandler(res));
 });
+
 app.get('/ideas/mine', function(req, res, next) {
 	apexClient.myItemsFeed(determineUser(req), onSuccessReturnResults(res), errorHandler(res));
 });
+
 app.get('/ideas/past', function(req, res, next) {
 	apexClient.pastItemsFeed(determineUser(req), onSuccessReturnResults(res), errorHandler(res));
 });
+
 app.get('/ideas/ignored', function(req, res, next) {
 	apexClient.ignoredIdeasFeed(determineUser(req), onSuccessReturnResults(res), errorHandler(res));
+});
+
+app.post('/ideas/search', function(req, res, next) {
+	apexClient.searchIdeas(determineUser(req), req.param('search'), onSuccessReturnResults(res), errorHandler(res));
 });
 
 app.get('/ideas/id/:id', function(req, res, next) {
@@ -77,6 +86,10 @@ app.use('/ideas', bodyParser.json({
 
 app.post('/login', function(req, res, next) {
 	apexClient.loginUser(determineUser(req), req.param('pw'), onSuccessReturnResults(res), errorHandler(res));
+});
+
+app.post('/verify', function(req, res, next) {
+	apexClient.verifyUser(determineUser(req), req.param('userToken'), onSuccessReturnResults(res), errorHandler(res));
 });
 
 app.post('/ideas', function(req, res, next) {

@@ -145,6 +145,39 @@ exports.newIdeasFeed = newIdeasFeed = function(user, successHandler, errorHandle
 	ideaFeed(sql, [], successHandler, errorHandler);
 };
 
+exports.searchIdeas = searchIdeas = function(user, search, successHandler, errorHandler) {
+	logger.info('apexClient.searchIdeas(%s,%s)', user, search);
+	var lowerRowCount = 1;
+	var upperRowCount = 25;
+	var sql =
+		"select * " +
+		"  from ( select rownum rnum, a.* " +
+		"           from ( select x.id, x.owner, x.topic_id, x.topic_title, x.short_desc, x.description, " +
+		"                         x.created, x.comment_count, x.tags, x.rn " +
+		"                    from (select i.id, i.owner, t.id topic_id, t.title topic_title, i.short_desc, " +
+		"                                 i.description, i.created, c.comment_count, rownum rn, t.tags " +
+		"                            from ideas i, topics t, " +
+		"                                 (select count(*) comment_count, parent_id " +
+		"                                    from comments " +
+		"                                   where parent_type = 'idea' " +
+		"                                   group by parent_id) c, " +
+		"                                 (select it.idea_id, " +
+		"                                         listagg(it.tag, ' ') within group (order by it.tag) tags " +
+		"                                    from idea_tags it " +
+		"                                   group by it.idea_id) t " +
+		"                           where i.topic_id = t.id(+) " +
+		"                             and c.parent_id(+) = i.id " +
+		"                             and i.id = t.idea_id(+) " +
+		"                             and ( contains (i.short_desc, th_parser.simpleSearch('" + search + "')) > 0 " +
+		"                                or contains (i.description, th_parser.simpleSearch('" + search + "')) > 0 ) ) x ) a " +
+		"          where rownum <= " + upperRowCount + " ) " +
+		" where rnum >= " + lowerRowCount +
+		"   and id not in (select distinct idea_id from votes where voter = '" + user + "' union all " +
+		"                  select idea_id from ignored_ideas where ignoring_user = '" + user + "') "; 
+
+	ideaFeed(sql, [], successHandler, errorHandler);
+};
+
 exports.trackedIdeasFeed = trackedIdeasFeed = function(user, successHandler, errorHandler) {
 	logger.info('apexClient.trackedIdeasFeed(%s)', user);
 	var lowerRowCount = 1;
@@ -448,7 +481,8 @@ var stringToYesNo = function(string) {
 
 
 exports.loginUser = loginUser = function(user, pw, successHandler, errorHandler) {
-	logger.info('apexClient.loginUser(%s,%s)', user, pw);
+	// DO NOT LOG THE PASSWORD! THESE ARE USERS' ACCOUNT CREDENTIALS!
+	logger.info('apexClient.loginUser(%s)', user);
 
 	var sql = "call th_auth_pkg.login_user(:1,:2,:3,:4,:5,:6,:7)";
 	var params = [user, pw, new oracle.OutParam(oracle.OCCISTRING),
@@ -463,10 +497,22 @@ exports.loginUser = loginUser = function(user, pw, successHandler, errorHandler)
 			transport.token = data.returnParam;
 			transport.username = data.returnParam1;
 			transport.firstname = data.returnParam2;
-			transport.lastname = returnParam3;
+			transport.lastname = data.returnParam3;
+			transport.email = data.returnParam4;
 			successHandler(data);
 		}
 	}
+	runSql(sql, params, formatAndCallSuccessHandler, errorHandler);
+};
+
+
+
+exports.verifyUser = verifyUser = function(user, userToken, successHandler, errorHandler) {
+	logger.info('apexClient.verifyUser(%s,%s)', user, userToken);
+
+	var sql = "call th_auth_pkg.auth_user(:1,:2)";
+	var params = [user, userToken];
+
 	runSql(sql, params, formatAndCallSuccessHandler, errorHandler);
 };
 
