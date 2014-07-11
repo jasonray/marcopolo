@@ -307,8 +307,10 @@ define(function(require, exports, module) {
         this.addItemView.on('newFeed:add', function(item){
             var Ideas           = require('entities/ideas');
             _closeLightBox.call(this);
-            this.options.feed.data.unshift(item);
-
+            var newFeedData = Store.get("newFeed");
+            newFeedData.unshift(item);
+            
+            Store.set("newFeed", newFeedData);
             var newIdea = new Ideas.Idea(item);
             newIdea.save({}, {
                 success: function(resp) {
@@ -317,10 +319,11 @@ define(function(require, exports, module) {
                 }
             });
 
-            Store.set('newFeed', this.options.feed.data)
-            
-            this.feedView.render = function(){ return null; }
-            _createFeedView.call(this);
+            if (this.options.feed.name === 'newFeed') {
+                this.options.feed.data = newFeedData;
+                this.feedView.render = function(){ return null; }
+                _createFeedView.call(this);
+            }
         }.bind(this));
 
         this.addItemView.on('newFeed:close', function(){
