@@ -275,7 +275,7 @@ define(function(require, exports, module) {
         this.searchInput.on("keypress", function(e) {
             if (e.which == 13) {
                 var callback = function() {
-                    this.options.feed.data = JSON.parse(window.localStorage['searchFeed']);
+                    this.options.feed.data = Store.get("searchFeed");
                     this.options.feed.title = "Results"
                     this.refreshFeed();
                 }.bind(this);
