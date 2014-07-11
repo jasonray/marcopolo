@@ -73,7 +73,7 @@ app.get('/ideas/ignored', function(req, res, next) {
 });
 
 app.post('/ideas/search', function(req, res, next) {
-	apexClient.searchIdeas(determineUser(req), req.param('search'), onSuccessReturnResults(res), errorHandler(res));
+	apexClient.searchIdeas(determineUser(req), decodeURIComponent(req.param('search')), onSuccessReturnResults(res), errorHandler(res));
 });
 
 app.get('/ideas/search', function(req, res, next) {
@@ -89,7 +89,7 @@ app.use('/ideas', bodyParser.json({
 }));
 
 app.post('/login', function(req, res, next) {
-	apexClient.loginUser(determineUser(req), req.param('pw'), onSuccessReturnResults(res), errorHandler(res));
+	apexClient.loginUser(determineUser(req), decodeURIComponent(req.param('pw')), onSuccessReturnResults(res), errorHandler(res));
 });
 
 app.post('/verify', function(req, res, next) {
@@ -147,6 +147,11 @@ app.post('/ideas/id/:id/operations/suspend', function(req, res, next) {
 
 app.post('/ideas/id/:id/operations/ignore', function(req, res, next) {
 	apexClient.ignoreIdea(req.param('id'), determineUser(req), onSuccessReturnResults(res), errorHandler(res));
+});
+
+app.post('/ideas/id/:id/operations/addtag', function(req, res, next) {
+	var tag = req.param('tag');
+	apexClient.tagIdea(req.param('id'), tag, determineUser(req), onSuccessReturnResults(res), errorHandler(res));
 });
 
 function determineUser(req) {

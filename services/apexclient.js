@@ -173,7 +173,7 @@ exports.searchIdeas = searchIdeas = function(user, search, successHandler, error
 		"          where rownum <= " + upperRowCount + " ) " +
 		" where rnum >= " + lowerRowCount +
 		"   and id not in (select distinct idea_id from votes where voter = '" + user + "' union all " +
-		"                  select idea_id from ignored_ideas where ignoring_user = '" + user + "') "; 
+		"                  select idea_id from ignored_ideas where ignoring_user = '" + user + "') ";
 
 	ideaFeed(sql, [], successHandler, errorHandler);
 };
@@ -242,7 +242,7 @@ exports.myItemsFeed = myItemsFeed = function(user, successHandler, errorHandler)
 		"                             and ti.tracking_user (+) = '" + user + "' " +
 		"                             and i.id = t.idea_id(+) ) x ) a " +
 		"          where rownum <= " + upperRowCount + " ) " +
-		" where rnum >= " + lowerRowCount; 
+		" where rnum >= " + lowerRowCount;
 
 	ideaFeed(sql, [], successHandler, errorHandler);
 };
@@ -460,6 +460,23 @@ exports.ignoreIdea = ignoreIdea = function(id, user, successHandler, errorHandle
 	runSql(sql, params, successHandler, errorHandler);
 };
 
+exports.tagIdea = tagIdea = function(id, tag, user, successHandler, errorHandler) {
+	// th@XE> begin
+	//   2    th_ideas_pkg.tag_idea(p_id => 1,
+	//   3     p_tag => '#groovytown',
+	//   4     p_tagger => 'dillons');
+
+	tag = "#" + tag;
+
+	logger.info('apexClient.tagIdea(%s,%s,%s)', id, tag, user);
+
+
+	var sql = "call th_ideas_pkg.tag_idea(:1,:2,:3)";
+	var params = [id, tag, user];
+
+	runSql(sql, params, successHandler, errorHandler);
+};
+
 var stringToYesNo = function(string) {
 	if (string === true) return "yes";
 	if (string === false) return "no";
@@ -486,10 +503,11 @@ exports.loginUser = loginUser = function(user, pw, successHandler, errorHandler)
 
 	var sql = "call th_auth_pkg.login_user(:1,:2,:3,:4,:5,:6,:7)";
 	var params = [user, pw, new oracle.OutParam(oracle.OCCISTRING),
-                                new oracle.OutParam(oracle.OCCISTRING),
-                                new oracle.OutParam(oracle.OCCISTRING),
-                                new oracle.OutParam(oracle.OCCISTRING),
-                                new oracle.OutParam(oracle.OCCISTRING)];
+		new oracle.OutParam(oracle.OCCISTRING),
+		new oracle.OutParam(oracle.OCCISTRING),
+		new oracle.OutParam(oracle.OCCISTRING),
+		new oracle.OutParam(oracle.OCCISTRING)
+	];
 
 	function formatAndCallSuccessHandler(data) {
 		var transport = {};
@@ -523,8 +541,9 @@ exports.createIdea = createIdea = function(item, user, successHandler, errorHand
 	console.dir(item);
 
 	var sql = "call th_ideas_pkg.create_idea(:1,:2,:3,:4,:5,:6,:7)";
-	var params = [item.short_description, user, item.long_description, 
-                      '#testdata', 'month', null, new oracle.OutParam(oracle.OCCIINT)];
+	var params = [item.short_description, user, item.long_description,
+		'#testdata', 'month', null, new oracle.OutParam(oracle.OCCIINT)
+	];
 
 	function formatAndCallSuccessHandler(data) {
 		if (data.returnParam) data.itemId = data.returnParam;
@@ -545,7 +564,7 @@ exports.fetchComments = fetchComments = function(id, successHandler, errorHandle
 exports.saveComment = saveComment = function(id, user, comment, successHandler, errorHandler) {
 	logger.info('apexClient.saveComment(%s,%s,%s)', item, user, comment);
 
-	var sql = "call th_comments_pkg.create_comment(:1,:2,:3,:4)"; 
+	var sql = "call th_comments_pkg.create_comment(:1,:2,:3,:4)";
 	var params = [id, 'idea', comment, user];
 
 	runSql(sql, params, successHandler, errorHandler);
