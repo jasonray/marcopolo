@@ -136,7 +136,7 @@ define(function(require, exports, module) {
         this.add(titleModifier).add(this.contentSurface);
     }
     function _buttonStateHighlight() {
-        if (typeof this.options.data.vote !== 'undefined') {
+        if (typeof this.options.data.vote !== 'undefined' && this.options.data.vote) {
             this.buttonBgSurface.setProperties({
                 backgroundColor: '#e9e9e9'
             });
