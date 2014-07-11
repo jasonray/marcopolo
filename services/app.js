@@ -149,6 +149,11 @@ app.post('/ideas/id/:id/operations/ignore', function(req, res, next) {
 	apexClient.ignoreIdea(req.param('id'), determineUser(req), onSuccessReturnResults(res), errorHandler(res));
 });
 
+app.post('/ideas/id/:id/operations/addtag', function(req, res, next) {
+	var tag = req.param('tag');
+	apexClient.tagIdea(req.param('id'), tag, determineUser(req), onSuccessReturnResults(res), errorHandler(res));
+});
+
 function determineUser(req) {
 	return req.param('user');
 }
