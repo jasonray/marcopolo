@@ -62,6 +62,7 @@ define(function(require, exports, module) {
         sequentialLayout.sequenceFrom(this.inputs);
 
         this.add(layoutModifier).add(sequentialLayout);
+        this.usernameInput.focus();
     }
 
     function _createBackground() {

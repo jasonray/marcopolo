@@ -48,7 +48,7 @@ define(function(require, exports, module) {
         feedScroll.sequenceFrom(feedSequence);
 
         for (var i = 0; i < this.options.feedData.length; i++) {
-            this.feedItemView = new FeedItemView({data: this.options.feedData[i], yOffset: yOffset});
+            this.feedItemView = new FeedItemView({data: this.options.feedData[i], yOffset: yOffset, feedName: this.options.feedName});
 
             var stripModifier = new StateModifier({
                 transform: Transform.translate(0, yOffset, 0)

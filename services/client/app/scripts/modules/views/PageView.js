@@ -92,7 +92,6 @@ define(function(require, exports, module) {
                 boxShadow: '0 0 20px rgba(0,0,0,0.5)'
             }
         });
-
         this.add(backing);
     }
 
@@ -110,7 +109,7 @@ define(function(require, exports, module) {
     function _createTitleSurface() {
         this.titleSurface = new Surface({
             size: [200, 44],
-            content : this.options.title,
+            content : this.options.feed.title,
             properties: {
                 color: 'white',
                 fontFamily: 'AvenirNextCondensed-DemiBold',
@@ -226,7 +225,7 @@ define(function(require, exports, module) {
         this.addItemView = new AddItemView();
     }
     function _createFeedView() {
-        this.feedView = new FeedView({ feedData: this.options.feed });
+        this.feedView = new FeedView({ feedData: this.options.feed.data, feedName: this.options.feed.name });
         // this.feedModifier = new Modifier({
         //     transform: function() {
         //         return Transform.translate(this.pageViewPos.get(), 0, 0);
@@ -276,8 +275,8 @@ define(function(require, exports, module) {
         this.searchInput.on("keypress", function(e) {
             if (e.which == 13) {
                 var callback = function() {
-                    this.options.feed = JSON.parse(window.localStorage['searchFeed']);
-                    this.options.title = "Results"
+                    this.options.feed.data = JSON.parse(window.localStorage['searchFeed']);
+                    this.options.feed.title = "Results"
                     this.refreshFeed();
                 }.bind(this);
                 var search = new Ideas.searchIdeas(callback); 
@@ -308,7 +307,7 @@ define(function(require, exports, module) {
         this.addItemView.on('newFeed:add', function(item){
             var Ideas           = require('entities/ideas');
             _closeLightBox.call(this);
-            this.options.feed.unshift(item);
+            this.options.feed.data.unshift(item);
 
             new Ideas.Idea(item).save({}, {
                 success: function(resp) {
@@ -316,7 +315,7 @@ define(function(require, exports, module) {
                 }
             });
 
-            Store.set('newFeed', this.options.feed)
+            Store.set('newFeed', this.options.feed.data)
             
             this.feedView.render = function(){ return null; }
             _createFeedView.call(this);

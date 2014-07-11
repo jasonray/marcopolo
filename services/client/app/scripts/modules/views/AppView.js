@@ -47,7 +47,7 @@ define(function(require, exports, module) {
     };
 
     function _createPageView() {
-        this.pageView = new PageView({feed: FeedData, title: 'NEW'});
+        this.pageView = new PageView({feed: {data: FeedData, title: 'NEW', name: 'newFeed'}});
         this.pageModifier = new Modifier({
             transform: function() {
                 return Transform.translate(this.pageViewPos.get(), 0, 0);
@@ -72,8 +72,9 @@ define(function(require, exports, module) {
 
         this.menuView.on("menuToggle", function(feed){
             this.toggleMenu();
-            this.pageView.options.feed = JSON.parse(window.localStorage[feed.name]);
-            this.pageView.options.title = feed.title
+            this.pageView.options.feed.data = JSON.parse(window.localStorage[feed.name]);
+            this.pageView.options.feed.title = feed.title
+            this.pageView.options.feed.name = feed.name
             this.pageView.refreshFeed();
         }.bind(this));
     }

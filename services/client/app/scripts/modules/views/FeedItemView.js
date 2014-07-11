@@ -69,18 +69,27 @@ define(function(require, exports, module) {
             size: [55, 55],
             content : './images/thumbs-up.png',
             properties: {
-                // backgroundColor: '#4f4f4f',
-                borderLeft: '5px solid white',
-                zIndex: '5'
+                backgroundColor: '#e9e9e9',
+                // borderLeft: '5px solid white',
+                zIndex: '5',
+                // opacity: '.2'
             }
         });
         this.voteDownSurface = new ImageSurface({
             size: [55, 55],
             content : './images/thumbs-down.png',
             properties: {
-                // backgroundColor: '#fe9a9a',
-                borderLeft: '5px solid white',
+                backgroundColor: '#e9e9e9',
+                // borderLeft: '5px solid white',
                 zIndex: '5'
+            }
+        });
+        this.buttonBgSurface = new Surface({
+            size: [120, 55],
+            properties: {
+                backgroundColor: 'white',
+                border: 'none',
+                zIndex: '4'
             }
         });
         var viewModifier = new StateModifier({
@@ -91,9 +100,17 @@ define(function(require, exports, module) {
             origin: [1, 0],
             align : [0, 0]
         });
-        var voteDownModifier = new StateModifier({
-            transform: Transform.translate(-55, 0, 0)
+        var bgModifier = new StateModifier({
+            origin: [1, 0],
+            align : [0, 0]
         });
+        var voteDownModifier = new StateModifier({
+            transform: Transform.translate(-60, 0, 0)
+        });
+        
+        _buttonStateHighlight.call(this);
+
+        buttonView.add(bgModifier).add(this.buttonBgSurface);
         buttonView.add(voteUpModifier).add(this.voteUpSurface);
         buttonView.add(voteDownModifier).add(this.voteDownSurface);
         this.add(viewModifier).add(buttonView);
@@ -118,19 +135,85 @@ define(function(require, exports, module) {
 
         this.add(titleModifier).add(this.contentSurface);
     }
-    
-
-    function _setListeners() {
-        this.backgroundSurface.on("mouseover", function(){
-            this.setProperties({
-                backgroundColor: 'white'
-            });
-        });
-        this.backgroundSurface.on("mouseout", function(){
-            this.setProperties({
+    function _buttonStateHighlight() {
+        if (typeof this.options.data.vote !== 'undefined') {
+            this.buttonBgSurface.setProperties({
                 backgroundColor: '#e9e9e9'
             });
-        });
+            if (this.options.data.vote === 'no') {
+                this.voteUpSurface.setProperties({
+                    opacity: '.2'
+                });
+                this.voteDownSurface.setProperties({
+                    backgroundColor: 'white'
+                });
+            }
+            else {
+                this.voteDownSurface.setProperties({
+                    opacity: '.2'
+                });
+                this.voteUpSurface.setProperties({
+                    backgroundColor: 'white'
+                });
+            }
+        }
+    } 
+
+    function _voteChange() {
+        if (this.options.feedName === 'newFeed') {
+            this._eventOutput.emit("idea:delete", this);
+        } else if(this.options.data.vote === 'no') {
+            this.options.data.vote = 'yes';
+            this.voteUpSurface.setProperties({
+                backgroundColor: 'white'
+            });
+            this.voteDownSurface.setProperties({
+                backgroundColor: '#e9e9e9'
+            });
+            _buttonStateHighlight.call(this);
+        } else if(this.options.data.vote === 'yes') {
+            this.options.data.vote = 'no';
+            this.voteDownSurface.setProperties({
+                backgroundColor: 'white'
+            });
+            this.voteUpSurface.setProperties({
+                backgroundColor: '#e9e9e9'
+            });
+            _buttonStateHighlight.call(this);
+        }
+    }
+    
+    function _setListeners() {
+        this.backgroundSurface.on("mouseover", function(){
+            this.backgroundSurface.setProperties({
+                backgroundColor: 'white'
+            });
+            this.buttonBgSurface.setProperties({
+                backgroundColor: 'white'
+            });
+            this.voteDownSurface.setProperties({
+                backgroundColor: 'white'
+            });
+            this.voteUpSurface.setProperties({
+                backgroundColor: 'white'
+            });
+        }.bind(this));
+        this.backgroundSurface.on("mouseout", function(){
+            this.backgroundSurface.setProperties({
+                backgroundColor: '#e9e9e9'
+            });
+            this.buttonBgSurface.setProperties({
+                backgroundColor: 'white'
+            });
+            this.voteDownSurface.setProperties({
+                backgroundColor: '#e9e9e9'
+            });
+            this.voteUpSurface.setProperties({
+                backgroundColor: '#e9e9e9'
+            });
+            _buttonStateHighlight.call(this);
+            
+        }.bind(this));
 
         this.backgroundSurface.on("click", function(){
            this._eventOutput.emit("idea:open", this.options.data);
@@ -138,25 +221,29 @@ define(function(require, exports, module) {
 
         this.voteUpSurface.on("mouseover", function(){
             this.setProperties({
-                backgroundColor: 'white'
+                backgroundColor: 'white',
+                opacity: '1'
             });
         });
         this.voteUpSurface.on("mouseout", function(){
-            this.setProperties({
-                backgroundColor: null
+            this.voteUpSurface.setProperties({
+                backgroundColor: '#e9e9e9'
             });
-        });
+            _buttonStateHighlight.call(this);
+        }.bind(this));
 
         this.voteDownSurface.on("mouseover", function(){
             this.setProperties({
-                backgroundColor: 'white'
+                backgroundColor: 'white',
+                opacity: '1'
             });
         });
         this.voteDownSurface.on("mouseout", function(){
-            this.setProperties({
-                backgroundColor: null
+            this.voteDownSurface.setProperties({
+                backgroundColor: '#e9e9e9'
             });
-        });
+            _buttonStateHighlight.call(this);
+        }.bind(this));
 
         this.voteDownSurface.on("click", function(){
             var id = this.options.data.id;
@@ -168,12 +255,8 @@ define(function(require, exports, module) {
                 },
                 url: env+'/ideas/id/'+id+'/operations/voteNo?user='+User.instance().get('username')
             });
-        
-            this._eventOutput.emit("idea:delete", this);
-
-            // this.delete(function() {
-            //    // this.viewSequence.splice(removalData.index, 1);
-            // }.bind(this));
+            _voteChange.call(this);
+            
         }.bind(this));
         this.voteUpSurface.on("click", function(){
             var id = this.options.data.id;
@@ -185,7 +268,7 @@ define(function(require, exports, module) {
                 },
                 url: env+'/ideas/id/'+id+'/operations/voteYes?user='+User.instance().get('username')
             });
-            this._eventOutput.emit("idea:delete", this);
+            _voteChange.call(this);
         }.bind(this));
     };
 
