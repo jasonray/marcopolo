@@ -143,8 +143,7 @@ define(function(require, exports, module) {
             value: '',
             type: 'search',
             attributes: {
-                results: true,
-                autofocus: true  
+                results: 'results' 
             }
         });
 
@@ -253,6 +252,12 @@ define(function(require, exports, module) {
             modalClose = true;
            _closeLightBox.call(this);
         }.bind(this));
+        this.feedItemDetailsView.on('itemDetails:close', function(){
+           _closeLightBox.call(this);
+        }.bind(this));
+        this.feedItemDetailsView.on('idea:delete', function(item){
+           this.feedView.delete(item)
+        }.bind(this));
     }
 
     function _setVolatileListeners() {
@@ -329,6 +334,7 @@ define(function(require, exports, module) {
         this.addItemView.on('newFeed:close', function(){
            _closeLightBox.call(this);
         }.bind(this));
+
 
     }
     

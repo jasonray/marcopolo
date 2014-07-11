@@ -119,8 +119,13 @@ define(function(require, exports, module) {
     }
 
     FeedView.prototype.delete = function(item) {
+        if (typeof !item.options.data !== 'undefined') {
+             var index = this.options.feedData.indexOf(item.options);
+        } else {
+             var index = this.options.feedData.indexOf(item.options.data);
+        }
         
-        var index = this.options.feedData.indexOf(item.options.data);
+       
         this.restack(item, index);
         if (index > -1) {
             this.stripModifiers.splice(index, 1);

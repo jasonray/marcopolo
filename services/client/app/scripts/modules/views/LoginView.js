@@ -96,6 +96,9 @@ define(function(require, exports, module) {
             properties: {
                 zIndex: this.options.zIndex,
                 paddingLeft: '10px'
+            },
+            attributes: {
+                autofocus: true 
             }
         });
         this.passwordInput = new InputSurface({

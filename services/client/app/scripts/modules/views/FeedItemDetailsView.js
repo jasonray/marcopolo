@@ -11,6 +11,13 @@ define(function(require, exports, module) {
     var ImageSurface  = require('famous/surfaces/ImageSurface');
     var Lightbox      = require('famous/views/Lightbox');
     var Easing        = require('famous/transitions/Easing');
+
+    var User           = require('entities/user');
+    var Ideas          = require('entities/ideas');
+    var env      = '';
+
+    //dev
+    env = 'http://demos.agilex.com:9998'
     
 
     function FeedItemDetailsView() {
@@ -27,8 +34,8 @@ define(function(require, exports, module) {
         _createLayout.call(this);
         // _createInputs.call(this);
         _createBackground.call(this);
-        _createMetaData.call(this);
         _createButtons.call(this);
+        _createMetaData.call(this);
         _setListeners.call(this);
         
     }
@@ -37,8 +44,7 @@ define(function(require, exports, module) {
     FeedItemDetailsView.prototype.constructor = FeedItemDetailsView;
 
     FeedItemDetailsView.DEFAULT_OPTIONS = {
-        size: [450, 500],
-        title: 'New Idea',
+        size: [320, 500],
         primaryFontSize: 18,
         zIndex: 500,
         inputs: {
@@ -62,7 +68,7 @@ define(function(require, exports, module) {
 
     function _createBackground() {
         this.backgroundSurface = new Surface({
-            size : [320, 500],
+            size : this.options.size,
             properties: {
                 color: 'white',
                 textAlign: 'center',
@@ -79,15 +85,21 @@ define(function(require, exports, module) {
         this.add(formModifier).add(this.backgroundSurface);
     }
     function _createButtons() {
-        var buttonView = new View({
-            size: [320, undefined]
+        this.buttonView = new View();
+        this.buttonBgSurface = new Surface({
+            size: [120, 55],
+            properties: {
+                backgroundColor: 'white',
+                border: 'none',
+                zIndex: '4'
+            }
         });
         this.voteUpSurface = new ImageSurface({
             size: [55, 55],
             content : './images/thumbs-up.png',
             properties: {
                 // backgroundColor: '#4f4f4f',
-                borderLeft: '5px solid white',
+                // borderLeft: '5px solid white',
                 zIndex: this.options.zIndex
             }
         });
@@ -96,32 +108,59 @@ define(function(require, exports, module) {
             content : './images/thumbs-down.png',
             properties: {
                 // backgroundColor: '#fe9a9a',
-                borderLeft: '5px solid white',
+                // borderLeft: '5px solid white',
                zIndex: this.options.zIndex
             }
         });
-        var viewModifier = new StateModifier({
-            origin: [1, 0],
-            align : [0, 0]
+        this.inappropriateSurface = new ImageSurface({
+            size: [55, 55],
+            content : './images/inapp.png',
+            properties: {
+                // backgroundColor: '#fe9a9a',
+                // borderLeft: '5px solid white',
+               zIndex: this.options.zIndex
+            }
         });
-        var voteUpModifier = new StateModifier({
-            origin: [1, 0],
-            align : [0, 0]
+        this.ignoreSurface = new ImageSurface({
+            size: [55, 55],
+            content : './images/Ignore_icon.png',
+            properties: {
+                // backgroundColor: '#fe9a9a',
+                // borderLeft: '5px solid white',
+               zIndex: this.options.zIndex
+            }
+        });
+        var inappropriateModifier = new StateModifier({
+            transform: Transform.translate(225, -25, 0)
+        });
+
+        var ignoreModifier = new StateModifier({
+            transform: Transform.translate(225, -80, 0)
         });
         var voteDownModifier = new StateModifier({
-            transform: Transform.translate(-55, 0, 0)
+            transform: Transform.translate(225, -135, 0)
         });
-        buttonView.add(voteUpModifier).add(this.voteUpSurface);
-        buttonView.add(voteDownModifier).add(this.voteDownSurface);
-       // this.add(viewModifier).add(buttonView);
+        var voteUpModifier = new StateModifier({
+            transform: Transform.translate(225, -190, 0)
+        });
+        var bgModifier = new StateModifier({
+            origin: [1, 0],
+            align : [0, 0]
+        });
+       // this.buttonView.add(bgModifier).add(this.buttonBgSurface);
+        this.buttonView.add(voteDownModifier).add(this.voteDownSurface);
+        this.buttonView.add(voteUpModifier).add(this.voteUpSurface);
+        this.buttonView.add(ignoreModifier).add(this.ignoreSurface);
+        this.buttonView.add(inappropriateModifier).add(this.inappropriateSurface);
+        
     }
     function _createMetaData() {
-        var buttonView = new View();
+        var footerView = new View();
         var oneView = new View();
         var twoView = new View();
         
         this.ideaSummary = new Surface({
-            size: [this.options.inputs.size[0], 200],
+            size: [this.options.inputs.size[0] - 60, undefined],
             content : this.options.short_description,
             properties: {
                 color: 'white',
@@ -133,8 +172,8 @@ define(function(require, exports, module) {
             }
         });
         this.ideaDescription = new Surface({
-            size: [this.options.inputs.size[0], 200],
-            content : this.options.longs_description,
+            size: [this.options.inputs.size[0], undefined],
+            content : this.options.description,
             properties: {
                 color: 'white',
                 textAlign: 'left',
@@ -145,27 +184,9 @@ define(function(require, exports, module) {
             }
         });
         
-        this.submitSurface = new Surface({
-            size: [120, 50],
-            content: 'Submit',
-            properties: {
-                zIndex: this.options.zIndex,
-                lineHeight: '30px',
-                verticalAlign: 'middle',
-                border: 'none',
-                backgroundColor: '#00a9a6',
-                color: 'white',
-                textAlign: 'center',
-                borderRadius: '5px',
-                padding: '10px',
-                textDecoration: 'none',
-                fontFamily: 'AvenirNextCondensed-DemiBold',
-                fontSize: this.options.secondarySize + 'px',
-            }
-        }); 
         this.cancelSurface = new Surface({
             size: [120, 50],
-            content: 'Cancel',
+            content: 'Close',
             properties: {
                 zIndex: this.options.zIndex,
                 lineHeight: '30px',
@@ -182,35 +203,206 @@ define(function(require, exports, module) {
 
             }
         }); 
-
+        var summaryModifier = new StateModifier({
+            transform: Transform.translate(0,-180,0)
+        });
+        var descriptionModifier = new StateModifier({
+            transform: Transform.translate(0,0,0)
+        });
         var submitModifier = new StateModifier({
-            transform: Transform.translate(140,20,0)
+            transform: Transform.translate(140,300,0)
         });
         var cancelModifier = new StateModifier({
-            transform: Transform.translate(0,20,0)
+            transform: Transform.translate(140,180,0)
         });
-        oneView.add(this.ideaSummary);
-        twoView.add(this.ideaDescription);
-        // buttonView.add(submitModifier).add(this.submitSurface);
-        // buttonView.add(cancelModifier).add(this.cancelSurface);
+        oneView.add(summaryModifier).add(this.ideaSummary);
+        twoView.add(descriptionModifier).add(this.ideaDescription);
+        footerView.add(cancelModifier).add(this.cancelSurface);
+        
         this.details.push(oneView);
         this.details.push(twoView);
-        // this.details.push(buttonView); 
+        this.details.push(this.buttonView); 
+        this.details.push(footerView); 
     }
 
     function _setListeners() {
-        // this.submitSurface.on("click", function(){
-        //     this.newIdea = {comments:''};
-        //     this.newIdea.short_description = this.summaryInput.getValue();
-        //     this.newIdea.long_description = this.descriptionInput.getValue();
-        //     this._eventOutput.emit('newFeed:add', this.newIdea);
-        //     this.descriptionInput.setValue('');
-        // }.bind(this));
-        // this.cancelSurface.on("click", function(){
-        //     this._eventOutput.emit('newFeed:close');
-        // }.bind(this));
+        this.voteDownSurface.on("mouseover", function(){
+            this.ignoreSurface.setProperties({
+                backgroundColor: null
+            });
+            this.voteDownSurface.setProperties({
+                backgroundColor: 'white'
+            });
+            this.voteUpSurface.setProperties({
+                backgroundColor: null
+            });
+            this.inappropriateSurface.setProperties({
+                backgroundColor: null
+            });
+        }.bind(this));
+        this.voteDownSurface.on("mouseout", function(){
+            this.ignoreSurface.setProperties({
+                backgroundColor: null
+            });
+            this.voteDownSurface.setProperties({
+                backgroundColor: null
+            });
+            this.voteUpSurface.setProperties({
+                backgroundColor: null
+            });
+            this.inappropriateSurface.setProperties({
+                backgroundColor: null
+            });
+        }.bind(this));
+        this.voteUpSurface.on("mouseover", function(){
+            this.ignoreSurface.setProperties({
+                backgroundColor: null
+            });
+            this.voteDownSurface.setProperties({
+                backgroundColor: null
+            });
+            this.voteUpSurface.setProperties({
+                backgroundColor: 'white'
+            });
+            this.inappropriateSurface.setProperties({
+                backgroundColor: null
+            });
+        }.bind(this));
+        this.voteUpSurface.on("mouseout", function(){
+            this.ignoreSurface.setProperties({
+                backgroundColor: null
+            });
+            this.voteDownSurface.setProperties({
+                backgroundColor: null
+            });
+            this.voteUpSurface.setProperties({
+                backgroundColor: null
+            });
+            this.inappropriateSurface.setProperties({
+                backgroundColor: null
+            });
+        }.bind(this));
+        this.ignoreSurface.on("mouseover", function(){
+            this.ignoreSurface.setProperties({
+                backgroundColor: 'white'
+            });
+            this.voteDownSurface.setProperties({
+                backgroundColor: null
+            });
+            this.voteUpSurface.setProperties({
+                backgroundColor: null
+            });
+            this.inappropriateSurface.setProperties({
+                backgroundColor: null
+            });
+        }.bind(this));
+        this.ignoreSurface.on("mouseout", function(){
+            this.ignoreSurface.setProperties({
+                backgroundColor: null
+            });
+            this.voteDownSurface.setProperties({
+                backgroundColor: null
+            });
+            this.voteUpSurface.setProperties({
+                backgroundColor: null
+            });
+            this.inappropriateSurface.setProperties({
+                backgroundColor: null
+            });
+        }.bind(this));
+        this.inappropriateSurface.on("mouseover", function(){
+            this.ignoreSurface.setProperties({
+                backgroundColor: null
+            });
+            this.voteDownSurface.setProperties({
+                backgroundColor: null
+            });
+            this.voteUpSurface.setProperties({
+                backgroundColor: null
+            });
+            this.inappropriateSurface.setProperties({
+                backgroundColor: 'white'
+            });
+        }.bind(this));
+        this.inappropriateSurface.on("mouseout", function(){
+            this.ignoreSurface.setProperties({
+                backgroundColor: null
+            });
+            this.voteDownSurface.setProperties({
+                backgroundColor: null
+            });
+            this.voteUpSurface.setProperties({
+                backgroundColor: null
+            });
+            this.inappropriateSurface.setProperties({
+                backgroundColor: null
+            });
+        }.bind(this));
+        this.cancelSurface.on("mouseover", function(){
+            this.cancelSurface.setProperties({
+                backgroundColor: '#00a9a6',
+                cursor: 'ponter'
+            });
+        }.bind(this));
+        this.cancelSurface.on("mouseout", function(){
+            this.cancelSurface.setProperties({
+                backgroundColor: '#5e5e5e',
+            });
+        }.bind(this));
+
+        this.cancelSurface.on("click", function(){
+            this._eventOutput.emit('itemDetails:close');
+        }.bind(this));
+
+        this.voteDownSurface.on("click", function(){
+            var id = this.options.id;
+            var tempIdea = new Ideas.Idea(this.options);
+            tempIdea.unset('id');
+            tempIdea.save({},{
+                success: function(resp) {
+                   new Ideas.pastIdeas();
+                },
+                url: env+'/ideas/id/'+id+'/operations/voteNo?user='+User.instance().get('username')
+            });
+            this._eventOutput.emit('itemDetails:close');
+        }.bind(this));
+
+        this.voteDownSurface.on("click", function(){
+            var id = this.options.id;
+            var tempIdea = new Ideas.Idea(this.options);
+            tempIdea.unset('id');
+            tempIdea.save({},{
+                success: function(resp) {
+                   new Ideas.pastIdeas();
+                },
+                url: env+'/ideas/id/'+id+'/operations/voteNo?user='+User.instance().get('username')
+            });
+            this._eventOutput.emit('itemDetails:close');
+        }.bind(this));
+
+        this.inappropriateSurface.on("click", function(){
+            var id = this.options.id;
+            var tempIdea = new Ideas.Idea(this.options);
+            tempIdea.unset('id');
+            tempIdea.save({},{
+                success: function(resp) {},  
+                url: env+'/ideas/id/'+id+'/operations/suspend?user='+User.instance().get('username')
+            });
+            this._eventOutput.emit('itemDetails:close');
+        }.bind(this));
+        this.ignoreSurface.on("click", function(){
+            var id = this.options.id;
+            var tempIdea = new Ideas.Idea(this.options);
+            tempIdea.unset('id');
+            tempIdea.save({},{
+                success: function(resp) {}, 
+                url: env+'/ideas/id/'+id+'/operations/ignore?user='+User.instance().get('username')
+            });
+            this._eventOutput.emit("idea:delete", this);
+            this._eventOutput.emit('itemDetails:close');
+        }.bind(this));
     }
-        FeedItemDetailsView.prototype.setContent = function() {
+    FeedItemDetailsView.prototype.setContent = function() {
         this.contentSurface.setContent(template.call(this));
     };
     var template = function() {
@@ -230,7 +422,7 @@ define(function(require, exports, module) {
                 <div class="form-group"> \
                     <label class="col-md-4 control-label" for="long_description">Description</label> \
                     <div class="col-md-4"> \
-                        <textarea class="form-control" id="long_description" name="long_description"></textarea> \
+                        <textarea class="form-control" id="long_description" name="description"></textarea> \
                     </div> \
                 </div> \
                 <!-- Select Basic --> \
