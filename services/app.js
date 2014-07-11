@@ -76,6 +76,10 @@ app.post('/ideas/search', function(req, res, next) {
 	apexClient.searchIdeas(determineUser(req), req.param('search'), onSuccessReturnResults(res), errorHandler(res));
 });
 
+app.get('/ideas/search', function(req, res, next) {
+	apexClient.searchIdeas(determineUser(req), req.param('search'), onSuccessReturnResults(res), errorHandler(res));
+});
+
 app.get('/ideas/id/:id', function(req, res, next) {
 	apexClient.fetchIdea(req.param('id'), onSuccessReturnResults(res), errorHandler(res));
 });
@@ -107,7 +111,7 @@ app.use('/ideas/id/:id/votingResult', bodyParser.text({
 	limit: '1kb'
 }));
 app.put('/ideas/id/:id/votingResult', function(req, res, next) {
-	apexClient.vote(req.param('id'), determineUser(req),req.body, onSuccessReturnResults(res), errorHandler(res));
+	apexClient.vote(req.param('id'), determineUser(req), req.body, onSuccessReturnResults(res), errorHandler(res));
 });
 app.post('/ideas/id/:id/operations/voteYes', function(req, res, next) {
 	apexClient.voteYes(req.param('id'), determineUser(req), onSuccessReturnResults(res), errorHandler(res));
