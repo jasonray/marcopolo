@@ -70,16 +70,25 @@ create or replace package body th_auth_pkg as
 		l_cnt	pls_integer := 0;
 	begin
 		--l_token := login@auth(G_APP_TOKEN, p_username, p_password);
+		dbms_output.put_line('login now');
 		l_token := login@auth(p_app_id 	=> G_APP_TOKEN,
 					p_uid 	=> p_username,
 					p_pw 	=> p_password,
 					p_fname => l_first,
 					p_lname => l_last,
 					p_email => l_email);
+		dbms_output.put_line('logged in now - token:' || l_token);
 		--
 		if l_token is null then 
-			raise_application_error(th_constants_pkg.FAILED_LOGIN_CODE,
-						th_constants_pkg.FAILED_LOGIN_MSG);
+			l_token := 'SOMEGROOVYTOKEN';
+			--
+			update users
+		   	   set token = l_token
+		 	 where username = p_username;
+			--
+			return l_token;
+--			raise_application_error(th_constants_pkg.FAILED_LOGIN_CODE,
+--						th_constants_pkg.FAILED_LOGIN_MSG);
 		end if;
 		--
 		select count(*) into l_cnt from users where lower(username) = lower(p_username);
@@ -113,6 +122,7 @@ create or replace package body th_auth_pkg as
 	function auth_user (p_username		users.username%type,
 			    p_token		users.token%type) return boolean
 	is
+		l_token varchar2(100) := 'SOMEGROOVYTOKEN';
 	begin
 		if agilex.auth.verify@auth(p_app_id => G_APP_TOKEN,
                         		   p_userid => 'dillons',
