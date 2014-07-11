@@ -62,7 +62,6 @@ define(function(require, exports, module) {
         sequentialLayout.sequenceFrom(this.inputs);
 
         this.add(layoutModifier).add(sequentialLayout);
-        this.usernameInput.focus();
     }
 
     function _createBackground() {
@@ -85,7 +84,7 @@ define(function(require, exports, module) {
         this.add(formModifier).add(this.backgroundSurface);
     }
     function _createInputs() {
-        var buttonView = new View();
+        this.buttonView = new View();
         var oneView = new View();
         var twoView = new View();
         this.usernameInput = new InputSurface({
@@ -106,6 +105,15 @@ define(function(require, exports, module) {
             type: 'password',
             properties: {
                 zIndex: this.options.zIndex
+            }
+        });
+        this.errorSurface = new Surface({
+            size: this.options.inputs.size,
+            content: 'Try Again!',
+            properties: {
+                zIndex: this.options.zIndex+1,
+                color: 'white',
+                paddingTop: '15px'
             }
         });
         
@@ -134,10 +142,10 @@ define(function(require, exports, module) {
         
         oneView.add(this.usernameInput);
         twoView.add(this.passwordInput);
-        buttonView.add(submitModifier).add(this.submitSurface);
+        this.buttonView.add(submitModifier).add(this.submitSurface);
         this.inputs.push(oneView);
         this.inputs.push(twoView);
-        this.inputs.push(buttonView); 
+        this.inputs.push(this.buttonView); 
     }
 
     function _setListeners() {
@@ -150,6 +158,11 @@ define(function(require, exports, module) {
                 success: function(resp){
                     resp.submit();
                     that._eventOutput.emit('login:close');
+                },
+                error: function(){
+                    that.buttonView.add(that.errorSurface);
+                    that.usernameInput.focus();
+                    that.passwordInput.setValue('');
                 },
                 url: env + '/login?user='+auth.username+'&pw='+auth.password
             });
