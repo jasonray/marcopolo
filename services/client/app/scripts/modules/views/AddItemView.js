@@ -58,6 +58,7 @@ define(function(require, exports, module) {
         sequentialLayout.sequenceFrom(this.inputs);
 
         this.add(layoutModifier).add(sequentialLayout);
+
     }
 
     function _createBackground() {
@@ -81,10 +82,21 @@ define(function(require, exports, module) {
         var buttonView = new View();
         var oneView = new View();
         var twoView = new View();
+        var threeView = new View();
         this.summaryInput = new InputSurface({
             size: this.options.inputs.size,
             name: 'input-summary',
             placeholder: 'Type idea here',
+            value: '',
+            type: 'text',
+            properties: {
+                zIndex: this.options.zIndex
+            }
+        });
+        this.tagsInput = new InputSurface({
+            size: this.options.inputs.size,
+            name: 'input-tags',
+            placeholder: 'Add a tag',
             value: '',
             type: 'text',
             properties: {
@@ -144,10 +156,12 @@ define(function(require, exports, module) {
         });
         oneView.add(this.summaryInput);
         twoView.add(this.descriptionInput);
+        threeView.add(this.tagsInput);
         buttonView.add(submitModifier).add(this.submitSurface);
         buttonView.add(cancelModifier).add(this.cancelSurface);
         this.inputs.push(oneView);
         this.inputs.push(twoView);
+        this.inputs.push(threeView);
         this.inputs.push(buttonView); 
     }
 
@@ -155,7 +169,7 @@ define(function(require, exports, module) {
         this.submitSurface.on("click", function(){
             this.newIdea = {comments:''};
             this.newIdea.short_description = this.summaryInput.getValue();
-            this.newIdea.long_description = this.descriptionInput.getValue();
+            this.newIdea.description = this.descriptionInput.getValue();
             this._eventOutput.emit('newFeed:add', this.newIdea);
             this.descriptionInput.setValue('');
         }.bind(this));
@@ -163,6 +177,53 @@ define(function(require, exports, module) {
             this._eventOutput.emit('newFeed:close');
         }.bind(this));
     }
+    AddItemView.prototype.setContent = function() {
+        this.contentSurface.setContent(template.call(this));
+    };
+    var template = function() {
+        return '<form class="form-horizontal"> \
+            <fieldset> \
+                <!-- Form Name --> \
+                <legend>New Idea!</legend> \
+                <!-- Text input--> \
+                <div class="form-group"> \
+                    <label class="col-md-4 control-label" for="short_description">Summary</label> \
+                    <div class="col-md-5"> \
+                        <input id="short_description" name="short_description" type="text" placeholder="Type idea here" class="form-control input-md" required=""> \
+                        <span class="help-block">Keep it succint!</span> \
+                    </div> \
+                </div> \
+                <!-- Textarea --> \
+                <div class="form-group"> \
+                    <label class="col-md-4 control-label" for="long_description">Description</label> \
+                    <div class="col-md-4"> \
+                        <textarea class="form-control" id="long_description" name="description"></textarea> \
+                    </div> \
+                </div> \
+                <!-- Select Basic --> \
+                <div class="form-group"> \
+                  <label class="col-md-4 control-label" for="ideaDuration">Duration</label> \
+                  <div class="col-md-5"> \
+                    <select id="ideaDuration" name="ideaDuration" class="form-control"> \
+                      <option value="1209600000">Month</option> \
+                      <option value="302400000">Week</option> \
+                      <option value="43200000">Day</option> \
+                      <option value="3600000">Hour</option> \
+                    </select> \
+                  </div> \
+                </div> \
+                <!-- Button (Double) --> \
+                <div class="form-group"> \
+                  <label class="col-md-4 control-label" for="newIdeaCancel"></label> \
+                  <div class="col-md-8"> \
+                    <button id="newIdeaCancel" name="newIdeaCancel" class="btn btn-default">Cancel</button> \
+                    <button id="newIdeaSubmit" name="newIdeaSubmit" class="btn btn-primary">Submit</button> \
+                  </div> \
+                </div> \
+            </fieldset> \
+        </form>';        
+    };
+
 
     module.exports = AddItemView;
 });
