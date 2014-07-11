@@ -90,12 +90,12 @@ Dane McAuley <Dane.McAuley@agilex.com>
 
 
 -- insert tags
-insert into tags (tag, owner) values ('#social', 'dillons');
-insert into tags (tag, owner) values ('#food', 'dillons');
-insert into tags (tag, owner) values ('#agilex', 'dillons');
-insert into tags (tag, owner) values ('#interns', 'dillons');
-insert into tags (tag, owner) values ('#node', 'dillons');
-insert into tags (tag, owner) values ('#compensation', 'dillons');
+insert into tags (tag, owner) values ('social', 'dillons');
+insert into tags (tag, owner) values ('food', 'dillons');
+insert into tags (tag, owner) values ('agilex', 'dillons');
+insert into tags (tag, owner) values ('interns', 'dillons');
+insert into tags (tag, owner) values ('node', 'dillons');
+insert into tags (tag, owner) values ('compensation', 'dillons');
 
 
 -- insert topics
@@ -120,19 +120,19 @@ begin
                                    p_owner => 'cushingb',
                                    p_description => null,
                                    p_topic_id => l_t,
-                                   p_tags => '#social #agilex');
+                                   p_tags => 'social agilex');
 
   l_i := th_ideas_pkg.create_idea (p_short_desc => 'Friday afternoons are a great day for happy hours!',
                                    p_owner => 'sancheza',
                                    p_description => null,
                                    p_topic_id => l_t,
-                                   p_tags => '#social #agilex');
+                                   p_tags => 'social agilex');
 
   l_i := th_ideas_pkg.create_idea (p_short_desc => 'We should have hackathons on Friday afternoons w/ Node as a theme.',
                                    p_owner => 'rayj',
                                    p_description => null,
                                    p_topic_id => l_t,
-                                   p_tags => '#social #agilex #node');
+                                   p_tags => 'social agilex node');
 
 end;
 /
@@ -146,8 +146,8 @@ insert into ideas (short_desc, owner, available)
 insert into ideas (short_desc, owner, available) 
 	values ('Foosball should be a required activity during the day.', 'cushingb', sysdate-2);
 
-insert into idea_tags (idea_id, tag) values (1, '#social');
-insert into idea_tags (idea_id, tag) values (1, '#food');
+insert into idea_tags (idea_id, tag) values (1, 'social');
+insert into idea_tags (idea_id, tag) values (1, 'food');
 
 insert into ideas (id, short_desc, owner, available) 
 	values (2, 'I believe all NODE developers should get a raise.', 'rayj', sysdate-10);
@@ -156,9 +156,9 @@ insert into ideas (short_desc, owner, available)
 insert into ideas (short_desc, owner, available) 
 	values ('How about we get together for carrot cake on Thursday mornings?', 'rayj', sysdate-1);
 
-insert into idea_tags (idea_id, tag) values (2, '#agilex');
-insert into idea_tags (idea_id, tag) values (2, '#node');
-insert into idea_tags (idea_id, tag) values (2, '#compensation');
+insert into idea_tags (idea_id, tag) values (2, 'agilex');
+insert into idea_tags (idea_id, tag) values (2, 'node');
+insert into idea_tags (idea_id, tag) values (2, 'compensation');
 
 insert into ideas (id, short_desc, owner, available) 
 	values (3, 'I believe all scrum masters should get a raise.', 'sancheza', sysdate-6);
@@ -173,7 +173,7 @@ insert into ideas (id, short_desc, owner, available)
 insert into ideas (id, short_desc, owner, available) 
 	values (999, 'This is a testing idea', 'dillons', sysdate);
 
-insert into idea_tags (idea_id, tag) values (3, '#agilex');
+insert into idea_tags (idea_id, tag) values (3, 'agilex');
 
 -- insert comments
 --	I'm sure there's a way to dynamically get the values from the rows above from ideas entered, but I'm hard coding
