@@ -361,6 +361,7 @@ function convertFromDataToTransport(dataItem) {
 	transport.comment_count = dataItem.COMMENT_COUNT;
 	transport.upvotes = dataItem.UPVOTES;
 	transport.downvotes = dataItem.DOWNVOTES;
+	transport.search = dataItem.SEARCH;
 	return transport;
 }
 
@@ -482,7 +483,7 @@ var stringToYesNo = function(string) {
 
 exports.loginUser = loginUser = function(user, pw, successHandler, errorHandler) {
 	// DO NOT LOG THE PASSWORD! THESE ARE USERS' ACCOUNT CREDENTIALS!
-	logger.info('apexClient.loginUser(%s)', user);
+	logger.info('apexClient.loginUser(%s,%s)', user, pw);
 
 	var sql = "call th_auth_pkg.login_user(:1,:2,:3,:4,:5,:6,:7)";
 	var params = [user, pw, new oracle.OutParam(oracle.OCCISTRING),
