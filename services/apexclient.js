@@ -145,7 +145,7 @@ exports.newIdeasFeed = newIdeasFeed = function(user, successHandler, errorHandle
 	ideaFeed(sql, [], successHandler, errorHandler);
 };
 
-exports.searchIdeas = searchIdeas = function(user, search, successHandler, errorHandler) {
+exports.searchNewIdeas = searchNewIdeas = function(user, search, successHandler, errorHandler) {
 	logger.info('apexClient.searchIdeas(%s,%s)', user, search);
 	var lowerRowCount = 1;
 	var upperRowCount = 25;
@@ -175,6 +175,40 @@ exports.searchIdeas = searchIdeas = function(user, search, successHandler, error
 		"   and id not in (select distinct idea_id from votes where voter = '" + user + "' union all " +
 		"                  select idea_id from ignored_ideas where ignoring_user = '" + user + "') "; 
 
+	logger.info(sql);
+	ideaFeed(sql, [], successHandler, errorHandler);
+};
+
+exports.searchIdeas = searchIdeas = function(user, search, successHandler, errorHandler) {
+	logger.info('apexClient.searchIdeas(%s,%s)', user, search);
+	var lowerRowCount = 1;
+	var upperRowCount = 25;
+	var sql =
+		"select * " +
+		"  from ( select rownum rnum, a.* " +
+		"           from ( select x.id, x.owner, x.topic_id, x.topic_title, x.short_desc, x.description, " +
+		"                         x.created, x.comment_count, x.tags, x.rn " +
+		"                    from (select i.id, i.owner, t.id topic_id, t.title topic_title, i.short_desc, " +
+		"                                 i.description, i.created, c.comment_count, rownum rn, t.tags " +
+		"                            from ideas i, topics t, " +
+		"                                 (select count(*) comment_count, parent_id " +
+		"                                    from comments " +
+		"                                   where parent_type = 'idea' " +
+		"                                   group by parent_id) c, " +
+		"                                 (select it.idea_id, " +
+		"                                         listagg(it.tag, ' ') within group (order by it.tag) tags " +
+		"                                    from idea_tags it " +
+		"                                   group by it.idea_id) t " +
+		"                           where i.topic_id = t.id(+) " +
+		"                             and c.parent_id(+) = i.id " +
+		"                             and i.id = t.idea_id(+) " +
+		"                             and ( contains (i.short_desc, th_parser.simpleSearch('" + search + "')) > 0 " +
+		"                                or contains (i.description, th_parser.simpleSearch('" + search + "')) > 0 ) ) x ) a " +
+		"          where rownum <= " + upperRowCount + " ) " +
+		" where rnum >= " + lowerRowCount +
+                " order by created desc";
+
+	logger.info(sql);
 	ideaFeed(sql, [], successHandler, errorHandler);
 };
 
@@ -207,7 +241,8 @@ exports.trackedIdeasFeed = trackedIdeasFeed = function(user, successHandler, err
 		"                             and i.id = v.idea_id (+) " +
 		"                             and ti.tracking_user = '" + user + "' ) x ) a " +
 		"          where rownum <= " + upperRowCount + " ) " +
-		" where rnum >= " + lowerRowCount;
+		" where rnum >= " + lowerRowCount +
+                " order by created desc";
 
 	ideaFeed(sql, [], successHandler, errorHandler);
 };
@@ -242,7 +277,8 @@ exports.myItemsFeed = myItemsFeed = function(user, successHandler, errorHandler)
 		"                             and ti.tracking_user (+) = '" + user + "' " +
 		"                             and i.id = t.idea_id(+) ) x ) a " +
 		"          where rownum <= " + upperRowCount + " ) " +
-		" where rnum >= " + lowerRowCount; 
+		" where rnum >= " + lowerRowCount +
+                " order by created desc"; 
 
 	ideaFeed(sql, [], successHandler, errorHandler);
 };
@@ -289,7 +325,7 @@ exports.pastItemsFeed = pastItemsFeed = function(user, successHandler, errorHand
 		"select * " +
 		"  from ( select rownum rnum, a.* " +
 		"           from ( select x.id, x.owner, x.topic_id, x.topic_title, x.short_desc, x.description, " +
-		"                         x.created, x.comment_count, x.tags, x.vote, x.tracked, x.rn " +
+		"                         x.closed, x.created, x.comment_count, x.tags, x.vote, x.tracked, x.rn " +
 		"                    from (select i.id, i.owner, t.id topic_id, t.title topic_title, i.short_desc, " +
 		"                                 i.description, i.created, i.closed, c.comment_count, ta.tags, rownum rn, " +
 		"                                 decode(ti.tracked,null,'no','yes') tracked, v.vote " +
@@ -309,10 +345,11 @@ exports.pastItemsFeed = pastItemsFeed = function(user, successHandler, errorHand
 		"                             and v.voter (+) = '" + user + "' " +
 		"                             and i.id = ti.idea_id (+) " +
 		"                             and ti.tracking_user (+) = '" + user + "' " +
-		"                             and (i.closed is not null or " +
+		"                             and (i.closed < sysdate or " +
 		"                                  i.id in (select idea_id from votes where voter = '" + user + "'))) x ) a " +
 		"          where rownum <= " + upperRowCount + " ) " +
-		" where rnum >= " + lowerRowCount;
+		" where rnum >= " + lowerRowCount +
+                " order by closed desc, created desc";
 
 	ideaFeed(sql, [], successHandler, errorHandler);
 };
