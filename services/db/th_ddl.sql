@@ -11,6 +11,13 @@ drop table ideas;
 drop table topics;
 drop table users;
 drop sequence ideas_seq;
+drop database link auth;
+
+
+create public database link auth
+connect to auth
+identified by auth 
+using 'apps';
 
 
 create sequence ideas_seq start with 100;
@@ -20,6 +27,7 @@ create table users (
 	username	varchar2(200) not null,	-- unique id for user
 	first_name	varchar2(100),
 	last_name	varchar2(100),
+	token		varchar2(200), -- used for agilex AD authentication
 	email		varchar2(100)
 );
 
@@ -35,7 +43,7 @@ create table topics (
 	description	clob,				-- description of the topic
 	owner		varchar2(200) 	not null,	-- created by
 	created		date 		not null,	-- created date
-	duration	varchar2(30)	not null,	-- how long should the topic be available?
+	duration	varchar2(30)	default 'quarter',	-- how long should the topic be available?
 	last_edited	date		not null,	-- last edited date
 	last_edited_by	varchar2(200) 	not null,	-- who was the last user to edit this topic
 	closed		date,				-- when this topic is closed for voting
@@ -66,7 +74,7 @@ create table ideas (
 	description	clob,
 	owner		varchar2(200)	not null,
 	created		date		not null,	-- when was this idea created 
-	duration	varchar2(30)	not null,	-- how long should the idea be available?
+	duration	varchar2(30)	default 'month',	-- how long should the idea be available?
 	last_edited_by	varchar2(200)	not null,	-- who was the last user to edit the idea
 	last_edited	date		not null,	-- when was the last time this idea was edited
 	available	date,				-- when is/was this idea open for voting
@@ -200,7 +208,9 @@ create table suspension_requests (
 	parent_id	number		not null,
 	parent_type	varchar2(40)	not null,
 	suspender	varchar2(200)	not null,
-	suspended_date	date
+	suspended_date	date,
+	overridden_by	varchar2(200),
+	overridden      date
 );
 
 
@@ -250,7 +260,8 @@ references users;
 
 create table ignored_ideas (
 	idea_id		number,
-	ignoring_user	varchar2(200)
+	ignoring_user	varchar2(200),
+	ignored		date
 );
 
 alter table ignored_ideas

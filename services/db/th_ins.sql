@@ -6,9 +6,15 @@
 @th_comments_pkg.sql
 @th_topics_pkg.sql
 @th_ideas_pkg.sql
+@th_views.sql
+@th_acl.sql
+@th_auth_pkg.sql
 
 -- insert sample data
 @th_data.sql
+
+-- build text indexes
+@th_context
 
 -- perform unit testing
 --@ut_th_ideas_pks.sql

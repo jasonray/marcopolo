@@ -253,6 +253,8 @@ create or replace package body th_ideas_pkg as
 	procedure suspend_idea (p_id		ideas.id%type,
 			p_suspender		users.username%type)
 	is
+		l_cnt number;
+		l_now date := sysdate;
 	begin
 		if (p_id is null) then
 			raise_application_error(th_constants_pkg.NO_ID_CODE,
@@ -262,15 +264,20 @@ create or replace package body th_ideas_pkg as
 						th_constants_pkg.NO_SUSPENDER_MSG);
 		end if;
 		--
-		update ideas
-		   set suspended = sysdate,
-		       suspended_by = p_suspender,
-		       last_edited_by = p_suspender
-		 where id = p_id;
+		insert into suspension_requests (parent_id, parent_type, suspender, suspended_date)
+		values (p_id, 'idea', p_suspender, l_now);
 		--
-		if SQL%ROWCOUNT = 0 then
-			-- TODO: log tried to revoke an idea that doesn't exist
-			null;
+		select count(*) into l_cnt
+		  from suspension_requests
+		 where parent_type = 'idea'
+		   and parent_id = p_id
+		   and overridden is null;
+		-- 
+		if l_cnt >= 2 then
+			update ideas
+			   set revoked = l_now,
+                               revoked_by = p_suspender
+			 where id = p_id;
 		end if;
 	end;
 
@@ -464,7 +471,7 @@ create or replace package body th_ideas_pkg as
 	procedure reset_idea (p_id		ideas.id%type)
 	is
 		l_created date;
-		l_duration number(4,2) := 30;
+		l_duration number := 30;
 	begin
 		delete from comments
 		 where parent_type = 'idea'

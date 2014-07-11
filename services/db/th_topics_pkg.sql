@@ -121,7 +121,7 @@ create or replace package body th_topics_pkg as
 	is
 		l_id		topics.id%type;
 		l_now		date	:= sysdate;
-		l_duration	number(4,2);
+		l_duration	number;
 	begin
 		if (p_title is null or length(p_title) > th_constants_pkg.G_TITLE_MAXLEN) then
 			raise_application_error(th_constants_pkg.NO_TITLE_CODE,

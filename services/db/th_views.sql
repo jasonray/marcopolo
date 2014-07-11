@@ -34,9 +34,8 @@ select *
                                          listagg(it.tag, ' ') within group (order by it.tagged) tags
                                     from idea_tags it
                                    group by it.idea_id) t
-                           where c.parent_id = i.id
-                             and i.id = t.idea_id
-                             and v.idea_id (+) = i.id ) x ) a
+                           where c.parent_id (+) = i.id
+                             and i.id = t.idea_id (+) ) x ) a
           where rownum <= 4 )
  where rnum >= 2;
 

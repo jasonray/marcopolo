@@ -32,6 +32,11 @@ create or replace package th_constants_pkg as
 	NO_CREATOR_MSG varchar2(100) := 'EXCEPTION: Invalid or null user specified as the creator of this object';
 	PRAGMA EXCEPTION_INIT(NO_CREATOR_EXCEPTION, -20004);
 
+	FAILED_LOGIN_EXCEPTION exception;
+	FAILED_LOGIN_CODE number := -20005;
+	FAILED_LOGIN_MSG varchar2(100) := 'EXCEPTION: Invalid or null username specified. Login failed';
+	PRAGMA EXCEPTION_INIT(FAILED_LOGIN_EXCEPTION, -20005);
+
 
 	---------------------------------------------
 	-- TOPIC RELATED EXCEPTIONS : -20100..-20199

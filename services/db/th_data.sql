@@ -1,8 +1,92 @@
 -- insert users
 insert into users (username, first_name, last_name, email) values ('dillons', 'Sean', 'Dillon', 'sean.dillon@agilex.com');
-insert into users (username) values ('cushingb');
-insert into users (username, first_name, last_name) values ('rayj', 'Jason', 'Ray');
-insert into users (username, first_name, last_name) values ('sancheza', 'Analisa', 'Sanchez');
+insert into users (username, first_name, last_name, email) values ('cushingb', 'Ben', 'Cushing', 'ben.cushing@agilex.com');
+insert into users (username, first_name, last_name, email) values ('rayj', 'Jason', 'Ray', 'jason.ray@agilex.com');
+insert into users (username, first_name, last_name, email) values ('sancheza', 'Analisa', 'Sanchez', 'analisa.sanchez@agilex.com');
+insert into users (username, first_name, last_name, email) values ('dashtarm', 'Mitra', 'Dashtaray', 'mitra.dashtaray@agilex.com');
+insert into users (username, first_name, last_name, email) values ('reevesm', 'Matt', 'Reeves', 'matt.reeves@agilex.com');
+insert into users (username, first_name, last_name, email) values ('liddella', 'Afton', 'Liddell', 'afton.lidell@agilex.com');
+insert into users (username, first_name, last_name, email) values ('brendelk', 'Kevin', 'Brendel', 'kevin.brendel@agilex.com');
+insert into users (username, first_name, last_name, email) values ('walkerb', 'Brynn', 'Walker', 'brynn.walker@agilex.com');
+insert into users (username, first_name, last_name, email) values ('bittmanm', 'Mark', 'Bittmann', 'mark.bittmann@agilex.com');
+insert into users (username, first_name, last_name, email) values ('osteenj', 'Jenna', 'O''Steen', 'jenna.osteen@agilex.com');
+insert into users (username, first_name, last_name, email) values ('scottc', 'Carole', 'Scott', 'carole.scott@agilex.com');
+insert into users (username, first_name, last_name, email) values ('entisi', 'Ira', 'Entis', 'ira.entis@agilex.com');
+insert into users (username, first_name, last_name, email) values ('gallj', 'John', 'Gall', 'john.gall@agilex.com');
+
+/*
+Dane McAuley <Dane.McAuley@agilex.com>
+ Don Almeida <Don.Almeida@agilex.com>
+ Greg Roberts <Greg.Roberts@agilex.com>
+ Visu Patlolla <Visu.Patlolla@agilex.com>
+ Brad Barber <Brad.Barber@agilex.com>
+ Zach Alsgaard <Zach.Alsgaard@agilex.com>
+ Sean Kosanovich <Sean.Kosanovich@agilex.com>
+ Alisa Chen <Alisa.Chen@agilex.com>
+ Jose Weeks <Jose.Weeks@agilex.com>
+ Jeff Killingsworth <Jeff.Killingsworth@agilex.com>
+ Jamie Sweetland <Jamie.Sweetland@agilex.com>
+ Hau Mai <Hau.Mai@agilex.com>
+ Cesar Santiago <Cesar.Santiago@agilex.com>
+ Doug Kurucz <Doug.Kurucz@agilex.com>
+ Doug Wheat <Doug.Wheat@agilex.com>
+ Srinath Godavarthi <Srinath.Godavarthi@agilex.com>
+ Steve Kirsch <Steve.Kirsch@agilex.com>
+ Rachel Killingsworth <Rachel.Killingsworth@agilex.com>
+ Kevin Worth <Kevin.Worth@agilex.com>
+ Isaac Baquera <Isaac.Baquera@agilex.com>
+ Destie Provenzano <Destie.Provenzano@agilex.com>
+ Stephanie Kao <Stephanie.Kao@agilex.com>
+ Richard Xie <Richard.Xie@agilex.com>
+ Jason Gunnink <Jason.Gunnink@agilex.com>
+ David Knowlton <David.Knowlton@agilex.com>
+ Ben Cushing <Ben.Cushing@agilex.com>
+ Analisa Sanchez <analisa.sanchez@agilex.com>
+ Sean Dillon <Sean.Dillon@agilex.com>
+ Jason Ray <Jason.Ray@agilex.com>
+ Vinay Doma <Vinay.Doma@agilex.com>
+ Linda Sloan <Linda.Sloan@agilex.com>
+ Karthikeyan Kandasamy <Karthikeyan.Kandasamy@agilex.com>
+ Beth Adams <Beth.Adams@agilex.com>
+ Ranveer Kalwanth <Ranveer.Kalwanth@agilex.com>
+ James Robertson <James.Robertson@agilex.com>
+ Sean Moran <Sean.Moran@agilex.com>
+ James Dressel <James.Dressel@agilex.com>
+ Jackson Phillips <Jackson.Phillips@agilex.com>
+ Michael Graf <Michael.Graf@agilex.com>
+ Abdullah Sahyouni <Abdullah.Sahyouni@agilex.com>
+ Ariel Cohen <Ariel.Cohen@agilex.com>
+ Ankit Agarwal <Ankit.Agarwal@agilex.com>
+ Melissa Von Wald <Melissa.VonWald@agilex.com>
+ Karan Bhatia <Karan.Bhatia@agilex.com>
+ Alex Hackman <Alex.Hackman@agilex.com>
+ Kyle Berger <Kyle.Berger@agilex.com>
+ Evan Althouse <Evan.Althouse@agilex.com>
+ David Tran <David.Tran@agilex.com>
+ Britton Vermaaten <Britton.Vermaaten@agilex.com>
+ Bryan Kim <Bryan.Kim@agilex.com>
+ Jeff Kopra <Jeff.Kopra@agilex.com>
+ Claire Ryberg <Claire.Ryberg@agilex.com>
+ Soule Ayoub <Soule.Ayoub@agilex.com>
+ Ty Dang <Ty.Dang@agilex.com>
+ Max Craft <Max.Craft@agilex.com>
+ Sean Witte <Sean.Witte@agilex.com>
+ Erica Ruth <Erica.Ruth@agilex.com>
+ Melissa Von Wald <vonwaldm@gmail.com>
+ Mitra Dashtaray <ctr.mitra.dashtaray@l-3com.com>
+ afton.a.liddell@cbp.dhs.gov" <afton.a.liddell@cbp.dhs.gov>
+ Matt Reeves <Matt.Reeves@agilex.com>
+ Kevin Brendel <Kevin.Brendel@agilex.com>
+ Brynn Walker <Brynn.Walker@agilex.com>
+ Jenna O'Steen <Jenna.Osteen@agilex.com>
+ Afton Liddell <Afton.Liddell@agilex.com>
+ Carole Scott <carole.scott@agilex.com>
+ Ira Entis <Ira.Entis@agilex.com>
+ Mark Bittmann <Mark.Bittmann@agilex.com>
+ John Gall <John.Gall@agilex.com>
+ Thuc Nguyen <Thuc.Nguyen@agilex.com>
+*/
+
 
 
 -- insert tags
